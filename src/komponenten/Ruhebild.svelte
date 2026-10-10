@@ -121,6 +121,7 @@
   .inhalt {
     position: absolute;
     inset: 0;
+    pointer-events: none;
     display: flex;
     flex-direction: column;
     justify-content: space-between;

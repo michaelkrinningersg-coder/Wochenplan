@@ -64,3 +64,11 @@ export function dreiDinge(jz: Jahreszeit, start: number) {
   const l = TYPISCH[jz]
   return [0, 1, 2].map((i) => l[(start + i) % l.length])
 }
+
+/** Bildschirm-Positionen (in %) von Baum, Dach und Boden im Jahreszeiten-Bild */
+export interface Orte {
+  krone: { x: number; y: number }
+  stamm: { x: number; y: number }
+  dach: { x: number; y: number }[]
+  boden: [number, number]
+}

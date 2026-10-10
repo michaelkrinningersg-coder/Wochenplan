@@ -286,6 +286,8 @@
     if (warAktiv && app.ansicht.art !== 'aufgabe') oeffnen({ art: 'tag', tag: heuteTag() })
   }
   function bedient(e: Event) {
+    // Antippen einer Überraschung im Ruhebild: nur spielen, nicht aufwachen
+    if (ruheAktiv && e.type === 'pointerdown' && (e.target as Element | null)?.closest?.('[data-spiel]')) return
     if (ruheAktiv) {
       // die Taste/der Tipp weckt nur auf und löst sonst nichts aus
       e.preventDefault()
@@ -328,7 +330,11 @@
   onpointerdown={tonFreischalten}
   onkeydowncapture={bedient}
   onpointerdowncapture={bedient}
-  onpointermove={() => (letzteAktivitaet = Date.now())}
+  onpointermove={(e) => {
+    // Maus/Finger über einer Überraschung im Ruhebild: nicht aufwachen (sonst kann man sie nicht antippen)
+    if (ruheAktiv && (e.target as Element | null)?.closest?.('[data-spiel]')) return
+    letzteAktivitaet = Date.now()
+  }}
   onwheel={() => (letzteAktivitaet = Date.now())}
 />
 

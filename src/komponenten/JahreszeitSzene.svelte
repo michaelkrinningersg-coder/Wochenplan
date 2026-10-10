@@ -1,7 +1,7 @@
 <script lang="ts">
   // Gemalte Landschaft je Jahreszeit (SVG + CSS): Himmel, Hügel, Baum, fallende Blätter/Schnee/Blüten.
   // Nachts dunkler Himmel mit Mond und Sternen.
-  import type { Jahreszeit } from '../lib/jahreszeit'
+  import type { Jahreszeit, Orte } from '../lib/jahreszeit'
   import SzenenEreignisse from './SzenenEreignisse.svelte'
 
   let { jz, nacht = false }: { jz: Jahreszeit; nacht?: boolean } = $props()
@@ -17,6 +17,22 @@
   // hochkant: Baum und Haus in die sichtbare Mitte rücken (das Bild wird seitlich beschnitten)
   const hoch = $derived(hoehe > breite)
   const f = $derived(FARBEN[jz])
+  // Lage von Baum, Haus und Boden auf dem Bildschirm (Bild 160×90, „slice“ = füllt und beschneidet)
+  const baumDx = $derived(hoch ? 30 : 0)
+  const hausX = $derived(hoch ? 82 : 110)
+  const orte = $derived.by((): Orte => {
+    const s = Math.max(breite / 160, hoehe / 90)
+    const ox = (breite - 160 * s) / 2
+    const oy = (hoehe - 90 * s) / 2
+    const p = (x: number, y: number) => ({ x: ((ox + x * s) / breite) * 100, y: ((oy + y * s) / hoehe) * 100 })
+    return {
+      krone: p(40 + baumDx, 38),
+      stamm: p(40 + baumDx, 56),
+      dach: [p(hausX - 2, 61), p(hausX + 9, 52), p(hausX + 20, 61)],
+      // oberhalb der drei Karten (quer ca. 74 % vom unteren Rand belegt, hochkant ca. 80 %)
+      boden: hoch ? [68, 74] : [62, 68],
+    }
+  })
   const himmel = $derived<[string, string]>(nacht ? ['#13204a', '#3a4f86'] : f.himmel)
 
   // svelte-ignore state_referenced_locally
@@ -86,7 +102,7 @@
     {/if}
   </svg>
 
-  <SzenenEreignisse {jz} />
+  <SzenenEreignisse {jz} {orte} />
 
   {#if f.teilchen.length}
     <div class="teilchen" class:schnee={jz === 'winter'}>
@@ -106,6 +122,7 @@
     overflow: hidden;
   }
   svg {
+    pointer-events: none;
     position: absolute;
     inset: 0;
     width: 100%;
@@ -119,6 +136,11 @@
   }
   .sonne {
     animation: leuchten 6s ease-in-out infinite alternate;
+  }
+.teilchen {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
   }
   .teilchen span {
     position: absolute;
