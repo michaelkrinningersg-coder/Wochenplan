@@ -2,7 +2,6 @@
   // Gemalte Landschaft je Jahreszeit (SVG + CSS): Himmel, Hügel, Baum, fallende Blätter/Schnee/Blüten.
   // Nachts dunkler Himmel mit Mond und Sternen.
   import type { Jahreszeit, Orte } from '../lib/jahreszeit'
-  import SzenenEreignisse from './SzenenEreignisse.svelte'
 
   import type { WetterArt } from '../lib/wetter.svelte'
 
@@ -107,7 +106,6 @@
     {/if}
   </svg>
 
-  <SzenenEreignisse {jz} {orte} />
 
   {#if wetterArt === 'wolkig' || wetterArt === 'regen' || wetterArt === 'gewitter' || wetterArt === 'schnee'}
     <div class="wetter-wolken" class:dunkel={wetterArt === 'gewitter'}>
