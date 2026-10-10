@@ -20,10 +20,7 @@ function a(titel: string, bild: string, minuten: number, zusatz?: string): Aufga
 export const KIND_FARBEN = ['#2a7fb8', '#3b8f32', '#d6634a', '#7a5cc4', '#b98a00', '#c2417a']
 
 export function standardKinder(): Kind[] {
-  return [
-    { id: 'k1', name: 'Kind 1', farbe: KIND_FARBEN[0] },
-    { id: 'k2', name: 'Kind 2', farbe: KIND_FARBEN[1] },
-  ]
+  return [{ id: 'k1', name: 'Kind 1', farbe: KIND_FARBEN[0] }]
 }
 
 /** Werktag (Mo–Fr): Kita bis zum Nachmittag, danach Spielzeit */
@@ -106,7 +103,8 @@ const UHR = /^\d{1,2}:\d{2}$/
 
 function aufgabeNormalisieren(x: Record<string, unknown>): Aufgabe | null {
   if (!x || typeof x !== 'object' || typeof x.titel !== 'string') return null
-  const fuer = Array.isArray(x.fuer) ? (x.fuer.filter((k) => k === 'k1' || k === 'k2') as KindId[]) : []
+  // Nur noch ein Kind: Zuordnung „für wen“ entfällt
+  const fuer: KindId[] = []
   const modus = x.fotoModus === 'foto' || x.fotoModus === 'wechsel' ? x.fotoModus : undefined
   return {
     id: typeof x.id === 'string' && x.id ? x.id : neueId(),
@@ -150,12 +148,7 @@ export function planNormalisieren(roh: unknown): Plan {
   const abendEnde = typeof p.abendEnde === 'string' && UHR.test(p.abendEnde) ? p.abendEnde : basis.abendEnde
   const kinder = standardKinder().map((k) => {
     const g = Array.isArray(p.kinder) ? p.kinder.find((x) => x && x.id === k.id) : undefined
-    return {
-      id: k.id,
-      name: typeof g?.name === 'string' && g.name.trim() ? g.name.trim().slice(0, 30) : k.name,
-      farbe: typeof g?.farbe === 'string' && /^#[0-9a-f]{6}$/i.test(g.farbe) ? g.farbe : k.farbe,
-      ...(typeof g?.geburtstag === 'string' && DATUM.test(g.geburtstag) ? { geburtstag: g.geburtstag } : {}),
-    }
+    return { id: k.id, name: k.name, farbe: typeof g?.farbe === 'string' && /^#[0-9a-f]{6}$/i.test(g.farbe) ? g.farbe : k.farbe }
   })
   const termine: Termin[] = Array.isArray(p.termine)
     ? p.termine

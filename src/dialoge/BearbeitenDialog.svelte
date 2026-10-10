@@ -58,10 +58,6 @@
     zuschnittQuelle = null
   }
 
-  function fuerSetzen(k: 'alle' | KindId) {
-    entwurf.fuer = k === 'alle' ? undefined : [k]
-  }
-
   function speichern() {
     const fertig: Aufgabe = { ...$state.snapshot(entwurf), titel: entwurf.titel.trim() || 'Aufgabe' }
     for (const f of ['zusatz', 'uhrzeit', 'bis', 'fuer', 'countdown', 'sternenregen', 'foto', 'fotoModus', 'wechselSek'] as const)
@@ -186,17 +182,6 @@
       </div>
 
       <div class="feld zwei">
-        <div>
-          <span class="name">Für</span>
-          <div class="reihe">
-            <button type="button" class="knopf klein" aria-pressed={!entwurf.fuer?.length} onclick={() => fuerSetzen('alle')}>Beide</button>
-            {#each app.plan.kinder as k (k.id)}
-              <button type="button" class="knopf klein kind" style="--kind: {k.farbe}" aria-pressed={entwurf.fuer?.length === 1 && entwurf.fuer[0] === k.id} onclick={() => fuerSetzen(k.id)}>
-                <span class="punkt"></span>{k.name}
-              </button>
-            {/each}
-          </div>
-        </div>
         <div>
           <span class="name">Countdown</span>
           <div class="reihe">
@@ -497,12 +482,6 @@
     max-width: 34em;
     color: var(--tinte-leise);
     font-size: var(--t-klein);
-  }
-  .kind .punkt {
-    width: 0.8em;
-    height: 0.8em;
-    border-radius: 50%;
-    background: var(--kind);
   }
   .name.zeile {
     align-self: center;

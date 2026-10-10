@@ -11,15 +11,16 @@
   import { dateiExportieren, istApp } from '../lib/geraet'
   import { ABSCHNITTE } from '../lib/konstanten'
   import { app, exportDaten, importDaten, zeigeHinweis } from '../lib/speicher.svelte'
-  import { KIND_FARBEN, neueId, startplan } from '../lib/startplan'
+  import { neueId, startplan } from '../lib/startplan'
   import { minutenVon } from '../lib/zeit'
   import { installieren, suchen, update, updateVerfuegbar } from '../lib/update.svelte'
 
   let zuruecksetzenFragen = $state(false)
+  let ruheUnter = $state<'wann' | 'bild'>('wann')
 
   // Reiter
   const REITER = [
-    { id: 'geraet', name: 'Gerät & Kinder' },
+    { id: 'geraet', name: 'Gerät' },
     { id: 'anzeige', name: 'Anzeige' },
     { id: 'sprache', name: 'Sprache' },
     { id: 'tag', name: 'Tagesablauf' },
@@ -159,6 +160,11 @@
   }
 </script>
 
+{#snippet schalter(wert: boolean, setze: (v: boolean) => void)}
+  <button class="knopf klein" aria-pressed={wert} onclick={() => setze(true)}>An</button>
+  <button class="knopf klein" aria-pressed={!wert} onclick={() => setze(false)}>Aus</button>
+{/snippet}
+
 <Fenster titel="Einstellungen" breit>
   <div class="einstellungen">
     <div class="reiter" role="tablist" aria-label="Bereiche der Einstellungen">
@@ -169,141 +175,128 @@
     {#if reiter === 'geraet'}
     <section>
       <h3>Dieses Gerät</h3>
-      <div class="reihe">
-        <button
-          class="knopf"
-          aria-pressed={e.rolle === 'planer'}
-          data-autofokus
-          onclick={() => {
-            e.rolle = 'planer'
-            aenderung()
-          }}>Planen (Handy, PC)</button
-        >
-        <button
-          class="knopf"
-          aria-pressed={e.rolle === 'anzeige'}
-          onclick={() => {
-            e.rolle = 'anzeige'
-            app.bearbeiten = false
-            aenderung()
-          }}>Nur anzeigen (Fernseher)</button
-        >
+      <div class="z">
+        <span class="zl">Aufgabe</span>
+        <div class="zr">
+          <button
+            class="knopf"
+            aria-pressed={e.rolle === 'planer'}
+            data-autofokus
+            onclick={() => {
+              e.rolle = 'planer'
+              aenderung()
+            }}>Planen (Handy, PC)</button
+          >
+          <button
+            class="knopf"
+            aria-pressed={e.rolle === 'anzeige'}
+            onclick={() => {
+              e.rolle = 'anzeige'
+              app.bearbeiten = false
+              aenderung()
+            }}>Nur anzeigen (Fernseher)</button
+          >
+        </div>
+        <p class="zh">
+          {#if e.rolle === 'planer'}
+            Hier wird der Plan bearbeitet. Jede Änderung wird verschlüsselt hochgeladen.
+          {:else}
+            Der Plan kommt vom Handy oder PC. Die App schaut alle 2 Minuten nach Änderungen.
+          {/if}
+        </p>
       </div>
-      <p class="hilfe">
-        {#if e.rolle === 'planer'}
-          Hier wird der Plan bearbeitet. Jede Änderung wird verschlüsselt hochgeladen.
-        {:else}
-          Der Plan kommt vom Handy oder PC. Die App schaut alle 2 Minuten nach Änderungen.
-        {/if}
-      </p>
-    </section>
-
-    <section>
-      <h3>Kinder</h3>
-      <div class="kinder">
-        {#each app.plan.kinder as k (k.id)}
-          <div class="kind-karte" style="--kind: {k.farbe}">
-            <label class="feld">
-              <span class="name">Name</span>
-              <input id="kind-name-{k.id}" type="text" bind:value={k.name} maxlength="30" autocomplete="off" />
-            </label>
-            <label class="feld">
-              <span class="name">Geburtstag</span>
-              <input id="kind-geburtstag-{k.id}" type="date" bind:value={k.geburtstag} />
-            </label>
-            <div class="feld">
-              <span class="name">Farbe</span>
-              <div class="farben">
-                {#each KIND_FARBEN as f (f)}
-                  <button class="farbe" style="--f: {f}" aria-pressed={k.farbe === f} aria-label="Farbe {f}" onclick={() => (k.farbe = f)}></button>
-                {/each}
-              </div>
-            </div>
-          </div>
-        {/each}
+      <div class="z">
+        <span class="zl">Bildschirm anlassen</span>
+        <div class="zr">{@render schalter(app.einst.wach, (v) => (app.einst.wach = v))}</div>
       </div>
-      <p class="hilfe">Namen und Geburtstage stehen nur im verschlüsselten Plan, nicht im öffentlichen Code.</p>
     </section>
     {:else if reiter === 'anzeige'}
     <section>
-      <h3>Darstellung</h3>
-      <p class="hilfe">Diese Einstellungen gelten für alle Geräte.</p>
-      <div class="reihe">
-        <button class="knopf" aria-pressed={app.einst.thema === 'auto'} onclick={() => (app.einst.thema = 'auto')}>Abends dunkel</button>
-        <button class="knopf" aria-pressed={app.einst.thema === 'tag'} onclick={() => (app.einst.thema = 'tag')}>Immer hell</button>
-        <button class="knopf" aria-pressed={app.einst.thema === 'nacht'} onclick={() => (app.einst.thema = 'nacht')}>Immer dunkel</button>
+      <h3>Aussehen</h3>
+      <p class="zh">Gilt für alle Geräte.</p>
+      <div class="z">
+        <span class="zl">Helligkeit</span>
+        <div class="zr">
+          <button class="knopf klein" aria-pressed={app.einst.thema === 'auto'} onclick={() => (app.einst.thema = 'auto')}>Abends dunkel</button>
+          <button class="knopf klein" aria-pressed={app.einst.thema === 'tag'} onclick={() => (app.einst.thema = 'tag')}>Immer hell</button>
+          <button class="knopf klein" aria-pressed={app.einst.thema === 'nacht'} onclick={() => (app.einst.thema = 'nacht')}>Immer dunkel</button>
+        </div>
       </div>
-      <div class="reihe">
-        <span class="name zeile">Uhr</span>
-        <button class="knopf" aria-pressed={(app.einst.uhrArt ?? 'digital') === 'digital'} onclick={() => (app.einst.uhrArt = 'digital')}>Digital 10:51</button>
-        <button class="knopf" aria-pressed={app.einst.uhrArt === 'analog'} onclick={() => (app.einst.uhrArt = 'analog')}>Analog mit Zeigern</button>
+      <div class="z">
+        <span class="zl">Uhr</span>
+        <div class="zr">
+          <button class="knopf klein" aria-pressed={(app.einst.uhrArt ?? 'digital') === 'digital'} onclick={() => (app.einst.uhrArt = 'digital')}>Digital</button>
+          <button class="knopf klein" aria-pressed={app.einst.uhrArt === 'analog'} onclick={() => (app.einst.uhrArt = 'analog')}>Analog</button>
+        </div>
       </div>
     </section>
 
     <section>
       <h3>Timer und Belohnung</h3>
-      <div class="reihe">
-        <span class="name zeile">Timer zeigen als</span>
-        <button class="knopf" aria-pressed={app.einst.timerArt === 'ampel'} onclick={() => (app.einst.timerArt = 'ampel')}>Ampel</button>
-        <button class="knopf" aria-pressed={app.einst.timerArt === 'sanduhr'} onclick={() => (app.einst.timerArt = 'sanduhr')}>Sanduhr</button>
+      <div class="z">
+        <span class="zl">Timer zeigen als</span>
+        <div class="zr">
+          <button class="knopf klein" aria-pressed={app.einst.timerArt === 'ampel'} onclick={() => (app.einst.timerArt = 'ampel')}>Ampel</button>
+          <button class="knopf klein" aria-pressed={app.einst.timerArt === 'sanduhr'} onclick={() => (app.einst.timerArt = 'sanduhr')}>Sanduhr</button>
+        </div>
       </div>
-      <div class="reihe">
-        <button class="knopf" aria-pressed={app.einst.ton} onclick={() => (app.einst.ton = !app.einst.ton)}>Töne {app.einst.ton ? 'an' : 'aus'}</button>
+      <div class="z">
+        <span class="zl">Töne (inkl. Countdown-Piepen)</span>
+        <div class="zr">{@render schalter(app.einst.ton, (v) => (app.einst.ton = v))}</div>
       </div>
-      <div class="reihe">
-        <span class="name zeile">Sternenregen</span>
-        {#each [['alle', 'bei allen Aufgaben'], ['auswahl', 'nur ausgewählte'], ['aus', 'aus']] as [wert, text] (wert)}
-          <button class="knopf klein" aria-pressed={(app.einst.sternenregen ?? 'alle') === wert} onclick={() => (app.einst.sternenregen = wert as 'alle' | 'auswahl' | 'aus')}>{text}</button>
-        {/each}
-      </div>
-    </section>
-
-    <section>
-      <h3>Dieses Gerät</h3>
-      <div class="reihe">
-        <button class="knopf" aria-pressed={app.einst.wach} onclick={() => (app.einst.wach = !app.einst.wach)}>
-          Bildschirm anlassen: {app.einst.wach ? 'ja' : 'nein'}
-        </button>
+      <div class="z">
+        <span class="zl">Sternenregen</span>
+        <div class="zr">
+          {#each [['alle', 'Bei allen Aufgaben'], ['auswahl', 'Nur ausgewählte'], ['aus', 'Aus']] as [wert, text] (wert)}
+            <button class="knopf klein" aria-pressed={(app.einst.sternenregen ?? 'alle') === wert} onclick={() => (app.einst.sternenregen = wert as 'alle' | 'auswahl' | 'aus')}>{text}</button>
+          {/each}
+        </div>
       </div>
     </section>
     {:else if reiter === 'sprache'}
     <section>
       <h3>Vorlesen</h3>
-      <p class="hilfe">Aufgaben, Lob, Uhrzeit und Timer werden laut angesagt.</p>
-      <div class="reihe">
-        <button class="knopf" aria-pressed={app.einst.vorlesen} onclick={() => (app.einst.vorlesen = !app.einst.vorlesen)}>
-          Vorlesen {app.einst.vorlesen ? 'an' : 'aus'}
-        </button>
-        <button class="knopf" aria-pressed={app.einst.zeitAnsagen !== false} onclick={() => (app.einst.zeitAnsagen = app.einst.zeitAnsagen === false)}>
-          Zeit ansagen (10 / 5 / 1 Min): {app.einst.zeitAnsagen !== false ? 'ja' : 'nein'}
-        </button>
+      <p class="zh">Aufgaben, Lob, Uhrzeit und Timer werden laut angesagt.</p>
+      <div class="z">
+        <span class="zl">Vorlesen</span>
+        <div class="zr">{@render schalter(app.einst.vorlesen, (v) => (app.einst.vorlesen = v))}</div>
       </div>
-          {#if app.einst.vorlesen}
-        <div class="stimme">
-          <span class="name">Stimme zum Vorlesen</span>
-          {#if stimmen.length}
-            <div class="reihe">
+      <div class="z">
+        <span class="zl">Zeit ansagen (10 / 5 / 1 Min)</span>
+        <div class="zr">{@render schalter(app.einst.zeitAnsagen !== false, (v) => (app.einst.zeitAnsagen = v))}</div>
+      </div>
+    </section>
+
+    {#if app.einst.vorlesen}
+      <section>
+        <h3>Stimme</h3>
+        {#if stimmen.length}
+          <div class="z">
+            <span class="zl">Stimme</span>
+            <div class="zr">
               <select id="stimme" bind:value={stimmeWahl} onchange={() => (app.einst.stimme = stimmeWahl || undefined)}>
                 <option value="">Automatisch (beste Stimme)</option>
                 {#each stimmen as s (s.uri)}
                   <option value={s.uri}>{stimmenName(s)}</option>
                 {/each}
               </select>
-              <button class="knopf" onclick={probeSprechen}><Symbol name="lautsprecher" />Probe hören</button>
+              <button class="knopf klein" onclick={probeSprechen}><Symbol name="lautsprecher" />Probe hören</button>
             </div>
-          {:else if stimmenGeladen}
-            <p class="hilfe">Auf diesem Gerät ist keine deutsche Stimme installiert. In den Android-Einstellungen unter „Sprachausgabe“ die Google-Sprachausgabe mit Deutsch installieren.</p>
-            <div class="reihe"><button class="knopf" onclick={probeSprechen}><Symbol name="lautsprecher" />Probe hören</button></div>
-          {/if}
-          <div class="reihe">
-            <span class="name zeile">Tempo</span>
+          </div>
+        {:else if stimmenGeladen}
+          <p class="zh">Auf diesem Gerät ist keine deutsche Stimme installiert. In den Android-Einstellungen unter „Sprachausgabe“ die Google-Sprachausgabe mit Deutsch installieren.</p>
+          <div class="zr"><button class="knopf klein" onclick={probeSprechen}><Symbol name="lautsprecher" />Probe hören</button></div>
+        {/if}
+        <div class="z">
+          <span class="zl">Tempo</span>
+          <div class="zr">
             {#each TEMPI as t (t.wert)}
               <button class="knopf klein" aria-pressed={(app.einst.tempo ?? 0.85) === t.wert} onclick={() => ((app.einst.tempo = t.wert), probeSprechen())}>{t.name}</button>
             {/each}
           </div>
         </div>
-      {/if}
-    </section>
+      </section>
+    {/if}
     {:else if reiter === 'tag'}
     <section>
       <h3>Tagesabläufe</h3>
@@ -345,49 +338,72 @@
       </div>
     </section>
     {:else if reiter === 'ruhe'}
+    <div class="unterreiter" role="tablist" aria-label="Ruhebild">
+      <button class="unter-knopf" role="tab" aria-selected={ruheUnter === 'wann'} onclick={() => (ruheUnter = 'wann')}>Wann</button>
+      <button class="unter-knopf" role="tab" aria-selected={ruheUnter === 'bild'} onclick={() => (ruheUnter = 'bild')}>Bild und Fotos</button>
+    </div>
+    {#if ruheUnter === 'wann'}
     <section>
-      <h3>Ruhebild und Live-Modus</h3>
-      <p class="hilfe">
-        Auf dem Fernseher erscheint nach einer Weile ohne Bedienung ein Ruhebild, wenn gerade kein Timer läuft. Hat eine Aufgabe eine feste Zeit
-        (von–bis), wird sie in dieser Zeit groß gezeigt. Eine Taste auf der Fernbedienung oder Antippen führt zurück.
+      <h3>Wann erscheint das Ruhebild?</h3>
+      <p class="zh">
+        Nach einer Weile ohne Bedienung erscheint ein Ruhebild, wenn gerade kein Timer läuft. Hat eine Aufgabe eine feste Zeit (von–bis), wird sie in dieser Zeit groß gezeigt.
+        Eine Taste auf der Fernbedienung oder Antippen führt zurück.
       </p>
-      <div class="reihe">
-        <span class="name zeile">Auf diesem Gerät</span>
-        <button class="knopf klein" aria-pressed={(app.einst.ruheHier ?? 'auto') === 'auto'} onclick={() => (app.einst.ruheHier = 'auto')}>Automatisch (nur Fernseher)</button>
-        <button class="knopf klein" aria-pressed={app.einst.ruheHier === 'an'} onclick={() => (app.einst.ruheHier = 'an')}>Ja</button>
-        <button class="knopf klein" aria-pressed={app.einst.ruheHier === 'aus'} onclick={() => (app.einst.ruheHier = 'aus')}>Nein</button>
+      <div class="z">
+        <span class="zl">Für alle Geräte</span>
+        <div class="zr">{@render schalter((app.einst.ruhe ?? 'an') === 'an', (v) => (app.einst.ruhe = v ? 'an' : 'aus'))}</div>
       </div>
-      <p class="hilfe">
-        {(app.einst.ruheHier ?? 'auto') === 'auto' && abgleich.einst.rolle === 'planer'
-          ? 'Dieses Gerät plant – hier erscheint das Ruhebild nur mit „Ja“.'
-          : 'Ein laufender Timer hält das Ruhebild zurück; eine geöffnete Aufgabe ohne Timer nicht.'}
-      </p>
-      <div class="reihe">
-        <span class="name zeile">Für alle Geräte</span>
-        <button class="knopf klein" aria-pressed={(app.einst.ruhe ?? 'an') === 'an'} onclick={() => (app.einst.ruhe = 'an')}>An</button>
-        <button class="knopf klein" aria-pressed={app.einst.ruhe === 'aus'} onclick={() => (app.einst.ruhe = 'aus')}>Aus</button>
-        <span class="name zeile">nach</span>
-        {#each [2, 5, 10, 15, 30] as m (m)}
-          <button class="knopf klein" aria-pressed={(app.einst.ruheWarten ?? 5) === m} onclick={() => (app.einst.ruheWarten = m)}>{m} Min</button>
-        {/each}
+      <div class="z">
+        <span class="zl">Nach</span>
+        <div class="zr">
+          {#each [2, 5, 10, 15, 30] as m (m)}
+            <button class="knopf klein" aria-pressed={(app.einst.ruheWarten ?? 5) === m} onclick={() => (app.einst.ruheWarten = m)}>{m} Min</button>
+          {/each}
+        </div>
       </div>
-      <div class="reihe">
-        <span class="name zeile">Bild</span>
-        <button class="knopf klein" aria-pressed={(app.einst.ruheArt ?? 'jahreszeit') === 'jahreszeit'} onclick={() => (app.einst.ruheArt = 'jahreszeit')}>Jahreszeit</button>
-        <button class="knopf klein" aria-pressed={app.einst.ruheArt === 'fotos'} onclick={() => (app.einst.ruheArt = 'fotos')}>Eigene Fotos</button>
-        <button class="knopf klein" aria-pressed={app.einst.ruheArt === 'schwarz'} onclick={() => (app.einst.ruheArt = 'schwarz')}>Schwarz</button>
-        <button class="knopf klein" onclick={() => ((app.dialog = null), (app.ruheVorschau = true))}>Vorschau zeigen</button>
+      <div class="z">
+        <span class="zl">Auf diesem Gerät</span>
+        <div class="zr">
+          <button class="knopf klein" aria-pressed={(app.einst.ruheHier ?? 'auto') === 'auto'} onclick={() => (app.einst.ruheHier = 'auto')}>Automatisch (nur Fernseher)</button>
+          <button class="knopf klein" aria-pressed={app.einst.ruheHier === 'an'} onclick={() => (app.einst.ruheHier = 'an')}>Ja</button>
+          <button class="knopf klein" aria-pressed={app.einst.ruheHier === 'aus'} onclick={() => (app.einst.ruheHier = 'aus')}>Nein</button>
+        </div>
+        <p class="zh">
+          {(app.einst.ruheHier ?? 'auto') === 'auto' && abgleich.einst.rolle === 'planer'
+            ? 'Dieses Gerät plant – hier erscheint das Ruhebild nur mit „Ja“.'
+            : 'Ein laufender Timer hält das Ruhebild zurück; eine geöffnete Aufgabe ohne Timer nicht.'}
+        </p>
       </div>
-      <div class="reihe">
-        <button class="knopf klein" aria-pressed={!!app.einst.ruheNacht} onclick={() => (app.einst.ruheNacht = !app.einst.ruheNacht)}>
-          Nachts schwarz (Schlafen bis Aufstehen): {app.einst.ruheNacht ? 'ja' : 'nein'}
-        </button>
-        <button class="knopf klein" aria-pressed={app.einst.ruheCountdown !== false} onclick={() => (app.einst.ruheCountdown = app.einst.ruheCountdown === false)}>
-          Mini-Countdown in der Ecke: {app.einst.ruheCountdown !== false ? 'ja' : 'nein'}
-        </button>
+      <div class="z">
+        <span class="zl">Nachts schwarz (Schlafen bis Aufstehen)</span>
+        <div class="zr">{@render schalter(!!app.einst.ruheNacht, (v) => (app.einst.ruheNacht = v))}</div>
       </div>
-      <p class="hilfe">„Schwarz“ macht den Bildschirm ganz dunkel. Bewegen, Antippen oder eine Taste auf der Fernbedienung holt die App zurück.</p>
-      {#if (app.einst.ruheArt ?? 'jahreszeit') === 'jahreszeit'}
+      <div class="z">
+        <span class="zl">Mini-Countdown in der Ecke</span>
+        <div class="zr">{@render schalter(app.einst.ruheCountdown !== false, (v) => (app.einst.ruheCountdown = v))}</div>
+      </div>
+    </section>
+    {:else}
+    <section>
+      <h3>Bild</h3>
+      <div class="z">
+        <span class="zl">Zeigen</span>
+        <div class="zr">
+          <button class="knopf klein" aria-pressed={(app.einst.ruheArt ?? 'jahreszeit') === 'jahreszeit'} onclick={() => (app.einst.ruheArt = 'jahreszeit')}>Jahreszeit</button>
+          <button class="knopf klein" aria-pressed={app.einst.ruheArt === 'fotos'} onclick={() => (app.einst.ruheArt = 'fotos')}>Eigene Fotos</button>
+          <button class="knopf klein" aria-pressed={app.einst.ruheArt === 'schwarz'} onclick={() => (app.einst.ruheArt = 'schwarz')}>Schwarz</button>
+          <button class="knopf klein" onclick={() => ((app.dialog = null), (app.ruheVorschau = true))}>Vorschau zeigen</button>
+        </div>
+        {#if app.einst.ruheArt === 'schwarz'}<p class="zh">„Schwarz“ macht den Bildschirm ganz dunkel. Bewegen, Antippen oder eine Taste holt die App zurück.</p>{/if}
+      </div>
+    </section>
+    {#if (app.einst.ruheArt ?? 'jahreszeit') === 'jahreszeit'}
+      <section>
+        <h3>Jahreszeiten-Bild</h3>
+        <div class="z">
+          <span class="zl">Namen unter den Bildern</span>
+          <div class="zr">{@render schalter(!!app.einst.ruheNamen, (v) => (app.einst.ruheNamen = v))}</div>
+        </div>
         <div class="feld">
           <span class="name">Echtes Wetter im Bild {wetterName ? `(jetzt: ${wetterName})` : ''}</span>
           <div class="reihe">
@@ -404,40 +420,39 @@
               {/each}
             </div>
           {/if}
-          {#if ortMeldung}<p class="hilfe">{ortMeldung}</p>{/if}
+          {#if ortMeldung}<p class="zh">{ortMeldung}</p>{/if}
         </div>
-        <div class="reihe">
-          <button class="knopf klein" aria-pressed={!!app.einst.ruheNamen} onclick={() => (app.einst.ruheNamen = !app.einst.ruheNamen)}>
-            Namen unter den Bildern: {app.einst.ruheNamen ? 'ja' : 'nein'}
-          </button>
-        </div>
-      {/if}
-      {#if app.einst.ruheArt === 'fotos'}
-        <div class="reihe">
-          <button class="knopf" onclick={() => fotoFeld?.click()} disabled={fotoLaedt}><Symbol name="bild" />Fotos hinzufügen</button>
-          {#if !istApp}<button class="knopf" onclick={() => ordnerFeld?.click()} disabled={fotoLaedt}>Ganzen Ordner</button>{/if}
-          <span class="name zeile">Wechsel alle</span>
-          {#each [10, 20, 60] as sek (sek)}
-            <button class="knopf klein" aria-pressed={(app.einst.ruheWechsel ?? 20) === sek} onclick={() => (app.einst.ruheWechsel = sek)}>{sek} s</button>
+      </section>
+    {/if}
+    {#if app.einst.ruheArt === 'fotos'}
+      <section>
+        <h3>Eigene Fotos</h3>
+      <div class="reihe">
+        <button class="knopf" onclick={() => fotoFeld?.click()} disabled={fotoLaedt}><Symbol name="bild" />Fotos hinzufügen</button>
+        {#if !istApp}<button class="knopf" onclick={() => ordnerFeld?.click()} disabled={fotoLaedt}>Ganzen Ordner</button>{/if}
+        <span class="name zeile">Wechsel alle</span>
+        {#each [10, 20, 60] as sek (sek)}
+          <button class="knopf klein" aria-pressed={(app.einst.ruheWechsel ?? 20) === sek} onclick={() => (app.einst.ruheWechsel = sek)}>{sek} s</button>
+        {/each}
+      </div>
+      <input bind:this={fotoFeld} type="file" accept="image/*" multiple hidden onchange={fotosGewaehlt} />
+      <input bind:this={ordnerFeld} type="file" accept="image/*" multiple hidden webkitdirectory onchange={fotosGewaehlt} />
+      {#if fotoLaedt}<p class="hilfe">Fotos werden vorbereitet … {fotoFortschritt}</p>{/if}
+      {#if (app.plan.ruhebilder ?? []).length}
+        <div class="ruhefotos">
+          {#each app.plan.ruhebilder ?? [] as id (id)}
+            <div class="ruhefoto">
+              {#if ruhe.bilder[id]}<img src={ruhe.bilder[id]} alt="" />{:else}<span class="laedt">…</span>{/if}
+              <button class="knopf klein gefahr" onclick={() => fotoLoeschen(id)} aria-label="Foto entfernen"><Symbol name="muell" /></button>
+            </div>
           {/each}
         </div>
-        <input bind:this={fotoFeld} type="file" accept="image/*" multiple hidden onchange={fotosGewaehlt} />
-        <input bind:this={ordnerFeld} type="file" accept="image/*" multiple hidden webkitdirectory onchange={fotosGewaehlt} />
-        {#if fotoLaedt}<p class="hilfe">Fotos werden vorbereitet … {fotoFortschritt}</p>{/if}
-        {#if (app.plan.ruhebilder ?? []).length}
-          <div class="ruhefotos">
-            {#each app.plan.ruhebilder ?? [] as id (id)}
-              <div class="ruhefoto">
-                {#if ruhe.bilder[id]}<img src={ruhe.bilder[id]} alt="" />{:else}<span class="laedt">…</span>{/if}
-                <button class="knopf klein gefahr" onclick={() => fotoLoeschen(id)} aria-label="Foto entfernen"><Symbol name="muell" /></button>
-              </div>
-            {/each}
-          </div>
-        {:else}
-          <p class="hilfe">Noch keine Fotos. Ohne Fotos wird das Jahreszeiten-Bild gezeigt.</p>
-        {/if}
+      {:else}
+        <p class="hilfe">Noch keine Fotos. Ohne Fotos wird das Jahreszeiten-Bild gezeigt.</p>
       {/if}
-    </section>
+      </section>
+    {/if}
+    {/if}
     {:else if reiter === 'abgleich'}
     <section>
       <h3>Abgleich</h3>
@@ -601,11 +616,6 @@
     place-items: center;
     height: 100%;
   }
-  .stimme {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
   select {
     min-width: 0;
     max-width: 100%;
@@ -655,7 +665,65 @@
   section {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 6px;
+    padding: 14px 16px;
+    border: 2px solid var(--linie);
+    border-radius: 20px;
+  }
+  .z {
+    display: grid;
+    grid-template-columns: minmax(9em, 13em) 1fr;
+    gap: 4px 16px;
+    align-items: center;
+    padding: 10px 0;
+    border-top: 1px solid var(--linie);
+  }
+  h3 + .z,
+  .zh + .z {
+    border-top: none;
+  }
+  .zl {
+    font-weight: 700;
+    font-size: var(--t-klein);
+  }
+  .zr {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    min-width: 0;
+  }
+  .zh {
+    grid-column: 1 / -1;
+    margin: 0;
+    font-size: var(--t-klein);
+    color: var(--tinte-leise);
+    max-width: 44em;
+  }
+  .unterreiter {
+    display: flex;
+    gap: 4px;
+    padding: 4px;
+    border-radius: 999px;
+    background: var(--himmel);
+    align-self: flex-start;
+  }
+  .unter-knopf {
+    padding: 0.4em 1.1em;
+    border: none;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--tinte);
+    font: inherit;
+    font-weight: 700;
+  }
+  .unter-knopf[aria-selected='true'] {
+    background: var(--tafel);
+    box-shadow: 0 0 0 2px var(--tinte);
+  }
+  @media (max-width: 560px) {
+    .z {
+      grid-template-columns: 1fr;
+    }
   }
   h3 {
     font-size: var(--t-text);
@@ -716,42 +784,6 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
     gap: 10px;
-  }
-  .kinder {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 10px;
-  }
-  .kind-karte {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    padding: 12px;
-    border-radius: 18px;
-    box-shadow: inset 0 0 0 3px var(--kind);
-  }
-  input[type='date'] {
-    padding: 0.45em 0.8em;
-    border: 2px solid var(--linie);
-    border-radius: 14px;
-    background: var(--himmel);
-    color: var(--tinte);
-    font: inherit;
-  }
-  .farben {
-    display: flex;
-    gap: 6px;
-  }
-  .farbe {
-    width: 32px;
-    height: 32px;
-    border: 3px solid var(--tafel);
-    border-radius: 50%;
-    background: var(--f);
-    box-shadow: 0 0 0 2px var(--linie);
-  }
-  .farbe[aria-pressed='true'] {
-    box-shadow: 0 0 0 3px var(--tinte);
   }
   .zeit-name {
     font-family: var(--schrift-titel);

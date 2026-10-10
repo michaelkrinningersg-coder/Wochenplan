@@ -5,7 +5,6 @@
   import { datumLang, heuteTag, spanneText, uhrzeitJetzt } from '../lib/zeit'
   import Bild from './Bild.svelte'
   import HalteKnopf from './HalteKnopf.svelte'
-  import KinderWahl from './KinderWahl.svelte'
   import AnalogUhr from './AnalogUhr.svelte'
   import { uhrzeitAnsagen } from '../lib/vorlesen'
   import { installieren, update, updateVerfuegbar } from '../lib/update.svelte'
@@ -61,9 +60,6 @@
       <h1>{titel}</h1>
       <span class="unter">{unter}</span>
     </div>
-    {#if a.art === 'tag' || a.art === 'abschnitt' || a.art === 'aufgabe'}
-      <KinderWahl />
-    {/if}
   </div>
 
   <div class="rechts">

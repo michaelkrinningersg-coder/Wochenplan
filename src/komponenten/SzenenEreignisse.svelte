@@ -70,8 +70,7 @@
   const terminHeute = (wort: RegExp) => termineAm(datumKey(new Date(app.jetzt))).some((t) => wort.test(t.titel))
   const istFeiertag = (d: Date) =>
     istFasching(d) || istMuttertag(d) || istVatertag(d) || terminHeute(/einschul|schulanfang|laterne|martin/i)
-  const kinderNamen = () => app.plan.kinder.filter((k) => k.name && !/^Kind \d$/.test(k.name))
-  const fotoListe = () => (app.plan.ruhebilder ?? []).map((id) => ruhe.bilder[id]).filter(Boolean)
+    const fotoListe = () => (app.plan.ruhebilder ?? []).map((id) => ruhe.bilder[id]).filter(Boolean)
 
   // ---------- Ereignisse ----------
   type Id =
@@ -179,7 +178,7 @@
     { id: 'feuerwerk', jz: ['herbst', 'winter'], wann: istSilvester, gewicht: 4 },
     { id: 'hasenspuren', jz: ['winter'] },
     // Extras (neu)
-    { id: 'sternenballon', jz: 'alle', wann: () => kinderNamen().some((k) => sterne(k.id).heute > 0) },
+    { id: 'sternenballon', jz: 'alle', wann: () => app.plan.kinder.some((k) => sterne(k.id).heute > 0) },
     { id: 'sternenglas', jz: 'alle', wann: () => app.plan.kinder.some((k) => sterne(k.id).woche > 0) },
     { id: 'banner', jz: 'alle', wann: () => countdowns(14).length > 0, gewicht: 2 },
     { id: 'wochentier', jz: 'alle' },
@@ -352,7 +351,7 @@
     return 'fasching'
   })
   const besterSammler = $derived.by(() => {
-    const l = kinderNamen().map((k) => ({ k, n: sterne(k.id).heute }))
+    const l = app.plan.kinder.map((k) => ({ k, n: sterne(k.id).heute }))
     l.sort((a, b) => b.n - a.n)
     return l[0]
   })
@@ -1146,7 +1145,7 @@
         {@const b = besterSammler}
         <div class="ding namensballon" data-spiel="platzen" use:animiere={{ k: Array.from({ length: 7 }, (_, j) => ({ left: `${30 + e.zufall[0] * 40 + Math.sin(j) * 4}%`, top: `${108 - (j / 6) * 125}%` })), dauer: 16000 }}>
           <span class="figur ballon-name" style="--farbe: {b?.k.farbe ?? '#e8452b'}">
-            <span>★ {b?.k.name ?? ''}</span>
+            <span>★ Super!</span>
             <small>{b?.n ?? 0} Sterne heute</small>
           </span>
         </div>

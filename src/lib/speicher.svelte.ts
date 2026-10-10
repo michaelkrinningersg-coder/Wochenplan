@@ -82,7 +82,7 @@ export const app = $state({
   plan: (gespeicherterPlan && !planErneuert ? planNormalisieren(gespeicherterPlan) : startplan()) as Plan,
   fotos: laden<Record<string, string>>(SCHLUESSEL.fotos, {}),
   erledigt: erledigtLaden(),
-  einst: { ...STANDARD_EINST, ...laden<Partial<Einstellungen>>(SCHLUESSEL.einst, {}) } as Einstellungen,
+  einst: { ...STANDARD_EINST, ...laden<Partial<Einstellungen>>(SCHLUESSEL.einst, {}), kind: 'alle' } as Einstellungen,
   timer: timerLaden(),
   ansicht: { art: 'tag', tag: heuteTag() } as Ansicht,
   bearbeiten: false,
