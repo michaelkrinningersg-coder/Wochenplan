@@ -148,6 +148,14 @@ export function zeitAnsagen(art: 'gelb' | 'rot' | 'ende', titel: string, restMin
   else void vorlesen(`Die Zeit für ${titel} ist um.`)
 }
 
+/** Uhrzeit laut und deutlich ansagen: „Es ist 10 Uhr 51.“ */
+export function uhrzeitAnsagen(d: Date) {
+  const h = d.getHours()
+  const m = d.getMinutes()
+  const uhr = h === 1 ? 'ein Uhr' : `${h} Uhr`
+  void vorlesen(m === 0 ? `Es ist ${uhr}.` : `Es ist ${uhr} ${m}.`, true)
+}
+
 /** Probe in den Einstellungen */
 export function probeSprechen() {
   void vorlesen('Hallo! So klinge ich. Jetzt ist Zähne putzen dran.', true)

@@ -239,6 +239,7 @@
 
     <section>
       <h3>Anzeige</h3>
+      <p class="hilfe">Diese Einstellungen gelten für alle Geräte (außer „Bildschirm anlassen“ und der Stimme).</p>
       <div class="reihe">
         <button class="knopf" aria-pressed={app.einst.thema === 'auto'} onclick={() => (app.einst.thema = 'auto')}>Abends dunkel</button>
         <button class="knopf" aria-pressed={app.einst.thema === 'tag'} onclick={() => (app.einst.thema = 'tag')}>Immer hell</button>
@@ -256,6 +257,9 @@
         <button class="knopf" aria-pressed={app.einst.vorlesen} onclick={() => (app.einst.vorlesen = !app.einst.vorlesen)}>
           Vorlesen {app.einst.vorlesen ? 'an' : 'aus'}
         </button>
+        <span class="name zeile">Uhr</span>
+        <button class="knopf klein" aria-pressed={(app.einst.uhrArt ?? 'digital') === 'digital'} onclick={() => (app.einst.uhrArt = 'digital')}>Digital 10:51</button>
+        <button class="knopf klein" aria-pressed={app.einst.uhrArt === 'analog'} onclick={() => (app.einst.uhrArt = 'analog')}>Analog mit Zeigern</button>
         <span class="name zeile">Sternenregen</span>
         {#each [['alle', 'bei allen Aufgaben'], ['auswahl', 'nur ausgewählte'], ['aus', 'aus']] as [wert, text] (wert)}
           <button class="knopf klein" aria-pressed={(app.einst.sternenregen ?? 'alle') === wert} onclick={() => (app.einst.sternenregen = wert as 'alle' | 'auswahl' | 'aus')}>{text}</button>

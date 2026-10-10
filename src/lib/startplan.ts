@@ -1,5 +1,5 @@
 import { ABSCHNITTE, TAGE } from './konstanten'
-import type { AbschnittId, Aufgabe, Kind, KindId, Plan, TagId, Tagesplan, Termin } from './typen'
+import type { AbschnittId, Aufgabe, GeteilteOptionen, Kind, KindId, Plan, TagId, Tagesplan, Termin } from './typen'
 
 export function neueId(): string {
   try {
@@ -184,10 +184,38 @@ export function planNormalisieren(roh: unknown): Plan {
       const bild = typeof x.bild === 'string' && x.bild ? x.bild : undefined
       if (name || bild) abschnitte[ab.id] = { ...(name ? { name } : {}), ...(bild ? { bild } : {}) }
     }
-  const plan: Plan = { version: 3, stand: STAND, woche, zeiten, abendEnde, kinder, termine, vorlagen, datumVorlage, abschnitte }
+  const optionen = optionenNormalisieren(p.optionen)
+  const plan: Plan = {
+    version: 3,
+    stand: STAND,
+    woche,
+    zeiten,
+    abendEnde,
+    kinder,
+    termine,
+    vorlagen,
+    datumVorlage,
+    abschnitte,
+    ...(optionen ? { optionen } : {}),
+  }
   const vonStand = typeof p.stand === 'number' ? p.stand : 1
   if (vonStand < STAND) umstellen(plan, vonStand)
   return plan
+}
+
+function optionenNormalisieren(roh: unknown): GeteilteOptionen | undefined {
+  if (!roh || typeof roh !== 'object') return undefined
+  const o = roh as Record<string, unknown>
+  const r: GeteilteOptionen = {}
+  if (o.thema === 'auto' || o.thema === 'tag' || o.thema === 'nacht') r.thema = o.thema
+  if (typeof o.ton === 'boolean') r.ton = o.ton
+  if (o.timerArt === 'ampel' || o.timerArt === 'sanduhr') r.timerArt = o.timerArt
+  if (typeof o.vorlesen === 'boolean') r.vorlesen = o.vorlesen
+  if (typeof o.tempo === 'number' && o.tempo >= 0.5 && o.tempo <= 1.5) r.tempo = o.tempo
+  if (typeof o.zeitAnsagen === 'boolean') r.zeitAnsagen = o.zeitAnsagen
+  if (o.sternenregen === 'alle' || o.sternenregen === 'auswahl' || o.sternenregen === 'aus') r.sternenregen = o.sternenregen
+  if (o.uhrArt === 'digital' || o.uhrArt === 'analog') r.uhrArt = o.uhrArt
+  return Object.keys(r).length ? r : undefined
 }
 
 /** Stand der einmaligen Umstellungen. Erhöhen, wenn neue Regeln in UMZUG dazukommen. */

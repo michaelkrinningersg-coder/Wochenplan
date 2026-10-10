@@ -77,6 +77,8 @@ export interface Plan {
   abschnitte: Partial<Record<AbschnittId, AbschnittAnpassung>>
   /** Stand der einmaligen Umstellungen (neue Bildkarten, Umbenennungen) */
   stand?: number
+  /** Einstellungen, die für alle Geräte gelten */
+  optionen?: GeteilteOptionen
 }
 
 export interface AbschnittAnpassung {
@@ -103,7 +105,13 @@ export interface Einstellungen {
   zeitAnsagen?: boolean
   /** Sterne vom Himmel beim Erledigen: bei allen, nur bei ausgewählten Aufgaben oder nie */
   sternenregen?: 'alle' | 'auswahl' | 'aus'
+  /** Uhr oben: Ziffern oder Zeiger */
+  uhrArt?: 'digital' | 'analog'
 }
+
+/** Optionen, die mit dem Plan auf alle Geräte gehen (nicht: Kind-Auswahl, Bildschirm anlassen, Stimme) */
+export const GETEILTE_OPTIONEN = ['thema', 'ton', 'timerArt', 'vorlesen', 'tempo', 'zeitAnsagen', 'sternenregen', 'uhrArt'] as const
+export type GeteilteOptionen = Partial<Pick<Einstellungen, (typeof GETEILTE_OPTIONEN)[number]>>
 
 export interface TimerZustand {
   datum: string
@@ -136,6 +144,7 @@ export type Dialog =
   | { art: 'vorlage'; tag: TagId }
   | { art: 'abschnittBild'; id: AbschnittId }
   | { art: 'ablaeufe' }
+  | { art: 'uhr' }
 
 export interface Fundstelle {
   abschnitt: AbschnittId

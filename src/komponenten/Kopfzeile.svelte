@@ -6,6 +6,8 @@
   import Bild from './Bild.svelte'
   import HalteKnopf from './HalteKnopf.svelte'
   import KinderWahl from './KinderWahl.svelte'
+  import AnalogUhr from './AnalogUhr.svelte'
+  import { uhrzeitAnsagen } from '../lib/vorlesen'
   import { installieren, update, updateVerfuegbar } from '../lib/update.svelte'
   import Symbol from './Symbol.svelte'
 
@@ -97,7 +99,20 @@
       </HalteKnopf>
     {/if}
 
-    <span class="uhr" aria-label="Uhrzeit">{uhrzeitJetzt(jetzt)}</span>
+    <button
+      class="uhr"
+      onclick={() => {
+        if (app.dialog?.art !== 'uhr') app.dialog = { art: 'uhr' }
+        else uhrzeitAnsagen(new Date())
+      }}
+      aria-label="Uhrzeit {uhrzeitJetzt(jetzt)} – groß zeigen und ansagen"
+    >
+      {#if (app.einst.uhrArt ?? 'digital') === 'analog'}
+        <AnalogUhr zeit={jetzt} groesse={52} />
+      {:else}
+        {uhrzeitJetzt(jetzt)}
+      {/if}
+    </button>
 
     {#if planer && abgleich.zustand !== 'aus'}
       <button
@@ -124,6 +139,9 @@
         <Symbol name="haken" />Fertig
       </button>
     {:else if planer}
+      <button class="knopf rund" onclick={() => (app.dialog = { art: 'einstellungen' })} aria-label="Einstellungen">
+        <Symbol name="zahnrad" />
+      </button>
       <HalteKnopf
         label="Plan bearbeiten (gedrückt halten)"
         onhalten={() => ((app.bearbeiten = true), void holen())}
@@ -137,7 +155,7 @@
         onhalten={() => (app.dialog = { art: 'einstellungen' })}
         onkurz={() => zeigeHinweis('Für die Einstellungen gedrückt halten')}
       >
-        <Symbol name="schloss" />
+        <Symbol name="zahnrad" />
       </HalteKnopf>
     {/if}
   </div>
@@ -197,6 +215,13 @@
     gap: 6px;
   }
   .uhr {
+    display: grid;
+    place-items: center;
+    border: 2px solid transparent;
+    border-radius: 16px;
+    padding: 2px 8px;
+    background: none;
+    color: inherit;
     font-family: var(--schrift-titel);
     font-weight: 600;
     font-size: var(--t-titel);

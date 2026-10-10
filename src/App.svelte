@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { GETEILTE_OPTIONEN, type GeteilteOptionen } from './lib/typen'
   import { onMount, tick, untrack } from 'svelte'
   import AbschnittAnsicht from './ansichten/AbschnittAnsicht.svelte'
   import AufgabeAnsicht from './ansichten/AufgabeAnsicht.svelte'
@@ -9,6 +10,7 @@
   import WochenAnsicht from './ansichten/WochenAnsicht.svelte'
   import AbschnittDialog from './dialoge/AbschnittDialog.svelte'
   import AblaeufeDialog from './dialoge/AblaeufeDialog.svelte'
+  import GrosseUhr from './komponenten/GrosseUhr.svelte'
   import AktionDialog from './dialoge/AktionDialog.svelte'
   import AufgabeKopierenDialog from './dialoge/AufgabeKopierenDialog.svelte'
   import BearbeitenDialog from './dialoge/BearbeitenDialog.svelte'
@@ -59,6 +61,29 @@
   })
   $effect(() => {
     speichern('einst', $state.snapshot(app.einst))
+  })
+
+  // ---------- Gemeinsame Optionen (Timer-Art, Uhr, Vorlesen …) für alle Geräte ----------
+  // Plan → dieses Gerät
+  $effect(() => {
+    const o = app.plan.optionen
+    if (!o) return
+    untrack(() => {
+      const einst = app.einst as unknown as Record<string, unknown>
+      for (const k of GETEILTE_OPTIONEN) if (o[k] !== undefined && einst[k] !== o[k]) einst[k] = o[k]
+    })
+  })
+  // dieses Gerät → Plan (nur Planer; geht dann mit dem Plan an alle Geräte)
+  $effect(() => {
+    const werte = GETEILTE_OPTIONEN.map((k) => app.einst[k])
+    if (abgleich.einst.rolle !== 'planer') return
+    untrack(() => {
+      const neu: Record<string, unknown> = {}
+      GETEILTE_OPTIONEN.forEach((k, i) => {
+        if (werte[i] !== undefined) neu[k] = werte[i]
+      })
+      if (JSON.stringify(neu) !== JSON.stringify(app.plan.optionen ?? {})) app.plan.optionen = neu as GeteilteOptionen
+    })
   })
   $effect(() => {
     speichern('timer', $state.snapshot(app.timer))
@@ -268,6 +293,8 @@
     <AbschnittDialog id={app.dialog.id} />
   {:else if app.dialog?.art === 'ablaeufe'}
     <AblaeufeDialog />
+  {:else if app.dialog?.art === 'uhr'}
+    <GrosseUhr />
   {/if}
 
   {#if app.hinweis}
