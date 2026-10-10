@@ -32,7 +32,7 @@
       stamm: p(40 + baumDx, 56),
       dach: [p(hausX - 2, 61), p(hausX + 9, 52), p(hausX + 20, 61)],
       // oberhalb der drei Karten (quer ca. 74 % vom unteren Rand belegt, hochkant ca. 80 %)
-      boden: hoch ? [68, 74] : [62, 68],
+      boden: hoch ? [70, 75] : [67, 72],
     }
   })
   const trueb = $derived(wetterArt === 'regen' || wetterArt === 'gewitter' || wetterArt === 'nebel' || wetterArt === 'wolkig' || wetterArt === 'schnee')
