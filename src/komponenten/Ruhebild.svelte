@@ -78,6 +78,7 @@
       <img class="foto" src={fotos[fotoNr % fotos.length]} alt="" />
     {/key}
     <div class="ecke">
+      <span class="ecke-jz">{JAHRESZEIT_NAME[jz]}</span>
       <span class="ecke-uhr">{hh}:{mm}</span>
       <span class="ecke-datum">{datum}</span>
     </div>
@@ -99,7 +100,7 @@
         {#each dinge as d (d.t)}
           <div class="ding">
             <span class="emoji">{d.e}</span>
-            <span class="ding-text">{d.t}</span>
+            {#if app.einst.ruheNamen}<span class="ding-text">{d.t}</span>{/if}
           </div>
         {/each}
       </div>
@@ -134,7 +135,7 @@
   .datum-block {
     display: flex;
     flex-direction: column;
-    padding: 1.4vh 2vw;
+    padding: 0.5em 0.9em;
     border-radius: 24px;
     background: rgba(255, 255, 255, 0.82);
     color: #1f2a44;
@@ -149,7 +150,7 @@
     font-size: clamp(18px, 3.6vh, 40px);
   }
   .uhr {
-    padding: 1vh 2vw;
+    padding: 0.18em 0.45em 0.12em;
     border-radius: 24px;
     background: rgba(255, 255, 255, 0.82);
     color: #1f2a44;
@@ -169,7 +170,7 @@
     flex-direction: column;
     align-items: center;
     width: clamp(120px, 22vw, 300px);
-    padding: 2vh 1vw;
+    padding: 2.4vh 1.2vw;
     border-radius: 28px;
     background: rgba(255, 255, 255, 0.88);
     color: #1f2a44;
@@ -209,7 +210,7 @@
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    padding: 1vh 1.6vw;
+    padding: 0.6em 1em;
     border-radius: 20px;
     background: rgba(0, 0, 0, 0.45);
     color: #fff;
@@ -219,6 +220,11 @@
     font-weight: 700;
     font-size: clamp(32px, 8vh, 90px);
     line-height: 1;
+  }
+  .ecke-jz {
+    font-family: var(--schrift-titel);
+    font-weight: 700;
+    font-size: clamp(18px, 3.4vh, 38px);
   }
   .ecke-datum {
     font-size: clamp(14px, 2.6vh, 28px);
@@ -262,6 +268,55 @@
     font-weight: 700;
     font-size: clamp(30px, 7vh, 80px);
     font-variant-numeric: tabular-nums;
+  }
+  /* hochkant (Handy, Tablet hochkant): Kopf untereinander, Bilder größer */
+  @media (orientation: portrait) {
+    .inhalt {
+      padding: 3vh 4vw 4vh;
+    }
+    .kopf {
+      flex-direction: column;
+      align-items: center;
+      gap: 1.6vh;
+    }
+    .datum-block {
+      align-items: center;
+      text-align: center;
+    }
+    .jz {
+      font-size: clamp(30px, 11vw, 72px);
+    }
+    .datum {
+      font-size: clamp(16px, 4.6vw, 34px);
+    }
+    .uhr {
+      font-size: clamp(44px, 17vw, 120px);
+    }
+    .dinge {
+      gap: 3vw;
+    }
+    .ding {
+      width: 29vw;
+      padding: 1.6vh 1vw;
+      border-radius: 20px;
+    }
+    .emoji {
+      font-size: 16vw;
+    }
+    .ding-text {
+      font-size: clamp(13px, 3.6vw, 26px);
+    }
+    .live {
+      flex-direction: column;
+      text-align: center;
+    }
+    .live-bild {
+      width: 70vw;
+      height: 70vw;
+    }
+    .live-text {
+      align-items: center;
+    }
   }
   @keyframes auftauchen {
     from {

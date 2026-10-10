@@ -220,6 +220,7 @@ function optionenNormalisieren(roh: unknown): GeteilteOptionen | undefined {
   if (o.ruhe === 'an' || o.ruhe === 'aus') r.ruhe = o.ruhe
   if (typeof o.ruheWarten === 'number' && o.ruheWarten >= 1 && o.ruheWarten <= 60) r.ruheWarten = o.ruheWarten
   if (o.ruheArt === 'jahreszeit' || o.ruheArt === 'fotos') r.ruheArt = o.ruheArt
+  if (typeof o.ruheNamen === 'boolean') r.ruheNamen = o.ruheNamen
   if (typeof o.ruheWechsel === 'number' && o.ruheWechsel >= 5 && o.ruheWechsel <= 600) r.ruheWechsel = o.ruheWechsel
   return Object.keys(r).length ? r : undefined
 }

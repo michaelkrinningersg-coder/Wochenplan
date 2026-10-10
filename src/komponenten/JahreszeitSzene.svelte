@@ -2,6 +2,7 @@
   // Gemalte Landschaft je Jahreszeit (SVG + CSS): Himmel, Hügel, Baum, fallende Blätter/Schnee/Blüten.
   // Nachts dunkler Himmel mit Mond und Sternen.
   import type { Jahreszeit } from '../lib/jahreszeit'
+  import SzenenEreignisse from './SzenenEreignisse.svelte'
 
   let { jz, nacht = false }: { jz: Jahreszeit; nacht?: boolean } = $props()
 
@@ -11,6 +12,10 @@
     herbst: { himmel: ['#9cc9e8', '#f5e6c8'], huegel: ['#c9a24a', '#a8792f'], krone: ['#e8752a', '#f2b33d', '#c94a2a'], teilchen: ['#e8752a', '#f2b33d', '#c94a2a', '#a8582a'] },
     winter: { himmel: ['#b9d3ea', '#eef5fb'], huegel: ['#ffffff', '#e3edf6'], krone: ['#ffffff', '#e8f1f8', '#d7e6f2'], teilchen: ['#ffffff'] },
   }
+  let breite = $state(1600)
+  let hoehe = $state(900)
+  // hochkant: Baum und Haus in die sichtbare Mitte rücken (das Bild wird seitlich beschnitten)
+  const hoch = $derived(hoehe > breite)
   const f = $derived(FARBEN[jz])
   const himmel = $derived<[string, string]>(nacht ? ['#13204a', '#3a4f86'] : f.himmel)
 
@@ -26,7 +31,7 @@
   const sterne = Array.from({ length: 40 }, () => ({ x: Math.random() * 100, y: Math.random() * 45, r: 0.15 + Math.random() * 0.3 }))
 </script>
 
-<div class="szene">
+<div class="szene" bind:clientWidth={breite} bind:clientHeight={hoehe}>
   <svg viewBox="0 0 160 90" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
     <defs>
       <linearGradient id="himmel" x1="0" y1="0" x2="0" y2="1">
@@ -48,6 +53,7 @@
     <path d="M0 62 Q30 48 62 58 T122 54 T160 58 V90 H0 Z" fill={nacht ? '#2e4a3a' : f.huegel[0]} />
     <path d="M0 74 Q40 62 82 72 T160 68 V90 H0 Z" fill={nacht ? '#22382c' : f.huegel[1]} />
     <!-- Baum -->
+    <g transform={hoch ? 'translate(30 0)' : undefined}>
     <rect x="38" y="44" width="4" height="22" rx="1.5" fill="#7a4e2d" />
     <circle cx="40" cy="40" r="11" fill={f.krone[0]} />
     <circle cx="33" cy="44" r="7.5" fill={f.krone[1]} />
@@ -56,8 +62,9 @@
     {#if jz === 'herbst'}
       <circle cx="37" cy="38" r="1.6" fill="#c94a2a" /><circle cx="44" cy="42" r="1.6" fill="#c94a2a" />
     {/if}
+    </g>
     <!-- kleines Haus -->
-    <g transform="translate(110 54)">
+    <g transform={hoch ? 'translate(82 54)' : 'translate(110 54)'}>
       <rect x="0" y="6" width="18" height="12" fill={jz === 'winter' ? '#f3e2c9' : '#f6d6a8'} />
       <path d="M-2 7 L9 -2 L20 7 Z" fill={jz === 'winter' ? '#ffffff' : '#c9563c'} />
       <rect x="7" y="11" width="4" height="7" fill="#7a4e2d" />
@@ -77,6 +84,8 @@
       <circle cx="70" cy="78" r="4.5" fill="#fff" /><circle cx="70" cy="71" r="3.2" fill="#fff" /><path d="M70 71 l3 0.6 -3 0.6 z" fill="#f08a24" />
     {/if}
   </svg>
+
+  <SzenenEreignisse {jz} />
 
   {#if f.teilchen.length}
     <div class="teilchen" class:schnee={jz === 'winter'}>
