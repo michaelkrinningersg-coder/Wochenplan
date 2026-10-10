@@ -8,6 +8,7 @@
   import { ABSCHNITTE, ZUSAETZE, tagName } from '../lib/konstanten'
   import { app, aufgabeLoeschen, aufgabeSpeichern, fotoHinzufuegen, zeigeHinweis } from '../lib/speicher.svelte'
   import type { AbschnittId, Aufgabe, TagId } from '../lib/typen'
+  import { VORLAGEN, type Vorlage } from '../lib/vorlagen'
 
   let props: { tag: TagId; abschnitt: AbschnittId; aufgabe: Aufgabe; neu: boolean } = $props()
   // Werte festhalten: Nach dem Schließen (app.dialog = null) sind die Props nicht mehr lesbar
@@ -59,6 +60,21 @@
     app.dialog = null
   }
 
+  // svelte-ignore state_referenced_locally
+  let zeigeVorlagen = $state(neu)
+  const passendeVorlagen = $derived([
+    ...VORLAGEN.filter((v) => v.abschnitt === abschnitt),
+    ...VORLAGEN.filter((v) => v.abschnitt !== abschnitt),
+  ])
+  function vorlageWaehlen(v: Vorlage) {
+    entwurf.titel = v.titel
+    entwurf.bild = v.bild
+    entwurf.minuten = v.minuten
+    entwurf.zusatz = v.zusatz
+    titelGeaendert = true
+    zeigeVorlagen = false
+  }
+
   const gruppenIcons = $derived(ICON_LIST.filter((i) => i.group === gruppe))
 </script>
 
@@ -76,6 +92,23 @@
     </div>
 
     <div class="felder">
+      {#if neu}
+        <div class="feld">
+          <span class="name">Aus der Bibliothek</span>
+          {#if zeigeVorlagen}
+            <div class="vorlagen">
+              {#each passendeVorlagen as v (v.titel + v.abschnitt)}
+                <button type="button" class="vorlage" data-seg={v.abschnitt} onclick={() => vorlageWaehlen(v)}>
+                  <span class="vorlage-bild"><Bild id={v.bild} zusatz={v.zusatz} /></span>
+                  <span>{v.titel}</span>
+                </button>
+              {/each}
+            </div>
+          {:else}
+            <div><button type="button" class="knopf klein" onclick={() => (zeigeVorlagen = true)}>Andere Vorlage wählen</button></div>
+          {/if}
+        </div>
+      {/if}
       <label class="feld">
         <span class="name">Name</span>
         <input
@@ -280,6 +313,32 @@
   .zusatz img {
     width: 1.3em;
     height: 1.3em;
+  }
+  .vorlagen {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+    gap: 8px;
+    max-height: 260px;
+    overflow: auto;
+    padding: 2px;
+  }
+  .vorlage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 4px;
+    border: none;
+    border-radius: 16px;
+    background: var(--seg-hell);
+    font-size: var(--t-klein);
+    font-weight: 700;
+    line-height: 1.1;
+    text-align: center;
+  }
+  .vorlage-bild {
+    width: 40px;
+    height: 40px;
   }
   .bildwahl {
     display: grid;
