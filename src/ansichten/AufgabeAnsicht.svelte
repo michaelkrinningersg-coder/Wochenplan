@@ -26,6 +26,8 @@
     timerZuruecksetzen,
   } from '../lib/speicher.svelte'
   import { spieleTon } from '../lib/ton'
+  import { vorlesen } from '../lib/vorlesen'
+  import { untrack } from 'svelte'
   import type { AbschnittId, TagId } from '../lib/typen'
   import { dauerText, inText } from '../lib/zeit'
 
@@ -67,12 +69,22 @@
   )
   const ampelHoehe = $derived(Math.floor(scheibe * 0.8))
 
+  // Beim Öffnen jeder Aufgabe den Namen vorlesen
+  $effect(() => {
+    const i = id
+    untrack(() => {
+      const t = finde(tag, i)?.aufgabe.titel
+      if (t) void vorlesen(t)
+    })
+  })
+
   function fertig() {
     if (!aufgabe) return
     setzeErledigt(aufgabe, true)
     timerPause(id)
     const alles = allesErledigt(tag)
     if (app.einst.ton) spieleTon(alles ? 'alles' : 'fertig')
+    setTimeout(() => void vorlesen(alles ? 'Alles geschafft! Super!' : 'Super gemacht!'), alles ? 2300 : 900)
     feiern = alles ? 'alles' : 'eins'
     setTimeout(
       () => {

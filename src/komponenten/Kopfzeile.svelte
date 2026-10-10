@@ -5,6 +5,7 @@
   import { datumLang, heuteTag, spanneText, uhrzeitJetzt } from '../lib/zeit'
   import Bild from './Bild.svelte'
   import HalteKnopf from './HalteKnopf.svelte'
+  import KinderWahl from './KinderWahl.svelte'
   import Symbol from './Symbol.svelte'
 
   const a = $derived(app.ansicht)
@@ -57,6 +58,9 @@
       <h1>{titel}</h1>
       <span class="unter">{unter}</span>
     </div>
+    {#if a.art === 'tag' || a.art === 'abschnitt' || a.art === 'aufgabe'}
+      <KinderWahl />
+    {/if}
   </div>
 
   <div class="rechts">
@@ -218,6 +222,15 @@
     font-size: var(--t-klein);
     text-align: center;
     flex: none;
+  }
+  @media (max-width: 1200px) {
+    .wort {
+      display: none;
+    }
+    .wechsel .knopf {
+      padding: 0;
+      width: 2.6em;
+    }
   }
   @media (max-width: 760px) {
     .wort {

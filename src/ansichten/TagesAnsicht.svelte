@@ -1,7 +1,10 @@
 <script lang="ts">
   import Bild from '../komponenten/Bild.svelte'
   import Kachel from '../komponenten/Kachel.svelte'
+  import Countdowns from '../komponenten/Countdowns.svelte'
+  import GeburtstagsBanner from '../komponenten/GeburtstagsBanner.svelte'
   import Sonnenbogen from '../komponenten/Sonnenbogen.svelte'
+  import { geburtstageHeute } from '../lib/countdown'
   import Symbol from '../komponenten/Symbol.svelte'
   import { aufgabeGewaehlt } from '../lib/aktionen'
   import { ABSCHNITTE, tagName } from '../lib/konstanten'
@@ -16,6 +19,7 @@
     minutenBisStart,
     neueAufgabe,
     oeffnen,
+    vorlageFuer,
   } from '../lib/speicher.svelte'
   import type { TagId } from '../lib/typen'
   import { spanneText, tagesPhase } from '../lib/zeit'
@@ -76,8 +80,18 @@
 </script>
 
 <div class="tagesansicht" class:schmal>
-  {#if heute && !schmal}
-    <Sonnenbogen {phase} {lagen} {breite} />
+  {#if heute && geburtstageHeute().length}
+    <GeburtstagsBanner />
+  {:else if heute && !schmal}
+    <div class="oben">
+      <Sonnenbogen {phase} {lagen} {breite} />
+      <div class="countdowns"><Countdowns max={2} /></div>
+    </div>
+  {:else if heute}
+    <div class="countdowns-schmal"><Countdowns max={2} /></div>
+  {/if}
+  {#if vorlageFuer(tag)}
+    <p class="vorlage-hinweis">Heute gilt der Ablauf „{vorlageFuer(tag)}“</p>
   {/if}
 
   {#if tagLeer && !app.bearbeiten}
@@ -150,6 +164,26 @@
     flex-direction: column;
     height: 100%;
     min-height: 0;
+  }
+  .oben {
+    position: relative;
+    flex: none;
+  }
+  .countdowns {
+    position: absolute;
+    right: 0;
+    top: 0;
+    max-width: 55%;
+    z-index: 5;
+  }
+  .countdowns-schmal {
+    margin-bottom: 8px;
+  }
+  .vorlage-hinweis {
+    margin: 0 0 6px;
+    font-size: var(--t-klein);
+    color: var(--tinte-leise);
+    font-weight: 700;
   }
   .spalten {
     flex: 1;

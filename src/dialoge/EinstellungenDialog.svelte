@@ -6,7 +6,7 @@
   import { dateiExportieren, istApp } from '../lib/geraet'
   import { ABSCHNITTE } from '../lib/konstanten'
   import { app, exportDaten, importDaten, zeigeHinweis } from '../lib/speicher.svelte'
-  import { startplan } from '../lib/startplan'
+  import { KIND_FARBEN, startplan } from '../lib/startplan'
   import { minutenVon } from '../lib/zeit'
 
   let zuruecksetzenFragen = $state(false)
@@ -88,6 +88,33 @@
           Der Plan kommt vom Handy oder PC. Die App schaut alle 2 Minuten nach Änderungen.
         {/if}
       </p>
+    </section>
+
+    <section>
+      <h3>Kinder</h3>
+      <div class="kinder">
+        {#each app.plan.kinder as k (k.id)}
+          <div class="kind-karte" style="--kind: {k.farbe}">
+            <label class="feld">
+              <span class="name">Name</span>
+              <input id="kind-name-{k.id}" type="text" bind:value={k.name} maxlength="30" autocomplete="off" />
+            </label>
+            <label class="feld">
+              <span class="name">Geburtstag</span>
+              <input id="kind-geburtstag-{k.id}" type="date" bind:value={k.geburtstag} />
+            </label>
+            <div class="feld">
+              <span class="name">Farbe</span>
+              <div class="farben">
+                {#each KIND_FARBEN as f (f)}
+                  <button class="farbe" style="--f: {f}" aria-pressed={k.farbe === f} aria-label="Farbe {f}" onclick={() => (k.farbe = f)}></button>
+                {/each}
+              </div>
+            </div>
+          </div>
+        {/each}
+      </div>
+      <p class="hilfe">Namen und Geburtstage stehen nur im verschlüsselten Plan, nicht im öffentlichen Code.</p>
     </section>
 
     <section>
@@ -183,6 +210,9 @@
       <div class="reihe">
         <button class="knopf" aria-pressed={app.einst.ton} onclick={() => (app.einst.ton = !app.einst.ton)}>
           Ton {app.einst.ton ? 'an' : 'aus'}
+        </button>
+        <button class="knopf" aria-pressed={app.einst.vorlesen} onclick={() => (app.einst.vorlesen = !app.einst.vorlesen)}>
+          Vorlesen {app.einst.vorlesen ? 'an' : 'aus'}
         </button>
         <button class="knopf" aria-pressed={app.einst.wach} onclick={() => (app.einst.wach = !app.einst.wach)}>
           Bildschirm anlassen: {app.einst.wach ? 'ja' : 'nein'}
@@ -280,6 +310,42 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
     gap: 10px;
+  }
+  .kinder {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 10px;
+  }
+  .kind-karte {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px;
+    border-radius: 18px;
+    box-shadow: inset 0 0 0 3px var(--kind);
+  }
+  input[type='date'] {
+    padding: 0.45em 0.8em;
+    border: 2px solid var(--linie);
+    border-radius: 14px;
+    background: var(--himmel);
+    color: var(--tinte);
+    font: inherit;
+  }
+  .farben {
+    display: flex;
+    gap: 6px;
+  }
+  .farbe {
+    width: 32px;
+    height: 32px;
+    border: 3px solid var(--tafel);
+    border-radius: 50%;
+    background: var(--f);
+    box-shadow: 0 0 0 2px var(--linie);
+  }
+  .farbe[aria-pressed='true'] {
+    box-shadow: 0 0 0 3px var(--tinte);
   }
   .zeit-name {
     font-family: var(--schrift-titel);

@@ -45,7 +45,7 @@
           <span class="lang">{t.lang}</span>
         </button>
         {#if app.bearbeiten}
-          <button class="kopieren" onclick={() => (app.dialog = { art: 'kopieren', tag: t.id })} aria-label="{t.lang} kopieren oder leeren">
+          <button class="kopieren" onclick={() => (app.dialog = { art: 'kopieren', tag: t.id })} aria-label="{t.lang} kopieren, als Vorlage speichern oder leeren">
             <Symbol name="kopie" />
           </button>
         {/if}
