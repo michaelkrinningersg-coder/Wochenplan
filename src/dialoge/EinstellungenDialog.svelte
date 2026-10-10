@@ -7,6 +7,7 @@
   import { onDestroy, onMount } from 'svelte'
   import ZeitWahl from '../komponenten/ZeitWahl.svelte'
   import Lizenzen from '../komponenten/Lizenzen.svelte'
+  import { SPRACHEN, spr, spracheSetzen } from '../lib/i18n.svelte'
   import { datei, dateiAbgleichen, dateiInfoLaden, dateiMoeglich, dateiTrennen, dateiWaehlen, passwortSpeichern } from '../lib/dateiabgleich.svelte'
   import { empfangStarten, empfangStoppen, fernseherSuchen, kopplung, kopplungMoeglich, planSenden, type Geraet } from '../lib/kopplung.svelte'
   import { abgleich, einstSpeichern, holen, hochladen, istEingerichtet, ruhebildFernLoeschen, ruhebildHochladen, statusHochladen } from '../lib/abgleich.svelte'
@@ -34,7 +35,7 @@
   const REITER = [
     { id: 'geraet', name: 'Gerät' },
     { id: 'anzeige', name: 'Anzeige' },
-    { id: 'sprache', name: 'Sprache' },
+    { id: 'sprache', name: 'Vorlesen' },
     { id: 'tag', name: 'Tagesablauf' },
     { id: 'ruhe', name: 'Ruhebild' },
     { id: 'abgleich', name: __STORE__ ? 'Daten & Info' : 'Abgleich & App' },
@@ -273,6 +274,18 @@
       </section>
     {/if}
     {:else if reiter === 'anzeige'}
+    <section>
+      <h3>Sprache / Language</h3>
+      <div class="z">
+        <span class="zl">Sprache der App</span>
+        <div class="zr">
+          {#each SPRACHEN as l (l.id)}
+            <button class="knopf klein" aria-pressed={spr.aktuell === l.id} onclick={() => spracheSetzen(l.id)}>{l.name}</button>
+          {/each}
+        </div>
+      </div>
+    </section>
+
     <section>
       <h3>Aussehen</h3>
       <p class="zh">Gilt für alle Geräte.</p>
