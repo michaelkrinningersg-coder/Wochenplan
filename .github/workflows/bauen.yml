@@ -1,0 +1,86 @@
+name: Bauen
+
+# Bei jedem Push auf main:
+#  - Webseite (Planer und Anzeige im Browser) nach GitHub Pages
+#  - Android-App (Tablet und Google TV) als Release „wochenplan.apk“
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: bauen
+  cancel-in-progress: true
+
+jobs:
+  webseite:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Typprüfung
+        run: npm run check
+      - name: Webseite bauen
+        run: npm run build
+      - name: Auf GitHub Pages veröffentlichen (Zweig gh-pages)
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          publish_branch: gh-pages
+          force_orphan: true
+          commit_message: Webseite aktualisiert
+
+  android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Webteil bauen und in die App kopieren
+        run: |
+          npm run build
+          npx cap sync android
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: gradle
+      - uses: android-actions/setup-android@v3
+      - name: APK bauen
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleRelease --no-daemon
+      - name: APK benennen
+        run: cp android/app/build/outputs/apk/release/app-release.apk wochenplan.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wochenplan-apk
+          path: wochenplan.apk
+      - name: Release veröffentlichen
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.${{ github.run_number }}
+          name: Wochenplan 1.0.${{ github.run_number }}
+          body: |
+            Installation auf Google TV mit der App „Downloader“:
+            https://github.com/${{ github.repository }}/releases/latest/download/wochenplan.apk
+          files: wochenplan.apk
+          make_latest: true
+      - name: Alte Releases aufräumen (die letzten 5 bleiben)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release list --repo "${{ github.repository }}" --limit 100 --json tagName --jq '.[5:][].tagName' \
+            | xargs -r -n1 gh release delete --repo "${{ github.repository }}" --cleanup-tag -y

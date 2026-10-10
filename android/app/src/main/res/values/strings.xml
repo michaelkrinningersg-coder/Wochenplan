@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Wochenplan</string>
+    <string name="title_activity_main">Wochenplan</string>
+    <string name="package_name">de.krinninger.wochenplan</string>
+    <string name="custom_url_scheme">de.krinninger.wochenplan</string>
+</resources>

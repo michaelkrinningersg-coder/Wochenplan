@@ -1,0 +1,21 @@
+package de.krinninger.wochenplan;
+
+import android.webkit.WebView;
+
+import com.getcapacitor.BridgeActivity;
+
+public class MainActivity extends BridgeActivity {
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Fernbedienung: Die Web-Oberfläche soll die Pfeiltasten direkt bekommen
+        if (getBridge() != null) {
+            WebView webView = getBridge().getWebView();
+            if (webView != null) {
+                webView.setFocusable(true);
+                webView.setFocusableInTouchMode(true);
+                webView.requestFocus();
+            }
+        }
+    }
+}
