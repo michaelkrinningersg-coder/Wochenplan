@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { segVon } from '../lib/konstanten'
   import Bild from '../komponenten/Bild.svelte'
   import Fenster from '../komponenten/Fenster.svelte'
   import Symbol from '../komponenten/Symbol.svelte'
@@ -28,7 +29,7 @@
 <Fenster titel="Aufgabe kopieren">
   {#if fund}
     <div class="inhalt">
-      <div class="aufgabe" data-seg={fund.abschnitt}>
+      <div class="aufgabe" data-seg={segVon(fund.abschnitt)}>
         <span class="bild"><Bild id={fund.aufgabe.bild} zusatz={fund.aufgabe.zusatz} /></span>
         <span><b>{fund.aufgabe.titel}</b><br /><small>{abschnittInfo(fund.abschnitt).name}, gleiche Tageszeit an jedem Zieltag</small></span>
       </div>

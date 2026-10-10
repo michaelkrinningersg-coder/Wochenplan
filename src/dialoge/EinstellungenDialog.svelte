@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { segVon } from '../lib/konstanten'
   import Fenster from '../komponenten/Fenster.svelte'
   import Symbol from '../komponenten/Symbol.svelte'
   import Bild from '../komponenten/Bild.svelte'
@@ -12,13 +13,14 @@
   import { ortSuchen, ortTeile, wetterAktualisieren } from '../lib/wetter.svelte'
   import { dateiExportieren, istApp } from '../lib/geraet'
   import { ABSCHNITTE } from '../lib/konstanten'
-  import { app, exportDaten, importDaten, zeigeHinweis } from '../lib/speicher.svelte'
+  import { abschnittAnlegen, abschnittLoeschen, app, exportDaten, importDaten, zeigeHinweis } from '../lib/speicher.svelte'
   import { neueId, startplan } from '../lib/startplan'
   import { minutenVon } from '../lib/zeit'
   import { installieren, suchen, update, updateVerfuegbar } from '../lib/update.svelte'
 
   let zuruecksetzenFragen = $state(false)
   // Kopplung Handy → Fernseher
+  let loeschenFragen = $state<string | null>(null)
   let gewaehlt = $state<Geraet | null>(null)
   let codeEingabe = $state('')
   let ipEingabe = $state('')
@@ -366,11 +368,14 @@
 
     <section>
       <h3>Tageszeiten</h3>
-      <p class="hilfe">Tippe auf Bild oder Namen, um eine Tageszeit umzubenennen oder ihr ein eigenes Bild zu geben. Jeder Abschnitt endet, wenn der nächste beginnt. Änderst du ein „bis“, verschiebt sich der Beginn des nächsten Abschnitts mit.</p>
+      <p class="hilfe">Tippe auf Bild oder Namen, um eine Tageszeit umzubenennen, ihr ein Bild oder eine Farbe zu geben. Jeder Abschnitt endet, wenn der nächste beginnt. Änderst du ein „bis“, verschiebt sich der Beginn des nächsten Abschnitts mit. Die letzte Tageszeit dauert bis zum Aufstehen am nächsten Tag.</p>
+      <div class="reihe">
+        <button class="knopf haupt klein" onclick={() => (app.dialog = { art: 'abschnittBild', id: abschnittAnlegen() })}>＋ Neue Tageszeit</button>
+      </div>
       <div class="zeiten">
         {#each ABSCHNITTE as ab, i (ab.id)}
           {@const naechster = ABSCHNITTE[i + 1]}
-          <div class="zeit" data-seg={ab.id}>
+          <div class="zeit" data-seg={segVon(ab.id)}>
             <button class="zeit-name" onclick={() => (app.dialog = { art: 'abschnittBild', id: ab.id })} aria-label="{ab.name}: Name und Bild ändern">
               <span class="zeit-bild"><Bild id={ab.bild} /></span>
               <span>{ab.name}</span>
@@ -388,6 +393,17 @@
                 <span class="bis-auto">bis Aufstehen</span>
               {/if}
             </div>
+            {#if ABSCHNITTE.length > 1}
+              {#if loeschenFragen === ab.id}
+                <div class="reihe">
+                  <button class="knopf klein gefahr" onclick={() => (abschnittLoeschen(ab.id), (loeschenFragen = null))}>Ja, löschen</button>
+                  <button class="knopf klein" onclick={() => (loeschenFragen = null)}>Nein</button>
+                </div>
+                <span class="hilfe">Die Aufgaben wandern in {ABSCHNITTE[Math.max(0, i === 0 ? 1 : i - 1)].name}.</span>
+              {:else}
+                <button class="knopf klein loeschen" onclick={() => (loeschenFragen = ab.id)} aria-label="{ab.name} löschen"><Symbol name="muell" />Löschen</button>
+              {/if}
+            {/if}
             {#if naechster && minutenVon(app.plan.zeiten[ab.id]) >= minutenVon(app.plan.zeiten[naechster.id])}
               <span class="warnung">„bis“ muss nach „von“ liegen</span>
             {/if}

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { segVon } from '../lib/konstanten'
   // Tageszeit anpassen: eigener Name und eigenes Bild (Symbol, Bildkarte oder Foto aus der Galerie)
   import BildZuschnitt from '../komponenten/BildZuschnitt.svelte'
   import Fenster from '../komponenten/Fenster.svelte'
@@ -8,7 +9,7 @@
   import { bildUrl, fotoVerkleinern } from '../lib/bilder'
   import { ICON_GROUPS, ICON_LIST } from '../lib/iconliste'
   import { bilderSuchen } from '../lib/suche'
-  import { ABSCHNITTE, abschnittInfo } from '../lib/konstanten'
+  import { ABSCHNITTE, STANDARD_ABSCHNITTE, abschnittInfo } from '../lib/konstanten'
   import { app, fotoHinzufuegen, fotosAufraeumen, zeigeHinweis } from '../lib/speicher.svelte'
   import type { AbschnittId } from '../lib/typen'
 
@@ -18,6 +19,9 @@
   const info = abschnittInfo(abId)
   const start = app.plan.abschnitte[abId] ?? {}
 
+  const eigene = !STANDARD_ABSCHNITTE.includes(abId)
+  let nacht = $state(start.nacht ?? info.grundNacht)
+  let farbe = $state(start.farbe ?? info.grundFarbe)
   let name = $state(start.name ?? '')
   let bild = $state(start.bild ?? '')
   let zuschnittQuelle = $state<string | null>(null)
@@ -50,8 +54,14 @@
 
   function speichern() {
     const n = name.trim()
-    if (!n && !bild) delete app.plan.abschnitte[abId]
-    else app.plan.abschnitte[abId] = { ...(n && n !== info.grundName ? { name: n.slice(0, 30) } : {}), ...(bild ? { bild } : {}) }
+    const neu = {
+      ...((n && n !== info.grundName) || eigene ? { name: (n || info.grundName).slice(0, 30) } : {}),
+      ...(bild ? { bild } : {}),
+      ...(nacht !== info.grundNacht ? { nacht } : {}),
+      ...(farbe !== info.grundFarbe ? { farbe } : {}),
+    }
+    if (Object.keys(neu).length) app.plan.abschnitte[abId] = neu
+    else delete app.plan.abschnitte[abId]
     fotosAufraeumen()
     app.dialog = { art: 'einstellungen' }
   }
@@ -62,7 +72,7 @@
 </script>
 
 <Fenster titel="Tageszeit anpassen" breit>
-  <div class="inhalt" data-seg={abId}>
+  <div class="inhalt" data-seg={segVon(abId)}>
     <div class="kopf">
       <span class="vorschau"><Bild id={vorschau} /></span>
       <label class="feld">
@@ -80,6 +90,20 @@
       {:else}
         <span class="name">Aufstehen am nächsten Tag</span>
       {/if}
+    </div>
+
+    <div class="feld">
+      <span class="name">Darstellung</span>
+      <div class="reihe">
+        <button type="button" class="knopf klein" aria-pressed={!nacht} onclick={() => (nacht = false)}>Tag (Sonne)</button>
+        <button type="button" class="knopf klein" aria-pressed={nacht} onclick={() => (nacht = true)}>Nacht (dunkel, Mond)</button>
+      </div>
+      <span class="name">Farbe</span>
+      <div class="reihe" role="group" aria-label="Farbe">
+        {#each STANDARD_ABSCHNITTE as f (f)}
+          <button type="button" class="farbpunkt" data-seg={f} style="background: var(--seg)" aria-pressed={farbe === f} aria-label="Farbe {abschnittInfo(f).grundName}" title={abschnittInfo(f).grundName} onclick={() => (farbe = f)}></button>
+        {/each}
+      </div>
     </div>
 
     <div class="feld">
@@ -192,5 +216,15 @@
     border-color: var(--tinte);
     background: var(--tafel);
     box-shadow: inset 0 0 0 2px var(--tinte);
+  }
+  .farbpunkt {
+    width: 36px;
+    height: 36px;
+    border: 3px solid var(--tafel);
+    border-radius: 50%;
+    box-shadow: 0 0 0 2px var(--linie);
+  }
+  .farbpunkt[aria-pressed='true'] {
+    box-shadow: 0 0 0 4px var(--tinte);
   }
 </style>

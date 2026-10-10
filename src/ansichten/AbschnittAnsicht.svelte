@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { segVon } from '../lib/konstanten'
   import Bild from '../komponenten/Bild.svelte'
   import Kachel from '../komponenten/Kachel.svelte'
   import Symbol from '../komponenten/Symbol.svelte'
@@ -38,11 +39,11 @@
   )
 </script>
 
-<div class="abschnitt" data-seg={abschnitt}>
+<div class="abschnitt" data-seg={segVon(abschnitt)}>
   {#if vorher}
     <button
       class="nachbar links"
-      data-seg={vorher.id}
+      data-seg={segVon(vorher.id)}
       onclick={() => oeffnen({ art: 'abschnitt', tag, abschnitt: vorher.id })}
       aria-label="Zurück zu {vorher.name}"
     >
@@ -88,7 +89,7 @@
   {#if nachher}
     <button
       class="nachbar rechts"
-      data-seg={nachher.id}
+      data-seg={segVon(nachher.id)}
       onclick={() => oeffnen({ art: 'abschnitt', tag, abschnitt: nachher.id })}
       aria-label="Weiter zu {nachher.name}"
     >

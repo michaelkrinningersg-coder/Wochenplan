@@ -29,7 +29,7 @@
     if (!name) return
     const quelle = $state.snapshot(planFuer(tag))
     const kopie = {} as typeof quelle
-    for (const ab of ABSCHNITTE) kopie[ab.id] = quelle[ab.id].map((x) => ({ ...x, id: neueId() }))
+    for (const ab of ABSCHNITTE) kopie[ab.id] = (quelle[ab.id] ?? []).map((x) => ({ ...x, id: neueId() }))
     app.plan.vorlagen.push({ id: neueId(), name, tag: kopie })
     vorlageName = ''
     zeigeHinweis(`Tagesvorlage „${name}“ gespeichert`)
@@ -38,7 +38,7 @@
     const v = app.plan.vorlagen.find((x) => x.id === id)
     if (!v) return
     const quelle = $state.snapshot(v.tag)
-    for (const ab of ABSCHNITTE) app.plan.woche[tag][ab.id] = quelle[ab.id].map((x) => ({ ...x, id: neueId() }))
+    for (const ab of ABSCHNITTE) app.plan.woche[tag][ab.id] = (quelle[ab.id] ?? []).map((x) => ({ ...x, id: neueId() }))
     zeigeHinweis(`${tagName(tag)} nutzt jetzt „${v.name}“`)
     app.dialog = null
   }

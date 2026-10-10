@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { segVon } from '../lib/konstanten'
   import Bild from '../komponenten/Bild.svelte'
   import Kachel from '../komponenten/Kachel.svelte'
   import Countdowns from '../komponenten/Countdowns.svelte'
@@ -107,7 +108,7 @@
           class="spalte"
           class:aktiv={aktiverAbschnitt(ab.id)}
           class:leer={anzahlen[i] === 0}
-          data-seg={ab.id}
+          data-seg={segVon(ab.id)}
           style={schmal ? '' : anzahlen[i] === 0 ? `flex: 0 0 ${LEER}px` : `flex: 1 1 ${raster.breiten[i]}px`}
         >
           <button

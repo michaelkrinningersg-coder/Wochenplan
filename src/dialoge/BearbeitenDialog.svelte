@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { segVon } from '../lib/konstanten'
   import AufgabenBild from '../komponenten/AufgabenBild.svelte'
   import Bild from '../komponenten/Bild.svelte'
   import BildZuschnitt from '../komponenten/BildZuschnitt.svelte'
@@ -125,7 +126,7 @@
       speichern()
     }}
   >
-    <div class="vorschau" data-seg={abschnitt}>
+    <div class="vorschau" data-seg={segVon(abschnitt)}>
       <div class="vorschau-bild"><AufgabenBild aufgabe={entwurf} /></div>
       <span class="vorschau-titel">{entwurf.titel || 'Neue Aufgabe'}</span>
     </div>
@@ -139,7 +140,7 @@
             {#if !gezeigteVorlagen.length}<p class="leer">Keine Vorlage gefunden.</p>{/if}
             <div class="vorlagen">
               {#each gezeigteVorlagen as v (v.titel + v.abschnitt)}
-                <button type="button" class="vorlage" data-seg={v.abschnitt} onclick={() => vorlageWaehlen(v)}>
+                <button type="button" class="vorlage" data-seg={segVon(v.abschnitt)} onclick={() => vorlageWaehlen(v)}>
                   <span class="vorlage-bild"><Bild id={v.bild} zusatz={v.zusatz} /></span>
                   <span>{v.titel}</span>
                 </button>
@@ -171,7 +172,7 @@
             <button
               type="button"
               class="knopf abschnitt-wahl"
-              data-seg={ab.id}
+              data-seg={segVon(ab.id)}
               aria-pressed={abschnitt === ab.id}
               onclick={() => (abschnitt = ab.id)}
             >

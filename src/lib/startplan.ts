@@ -1,4 +1,4 @@
-import { ABSCHNITTE, TAGE } from './konstanten'
+import { STANDARD_ABSCHNITTE, TAGE } from './konstanten'
 import type { AbschnittId, Aufgabe, GeteilteOptionen, Kind, KindId, Plan, TagId, Tagesplan, Termin } from './typen'
 
 export function neueId(): string {
@@ -9,8 +9,10 @@ export function neueId(): string {
   }
 }
 
-export function leererTag(): Tagesplan {
-  return { aufstehen: [], morgen: [], vormittag: [], mittag: [], nachmittag: [], frueh: [], abend: [], bett: [], schlafen: [] }
+export function leererTag(ids: string[] = STANDARD_ABSCHNITTE): Tagesplan {
+  const t: Tagesplan = {}
+  for (const id of ids) t[id] = []
+  return t
 }
 
 function a(titel: string, bild: string, minuten: number, zusatz?: string): Aufgabe {
@@ -121,14 +123,22 @@ function aufgabeNormalisieren(x: Record<string, unknown>): Aufgabe | null {
   }
 }
 
-function tagNormalisieren(roh: unknown): Tagesplan {
-  const neu = leererTag()
+function tagNormalisieren(roh: unknown, ids: string[]): Tagesplan {
+  const neu = leererTag(ids)
   const tag = roh as Record<string, unknown> | undefined
-  for (const ab of ABSCHNITTE) {
-    const liste = tag?.[ab.id]
-    if (Array.isArray(liste)) neu[ab.id] = liste.map(aufgabeNormalisieren).filter((x): x is Aufgabe => !!x)
+  for (const id of ids) {
+    const liste = tag?.[id]
+    if (Array.isArray(liste)) neu[id] = liste.map(aufgabeNormalisieren).filter((x): x is Aufgabe => !!x)
   }
   return neu
+}
+
+/** Eigene Reihenfolge der Tageszeiten prüfen; ohne gültige Liste gelten die Standard-Tageszeiten */
+function listeNormalisieren(roh: unknown): string[] | undefined {
+  if (!Array.isArray(roh)) return undefined
+  const ids = [...new Set(roh.filter((x): x is string => typeof x === 'string' && /^[a-z0-9-]{2,24}$/i.test(x)))].slice(0, 30)
+  if (!ids.length) return undefined
+  return ids.join() === STANDARD_ABSCHNITTE.join() ? undefined : ids
 }
 
 /** Gespeicherten Plan prüfen und fehlende Teile ergänzen. */
@@ -136,13 +146,15 @@ export function planNormalisieren(roh: unknown): Plan {
   const basis = startplan()
   if (!roh || typeof roh !== 'object') return basis
   const p = roh as Partial<Plan>
+  const liste = listeNormalisieren(p.abschnittListe)
+  const ids = liste ?? STANDARD_ABSCHNITTE
   const woche = {} as Record<TagId, Tagesplan>
-  for (const t of TAGE) woche[t.id] = tagNormalisieren((p.woche as Record<string, unknown> | undefined)?.[t.id])
-  const zeiten = { ...basis.zeiten }
-  for (const ab of ABSCHNITTE) {
-    const z = p.zeiten?.[ab.id]
-    if (typeof z === 'string' && UHR.test(z)) zeiten[ab.id] = z
-  }
+  for (const t of TAGE) woche[t.id] = tagNormalisieren((p.woche as Record<string, unknown> | undefined)?.[t.id], ids)
+  const zeiten: Record<string, string> = {}
+  ids.forEach((id, i) => {
+    const z = p.zeiten?.[id]
+    zeiten[id] = typeof z === 'string' && UHR.test(z) ? z : (basis.zeiten[id] ?? (i > 0 ? zeiten[ids[i - 1]] : '06:30'))
+  })
   const abendEnde = typeof p.abendEnde === 'string' && UHR.test(p.abendEnde) ? p.abendEnde : basis.abendEnde
   const kinder = standardKinder().map((k) => {
     const g = Array.isArray(p.kinder) ? p.kinder.find((x) => x && x.id === k.id) : undefined
@@ -153,7 +165,7 @@ export function planNormalisieren(roh: unknown): Plan {
         .map((t) => {
           const a = aufgabeNormalisieren(t as unknown as Record<string, unknown>)
           if (!a || typeof t.datum !== 'string' || !DATUM.test(t.datum)) return null
-          const abschnitt = ABSCHNITTE.some((x) => x.id === t.abschnitt) ? t.abschnitt : 'vormittag'
+          const abschnitt = ids.includes(t.abschnitt) ? t.abschnitt : ids.includes('vormittag') ? 'vormittag' : ids[0]
           return { ...a, datum: t.datum, abschnitt }
         })
         .filter((x): x is Termin => !!x)
@@ -161,7 +173,7 @@ export function planNormalisieren(roh: unknown): Plan {
   const vorlagen = Array.isArray(p.vorlagen)
     ? p.vorlagen
         .filter((v) => v && typeof v.name === 'string')
-        .map((v) => ({ id: typeof v.id === 'string' ? v.id : neueId(), name: v.name.slice(0, 40), tag: tagNormalisieren(v.tag) }))
+        .map((v) => ({ id: typeof v.id === 'string' ? v.id : neueId(), name: v.name.slice(0, 40), tag: tagNormalisieren(v.tag, ids) }))
     : []
   const datumVorlage: Record<string, string> = {}
   if (p.datumVorlage && typeof p.datumVorlage === 'object')
@@ -169,12 +181,15 @@ export function planNormalisieren(roh: unknown): Plan {
       if (DATUM.test(d) && vorlagen.some((v) => v.id === id)) datumVorlage[d] = id
   const abschnitte: Plan['abschnitte'] = {}
   if (p.abschnitte && typeof p.abschnitte === 'object')
-    for (const ab of ABSCHNITTE) {
-      const x = (p.abschnitte as Record<string, { name?: unknown; bild?: unknown }>)[ab.id]
+    for (const id of ids) {
+      const x = (p.abschnitte as Record<string, { name?: unknown; bild?: unknown; nacht?: unknown; farbe?: unknown }>)[id]
       if (!x || typeof x !== 'object') continue
       const name = typeof x.name === 'string' && x.name.trim() ? x.name.trim().slice(0, 30) : undefined
       const bild = typeof x.bild === 'string' && x.bild ? x.bild : undefined
-      if (name || bild) abschnitte[ab.id] = { ...(name ? { name } : {}), ...(bild ? { bild } : {}) }
+      const nacht = typeof x.nacht === 'boolean' ? x.nacht : undefined
+      const farbe = typeof x.farbe === 'string' && STANDARD_ABSCHNITTE.includes(x.farbe) ? x.farbe : undefined
+      if (name || bild || nacht !== undefined || farbe)
+        abschnitte[id] = { ...(name ? { name } : {}), ...(bild ? { bild } : {}), ...(nacht !== undefined ? { nacht } : {}), ...(farbe ? { farbe } : {}) }
     }
   const optionen = optionenNormalisieren(p.optionen)
   const plan: Plan = {
@@ -188,6 +203,7 @@ export function planNormalisieren(roh: unknown): Plan {
     vorlagen,
     datumVorlage,
     abschnitte,
+    ...(liste ? { abschnittListe: liste } : {}),
     ...(optionen ? { optionen } : {}),
     ...(Array.isArray(p.ruhebilder) ? { ruhebilder: p.ruhebilder.filter((x): x is string => typeof x === 'string' && /^[a-z0-9-]{4,40}$/i.test(x)).slice(0, 60) } : {}),
   }
@@ -236,7 +252,7 @@ function umstellen(plan: Plan, vonStand: number) {
   // Stand 3: neue Standardwoche (gewünschter Wochenablauf); Termine, Abläufe, Kinder und Zeiten bleiben
   if (vonStand < 3) plan.woche = standardWoche()
   // Stand 4: Timer nur noch nach Auswahl – keine vorgegebenen Minuten in der Woche
-  if (vonStand < 4) for (const tp of Object.values(plan.woche)) for (const ab of ABSCHNITTE) for (const x of tp[ab.id]) x.minuten = 0
+  if (vonStand < 4) for (const tp of Object.values(plan.woche)) for (const l of Object.values(tp)) for (const x of l) x.minuten = 0
   // Stand 5: vor dem Abendessen immer Hände waschen
   if (vonStand < 5)
     for (const tp of Object.values(plan.woche)) {
@@ -264,6 +280,6 @@ function umstellen(plan: Plan, vonStand: number) {
     if (r.neuerTitel) x.titel = r.neuerTitel
   }
   const tage = [...Object.values(plan.woche), ...plan.vorlagen.map((v) => v.tag)]
-  for (const tp of tage) for (const ab of ABSCHNITTE) tp[ab.id].forEach(anpassen)
+  for (const tp of tage) for (const l of Object.values(tp)) l.forEach(anpassen)
   plan.termine.forEach(anpassen)
 }

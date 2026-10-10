@@ -18,7 +18,7 @@
     if (!name) return
     const quelle = $state.snapshot(app.plan.woche[neuAus])
     const kopie = {} as typeof quelle
-    for (const ab of ABSCHNITTE) kopie[ab.id] = quelle[ab.id].map((x) => ({ ...x, id: neueId() }))
+    for (const ab of ABSCHNITTE) kopie[ab.id] = (quelle[ab.id] ?? []).map((x) => ({ ...x, id: neueId() }))
     app.plan.vorlagen.push({ id: neueId(), name: name.slice(0, 40), tag: kopie })
     neuName = ''
     zeigeHinweis(`Ablauf „${name}“ gespeichert`)
@@ -89,7 +89,7 @@
         const v = app.plan.vorlagen.find((x) => x.id === wahlFuer(t.id))
         if (!v) continue
         const quelle = $state.snapshot(v.tag)
-        for (const ab of ABSCHNITTE) app.plan.woche[t.id][ab.id] = quelle[ab.id].map((x) => ({ ...x, id: neueId() }))
+        for (const ab of ABSCHNITTE) app.plan.woche[t.id][ab.id] = (quelle[ab.id] ?? []).map((x) => ({ ...x, id: neueId() }))
         n++
       }
       zeigeHinweis(n ? `Die Standardwoche nutzt jetzt die gewählten Abläufe (${n} Tage)` : 'Kein Ablauf gewählt')
@@ -129,7 +129,7 @@
           {#each app.plan.vorlagen as v (v.id)}
             <li>
               <input type="text" bind:value={v.name} aria-label="Name des Ablaufs" maxlength="40" />
-              <span class="anzahl">{ABSCHNITTE.reduce((s, ab) => s + v.tag[ab.id].length, 0)} Aufgaben</span>
+              <span class="anzahl">{ABSCHNITTE.reduce((s, ab) => s + (v.tag[ab.id]?.length ?? 0), 0)} Aufgaben</span>
               {#if loeschenId === v.id}
                 <button class="knopf klein gefahr" onclick={() => loeschen(v.id)}>Wirklich löschen</button>
               {:else}

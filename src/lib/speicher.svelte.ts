@@ -15,7 +15,7 @@ import type {
   TagId,
   TimerZustand,
 } from './typen'
-import { datumFuerTag, datumKey, heuteTag, minutenJetzt, minutenVon, tagesPhase } from './zeit'
+import { abschnittSpanne, datumFuerTag, datumKey, heuteTag, minutenJetzt, minutenVon, tagesPhase } from './zeit'
 
 const SCHLUESSEL = {
   plan: 'wochenplan.plan.v1',
@@ -100,7 +100,10 @@ export const app = $state({
   abgehakt: 0,
 })
 
-abschnittAnpassungVon(() => app.plan.abschnitte)
+abschnittAnpassungVon(
+  () => app.plan.abschnitte,
+  () => app.plan.abschnittListe,
+)
 
 // ---------- Navigation ----------
 
@@ -187,7 +190,7 @@ export function termineAm(datum: string): Termin[] {
 export function aufgabenIn(tag: TagId, abschnitt: AbschnittId): Aufgabe[] {
   const datum = datumVon(tag)
   return [
-    ...planFuer(tag)[abschnitt].filter(sichtbar),
+    ...(planFuer(tag)[abschnitt] ?? []).filter(sichtbar),
     ...app.plan.termine.filter((t) => t.datum === datum && t.abschnitt === abschnitt && sichtbar(t)),
   ]
 }
@@ -199,7 +202,7 @@ export function istTermin(id: string): boolean {
 export function finde(tag: TagId, id: string): Fundstelle | null {
   const tp = planFuer(tag)
   for (const ab of ABSCHNITTE) {
-    const i = tp[ab.id].findIndex((x) => x.id === id)
+    const i = (tp[ab.id] ?? []).findIndex((x) => x.id === id)
     if (i >= 0) return { abschnitt: ab.id, index: i, aufgabe: tp[ab.id][i] }
   }
   const t = app.plan.termine.find((x) => x.id === id)
@@ -382,8 +385,8 @@ export function tagKopieren(von: TagId, nach: TagId[], ersetzen: boolean) {
     if (z === von) continue
     const ziel = planFuer(z)
     for (const ab of ABSCHNITTE) {
-      const kopie = quelle[ab.id].map((x) => ({ ...x, id: neueId() }))
-      ziel[ab.id] = ersetzen ? kopie : [...ziel[ab.id], ...kopie]
+      const kopie = (quelle[ab.id] ?? []).map((x) => ({ ...x, id: neueId() }))
+      ziel[ab.id] = ersetzen ? kopie : [...(ziel[ab.id] ?? []), ...kopie]
     }
   }
 }
@@ -401,6 +404,64 @@ export function tagLeeren(tag: TagId) {
   fotosAufraeumen()
 }
 
+// ---------- Tageszeiten anlegen und löschen ----------
+
+function alleTage(): Tagesplan[] {
+  return [...TAGE.map((t) => app.plan.woche[t.id]), ...app.plan.vorlagen.map((v) => v.tag)]
+}
+
+function hhmm(min: number): string {
+  const m = Math.max(0, Math.min(23 * 60 + 59, Math.round(min)))
+  return `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`
+}
+
+/** Neue Tageszeit: teilt die längste vorhandene Tageszeit in der Mitte. Gibt die Kennung zurück. */
+export function abschnittAnlegen(): AbschnittId {
+  const ids = ABSCHNITTE.map((a) => a.id)
+  let beste = 0
+  let laenge = -1
+  ids.forEach((id, i) => {
+    const [s, e] = abschnittSpanne(app.plan, id)
+    if (e - s > laenge) {
+      laenge = e - s
+      beste = i
+    }
+  })
+  const [s, e] = abschnittSpanne(app.plan, ids[beste])
+  const mitte = s + (e - s) / 2
+  const start = e - s >= 60 ? Math.round(mitte / 15) * 15 : Math.round(mitte)
+  const id = 't' + Math.random().toString(36).slice(2, 8)
+  app.plan.zeiten[id] = hhmm(start)
+  app.plan.abschnitte[id] = { name: 'Neue Tageszeit', bild: '_sonne', nacht: start >= 18 * 60 + 30, farbe: start >= 18 * 60 + 30 ? 'abend' : 'vormittag' }
+  for (const tp of alleTage()) tp[id] = []
+  const neu = [...ids]
+  neu.splice(beste + 1, 0, id)
+  app.plan.abschnittListe = neu
+  return id
+}
+
+/** Tageszeit löschen: ihre Aufgaben wandern in die vorige Tageszeit (bei der ersten in die nächste). */
+export function abschnittLoeschen(id: AbschnittId): boolean {
+  const ids = ABSCHNITTE.map((a) => a.id)
+  const i = ids.indexOf(id)
+  if (i < 0 || ids.length <= 1) return false
+  const ziel = ids[i === 0 ? 1 : i - 1]
+  for (const tp of alleTage()) {
+    const mit = tp[id] ?? []
+    tp[ziel] = i === 0 ? [...mit, ...(tp[ziel] ?? [])] : [...(tp[ziel] ?? []), ...mit]
+    delete tp[id]
+  }
+  for (const t of app.plan.termine) if (t.abschnitt === id) t.abschnitt = ziel
+  delete app.plan.zeiten[id]
+  delete app.plan.abschnitte[id]
+  app.plan.abschnittListe = ids.filter((x) => x !== id)
+  // Ansicht, die diese Tageszeit zeigte, auf den Tag zurücksetzen
+  const a = app.ansicht
+  if ((a.art === 'abschnitt' || a.art === 'aufgabe') && a.abschnitt === id) app.ansicht = { art: 'tag', tag: a.tag }
+  fotosAufraeumen()
+  return true
+}
+
 /** Fotos löschen, die keine Aufgabe mehr benutzt */
 export function fotosAufraeumen() {
   const benutzt = new Set<string>()
@@ -408,7 +469,7 @@ export function fotosAufraeumen() {
     for (const b of [x.bild, x.foto]) if (b && b.startsWith('foto:')) benutzt.add(b.slice(5))
   }
   const tage = [...TAGE.map((t) => app.plan.woche[t.id]), ...app.plan.vorlagen.map((v) => v.tag)]
-  for (const tp of tage) for (const ab of ABSCHNITTE) tp[ab.id].forEach(merken)
+  for (const tp of tage) for (const l of Object.values(tp)) l.forEach(merken)
   app.plan.termine.forEach(merken)
   for (const ab of Object.values(app.plan.abschnitte)) if (ab?.bild?.startsWith('foto:')) benutzt.add(ab.bild.slice(5))
   for (const id of Object.keys(app.fotos)) if (!benutzt.has(id)) delete app.fotos[id]

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { segVon } from '../lib/konstanten'
   import Kachel from '../komponenten/Kachel.svelte'
   import Symbol from '../komponenten/Symbol.svelte'
   import { aufgabeGewaehlt } from '../lib/aktionen'
@@ -52,7 +53,7 @@
       </div>
       <div class="baender">
         {#each ABSCHNITTE as ab (ab.id)}
-          <div class="band" data-seg={ab.id} data-zone data-tag={t.id} data-abschnitt={ab.id} style="--luecke: {LUECKE}px">
+          <div class="band" data-seg={segVon(ab.id)} data-zone data-tag={t.id} data-abschnitt={ab.id} style="--luecke: {LUECKE}px">
             {#each aufgabenIn(t.id, ab.id) as aufgabe (aufgabe.id)}
               <Kachel
                 {aufgabe}

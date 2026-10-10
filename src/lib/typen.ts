@@ -1,14 +1,6 @@
 export type TagId = 'mo' | 'di' | 'mi' | 'do' | 'fr' | 'sa' | 'so'
-export type AbschnittId =
-  | 'aufstehen'
-  | 'morgen'
-  | 'vormittag'
-  | 'mittag'
-  | 'nachmittag'
-  | 'frueh'
-  | 'abend'
-  | 'bett'
-  | 'schlafen'
+/** Kennung einer Tageszeit (Standard: aufstehen, morgen, … oder eine selbst angelegte) */
+export type AbschnittId = string
 
 /** Eine Aufgabe im Plan, z. B. „Zähne putzen“. */
 export interface Aufgabe {
@@ -77,6 +69,8 @@ export interface Plan {
   datumVorlage: Record<string, string>
   /** eigene Namen und Bilder der Tageszeiten */
   abschnitte: Partial<Record<AbschnittId, AbschnittAnpassung>>
+  /** Reihenfolge der Tageszeiten; fehlt sie, gelten die neun Standard-Tageszeiten */
+  abschnittListe?: AbschnittId[]
   /** Stand der einmaligen Umstellungen (neue Bildkarten, Umbenennungen) */
   stand?: number
   /** Einstellungen, die für alle Geräte gelten */
@@ -88,6 +82,10 @@ export interface Plan {
 export interface AbschnittAnpassung {
   name?: string
   bild?: string
+  /** dunkle Darstellung mit Mond */
+  nacht?: boolean
+  /** Farbfamilie (Kennung einer Standard-Tageszeit) */
+  farbe?: string
 }
 
 export interface Einstellungen {

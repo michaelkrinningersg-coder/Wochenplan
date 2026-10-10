@@ -14,7 +14,7 @@ export function datumKey(d = new Date()): string {
 }
 
 export function minutenVon(hhmm: string): number {
-  const [h, m] = hhmm.split(':').map(Number)
+  const [h, m] = (hhmm ?? '').split(':').map(Number)
   return (h || 0) * 60 + (m || 0)
 }
 
@@ -45,8 +45,8 @@ export type TagesPhase =
 /** In welchem Abschnitt sind wir gerade (bezogen auf die Uhrzeit)? */
 export function tagesPhase(plan: Plan, d = new Date()): TagesPhase {
   const jetzt = minutenJetzt(d)
-  const [ersterStart] = abschnittSpanne(plan, 'morgen')
-  const [, letztesEnde] = abschnittSpanne(plan, 'schlafen')
+  const [ersterStart] = abschnittSpanne(plan, ABSCHNITTE[0].id)
+  const [, letztesEnde] = abschnittSpanne(plan, ABSCHNITTE[ABSCHNITTE.length - 1].id)
   if (jetzt < ersterStart) return { art: 'vorher' }
   if (jetzt >= letztesEnde) return { art: 'nachher' }
   for (const a of ABSCHNITTE) {

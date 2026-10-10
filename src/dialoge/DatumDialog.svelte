@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { segVon } from '../lib/konstanten'
   import { abgleich } from '../lib/abgleich.svelte'
   import Bild from '../komponenten/Bild.svelte'
   import Fenster from '../komponenten/Fenster.svelte'
@@ -43,7 +44,7 @@
           <li>
             <button
               class="termin"
-              data-seg={t.abschnitt}
+              data-seg={segVon(t.abschnitt)}
               disabled={!darfAendern}
               onclick={() => (app.dialog = { art: 'termin', neu: false, termin: { ...t } })}
             >

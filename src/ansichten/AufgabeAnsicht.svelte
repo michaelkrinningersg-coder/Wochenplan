@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { segVon } from '../lib/konstanten'
   import Ampel from '../komponenten/Ampel.svelte'
   import AufgabenBild from '../komponenten/AufgabenBild.svelte'
   import Bild from '../komponenten/Bild.svelte'
@@ -114,7 +115,7 @@
 </script>
 
 {#if aufgabe}
-  <div class="aufgabe" class:quer data-seg={seg} bind:clientWidth={breite} bind:clientHeight={hoehe}>
+  <div class="aufgabe" class:quer data-seg={segVon(seg)} bind:clientWidth={breite} bind:clientHeight={hoehe}>
     <div class="bildteil">
       <TimerScheibe
         anteil={erledigt ? null : anteil}
@@ -199,7 +200,7 @@
       {#if danach}
         <button
           class="danach"
-          data-seg={danach.abschnitt}
+          data-seg={segVon(danach.abschnitt)}
           data-fokus-id="danach"
           onclick={() => oeffnen({ art: 'aufgabe', tag, abschnitt: danach.abschnitt, id: danach.aufgabe.id })}
         >
