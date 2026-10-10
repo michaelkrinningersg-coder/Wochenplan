@@ -84,7 +84,7 @@
     | 'wasserbombe' | 'melone' | 'eule' | 'sternschnuppe' | 'sonnenblume' | 'libelle' | 'gewitter' | 'fahrrad' | 'picknick' | 'segelboot'
     | 'kuerbis' | 'nebel' | 'traktor' | 'blaetterhaufen' | 'spinnennetz' | 'wildgaense' | 'regenschirm' | 'kastanienmann' | 'erntekorb'
     | 'eiszapfen' | 'schlittschuh' | 'iglu' | 'schneeengel' | 'pinguin' | 'kaminrauch' | 'adventskranz' | 'nikolaus' | 'feuerwerk' | 'hasenspuren'
-    | 'sternenballon' | 'sternenglas' | 'banner' | 'wochentier' | 'schaefchen' | 'sonnenaufgang' | 'fensterfoto' | 'kinderwinken' | 'feiertag'
+    | 'sternenballon' | 'sternenglas' | 'banner' | 'wochentier' | 'schaefchen' | 'sonnenaufgang' | 'fensterfoto' | 'feiertag'
   interface Def {
     id: Id
     jz: Jahreszeit[] | 'alle'
@@ -186,7 +186,6 @@
     { id: 'schaefchen', jz: 'alle', wann: (d) => d.getHours() >= 18 || d.getHours() < 6, gewicht: 2 },
     { id: 'sonnenaufgang', jz: 'alle', wann: istMorgen, gewicht: 2 },
     { id: 'fensterfoto', jz: 'alle', wann: () => fotoListe().length > 0 },
-    { id: 'kinderwinken', jz: 'alle' },
     { id: 'feiertag', jz: 'alle', wann: istFeiertag, gewicht: 4 },
   ]
 
@@ -1195,22 +1194,6 @@
         <div class="ding fensterbild" data-spiel="hops" style="left: {orte.dach[1].x}%; top: {orte.dach[1].y - 14}%" use:animiere={{ k: [{ opacity: 0, transform: 'scale(0.3)' }, { opacity: 1, transform: 'scale(1)', offset: 0.12 }, { opacity: 1, offset: 0.88 }, { opacity: 0, transform: 'scale(0.3)' }], dauer: 12000 }}>
           <span class="figur rahmen"><img src={f} alt="" /></span>
         </div>
-      {:else if e.id === 'kinderwinken'}
-        <div class="flaeche" use:animiere={{ k: sichtbar(0.03, 0.92), dauer: 10000 }}>
-          {#each app.plan.kinder.slice(0, 2) as k, i (k.id)}
-            <div class="ding kindfigur" data-spiel="hops" style="left: {orte.dach[0].x - 3 - i * 5}%; top: {orte.boden[0] + 1}%">
-              <svg class="figur" viewBox="0 0 40 70" width="100%" height="100%">
-                <circle cx="20" cy="14" r="10" fill="#f5c9a6" /><path d="M10 12 q10 -12 20 0" fill="#7a4e2d" />
-                <circle cx="16" cy="14" r="1.4" fill="#222" /><circle cx="24" cy="14" r="1.4" fill="#222" /><path d="M16 18 q4 3 8 0" fill="none" stroke="#222" stroke-width="1.2" />
-                <rect x="10" y="25" width="20" height="24" rx="6" fill={k.farbe} />
-                <path class="winken" style="animation-delay: {i * 0.3}s" d="M30 30 L38 18" stroke={k.farbe} stroke-width="5" stroke-linecap="round" />
-                <path d="M10 30 L4 40" stroke={k.farbe} stroke-width="5" stroke-linecap="round" />
-                <path d="M15 49 L14 66 M25 49 L26 66" stroke="#3a4f86" stroke-width="5" stroke-linecap="round" />
-              </svg>
-              {#if !/^Kind \d$/.test(k.name)}<span class="kindname" style="background: {k.farbe}">{k.name}</span>{/if}
-            </div>
-          {/each}
-        </div>
       {:else if e.id === 'feiertag'}
         <div class="flaeche" use:animiere={{ k: [{ opacity: 1 }, { opacity: 1 }], dauer: 14000 }}>
           {#if heuteFeiertag === 'fasching'}
@@ -2059,27 +2042,6 @@
     object-fit: cover;
     border-radius: 3px;
   }
-  .kindfigur {
-    width: clamp(36px, 5vw, 64px);
-    height: clamp(64px, 9vw, 112px);
-  }
-  .winken {
-    transform-box: fill-box;
-    transform-origin: 0% 100%;
-    animation: winken 0.5s ease-in-out infinite alternate;
-  }
-  .kindname {
-    position: absolute;
-    left: 50%;
-    top: -18%;
-    translate: -50% 0;
-    padding: 0 0.4em;
-    border-radius: 8px;
-    color: #fff;
-    font-weight: 700;
-    font-size: clamp(12px, 2vh, 22px);
-    white-space: nowrap;
-  }
   .luftschlange {
     position: absolute;
     top: -10%;
@@ -2324,14 +2286,6 @@
     100% {
       opacity: 0;
       translate: 20px -80px;
-    }
-  }
-  @keyframes winken {
-    from {
-      rotate: -20deg;
-    }
-    to {
-      rotate: 25deg;
     }
   }
   @keyframes schlange {
