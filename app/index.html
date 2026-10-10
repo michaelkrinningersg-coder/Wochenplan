@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Wochenplan installieren</title>
+    <link rel="icon" type="image/png" href="../favicon.png" />
+    <style>
+      :root {
+        --himmel: #e3edf6;
+        --tinte: #1d2b4f;
+        --leise: #56627f;
+        --gruen: #2fae66;
+        --weiss: #ffffff;
+        color-scheme: light;
+      }
+      * { box-sizing: border-box; }
+      html, body { height: 100%; margin: 0; }
+      body {
+        display: grid;
+        place-items: center;
+        padding: 24px;
+        background: linear-gradient(180deg, #bfe3fa 0%, var(--himmel) 100%);
+        color: var(--tinte);
+        font-family: 'Trebuchet MS', system-ui, sans-serif;
+        text-align: center;
+      }
+      main { display: flex; flex-direction: column; align-items: center; gap: 18px; max-width: 34em; }
+      img { width: 140px; height: 140px; border-radius: 32px; box-shadow: 0 8px 24px rgba(29, 43, 79, 0.2); }
+      h1 { margin: 0; font-size: 44px; }
+      p { margin: 0; font-size: 20px; color: var(--leise); }
+      .knopf {
+        display: inline-block;
+        padding: 18px 40px;
+        border-radius: 999px;
+        background: var(--gruen);
+        color: var(--weiss);
+        font-size: 30px;
+        font-weight: bold;
+        text-decoration: none;
+        box-shadow: 0 6px 0 #1f7a47;
+      }
+      .zweit { background: var(--weiss); color: var(--tinte); font-size: 20px; padding: 12px 28px; box-shadow: 0 4px 0 #c3d2e3; }
+      .knopf:focus { outline: 5px solid var(--tinte); outline-offset: 6px; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <img src="../icon-192.png" alt="" />
+      <h1>Wochenplan</h1>
+      <p>App für Google TV, Tablet und Handy</p>
+      <a id="laden" class="knopf" href="https://github.com/michaelkrinningersg-coder/wochenplan/releases/latest/download/wochenplan.apk">App herunterladen</a>
+      <p>Danach „Installieren“ wählen. Eine neuere Version installiert sich über die alte, der Plan bleibt erhalten.</p>
+      <a class="knopf zweit" href="../">Wochenplan im Browser öffnen</a>
+    </main>
+    <script>
+      document.getElementById('laden').focus()
+    </script>
+  </body>
+</html>
