@@ -27,7 +27,6 @@ export const VORLAGEN: Vorlage[] = [
   // Vormittag
   { titel: 'Kita', bild: 'kita', minuten: 0, abschnitt: 'vormittag' },
   { titel: 'Kinderturnen', bild: 'turnen', minuten: 0, abschnitt: 'nachmittag' },
-  { titel: 'Fr. Gardner', bild: 'psychotherapie', minuten: 0, abschnitt: 'nachmittag' },
   { titel: 'Obstpause', bild: 'apfel', minuten: 0, abschnitt: 'vormittag' },
   { titel: 'Trinken', bild: 'milch', minuten: 0, abschnitt: 'vormittag' },
   { titel: 'Arzt', bild: 'arzt', minuten: 0, abschnitt: 'vormittag' },
@@ -36,7 +35,6 @@ export const VORLAGEN: Vorlage[] = [
   { titel: 'Tisch decken', bild: 'essen', minuten: 0, abschnitt: 'mittag' },
   { titel: 'Mittagessen', bild: 'essen', minuten: 0, abschnitt: 'mittag' },
   { titel: 'Mittagsruhe', bild: 'mittagsruhe', minuten: 0, abschnitt: 'mittag' },
-  { titel: 'Ergotherapie', bild: 'ergotherapie', minuten: 0, abschnitt: 'mittag' },
   { titel: 'Abholen', bild: 'abholen', minuten: 0, abschnitt: 'mittag' },
   // Nachmittag
   { titel: 'Spielplatz', bild: 'spielplatz', minuten: 0, abschnitt: 'nachmittag' },

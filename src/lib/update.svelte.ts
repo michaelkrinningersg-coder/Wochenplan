@@ -39,6 +39,7 @@ async function versionLesen() {
 
 /** Auf GitHub nach der neuesten Version sehen */
 export async function suchen(): Promise<boolean> {
+  if (__STORE__) return false
   update.zustand = 'suche'
   update.meldung = ''
   try {
@@ -91,6 +92,7 @@ export async function installieren() {
 
 /** In der App beim Start und dann alle 6 Stunden still nachsehen */
 export function updatePruefungStarten(): () => void {
+  if (__STORE__) return () => {}
   void versionLesen()
   if (!istApp) return () => {}
   const pruefen = () => {

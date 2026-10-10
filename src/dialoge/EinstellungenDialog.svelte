@@ -5,6 +5,7 @@
   import { deutscheStimmen, probeSprechen, type Stimme } from '../lib/vorlesen'
   import { onMount } from 'svelte'
   import ZeitWahl from '../komponenten/ZeitWahl.svelte'
+  import Lizenzen from '../komponenten/Lizenzen.svelte'
   import { abgleich, einstSpeichern, holen, hochladen, istEingerichtet, ruhebildFernLoeschen, ruhebildHochladen, statusHochladen } from '../lib/abgleich.svelte'
   import { ruhe, ruhebildEntfernen, ruhebildSpeichern, ruhebildVorbereiten } from '../lib/ruhebilder.svelte'
   import { ortSuchen, ortTeile, wetterAktualisieren } from '../lib/wetter.svelte'
@@ -25,7 +26,7 @@
     { id: 'sprache', name: 'Sprache' },
     { id: 'tag', name: 'Tagesablauf' },
     { id: 'ruhe', name: 'Ruhebild' },
-    { id: 'abgleich', name: 'Abgleich & App' },
+    { id: 'abgleich', name: __STORE__ ? 'Daten & Info' : 'Abgleich & App' },
   ]
   const REITER_KEY = 'wochenplan.einst-reiter'
   let reiter = $state(
@@ -199,9 +200,9 @@
         </div>
         <p class="zh">
           {#if e.rolle === 'planer'}
-            Hier wird der Plan bearbeitet. Jede Änderung wird verschlüsselt hochgeladen.
+            {__STORE__ ? 'Hier wird der Plan bearbeitet. Alle Daten bleiben auf diesem Gerät.' : 'Hier wird der Plan bearbeitet. Jede Änderung wird verschlüsselt hochgeladen.'}
           {:else}
-            Der Plan kommt vom Handy oder PC. Die App schaut alle 2 Minuten nach Änderungen.
+            {__STORE__ ? 'Dieses Gerät zeigt den Plan nur an und ist gegen versehentliche Änderungen gesperrt.' : 'Der Plan kommt vom Handy oder PC. Die App schaut alle 2 Minuten nach Änderungen.'}
           {/if}
         </p>
       </div>
@@ -404,6 +405,7 @@
           <span class="zl">Namen unter den Bildern</span>
           <div class="zr">{@render schalter(!!app.einst.ruheNamen, (v) => (app.einst.ruheNamen = v))}</div>
         </div>
+        {#if !__STORE__}
         <div class="feld">
           <span class="name">Echtes Wetter im Bild {wetterName ? `(jetzt: ${wetterName})` : ''}</span>
           <div class="reihe">
@@ -422,6 +424,7 @@
           {/if}
           {#if ortMeldung}<p class="zh">{ortMeldung}</p>{/if}
         </div>
+        {/if}
       </section>
     {/if}
     {#if app.einst.ruheArt === 'fotos'}
@@ -454,6 +457,7 @@
     {/if}
     {/if}
     {:else if reiter === 'abgleich'}
+    {#if !__STORE__}
     <section>
       <h3>Abgleich</h3>
       <label class="feld">
@@ -509,8 +513,12 @@
       {/if}
     </section>
 
+    {/if}
     <section>
-      <h3>Sichern</h3>
+      <h3>{__STORE__ ? 'Plan sichern und teilen' : 'Sichern'}</h3>
+      {#if __STORE__}
+        <p class="zh">Alle Daten bleiben auf diesem Gerät. Um den Plan auf ein anderes Gerät zu bringen (Partner, Tablet, Fernseher), speicherst du ihn als Datei, schickst ihn per Nachricht oder E-Mail und lädst ihn dort wieder.</p>
+      {/if}
       <div class="reihe">
         <button class="knopf" onclick={exportieren}>Plan als Datei sichern</button>
         <button class="knopf" onclick={() => dateiFeld?.click()}>Plan aus Datei laden</button>
@@ -523,6 +531,7 @@
       </div>
     </section>
 
+    {#if !__STORE__}
     <section>
       <h3>App-Version</h3>
       <p class="hilfe">
@@ -548,9 +557,14 @@
       {/if}
     </section>
     {/if}
+    <section>
+      <h3>Info und Datenschutz</h3>
+      <Lizenzen />
+    </section>
+    {/if}
 
     <p class="info">
-      Wochenplan {istApp ? 'App' : 'im Browser'}. Bilder: Microsoft Fluent Emoji (MIT-Lizenz). Schriften: Fredoka und Andika (SIL Open Font License).
+      Wochenplan {istApp ? 'App' : 'im Browser'}{update.aktuell ? ` · Version 1.0.${update.aktuell}` : ''}.
     </p>
   </div>
 </Fenster>

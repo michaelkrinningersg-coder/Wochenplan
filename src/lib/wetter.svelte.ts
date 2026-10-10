@@ -22,6 +22,10 @@ export function ortTeile(ort?: string): { name: string; lat: number; lon: number
 
 /** Wetter holen (höchstens alle 30 Minuten) */
 export async function wetterAktualisieren(erzwingen = false) {
+  if (__STORE__) {
+    wetter.art = null
+    return
+  }
   const o = ortTeile(app.einst.wetterOrt)
   if (!o) {
     wetter.art = null

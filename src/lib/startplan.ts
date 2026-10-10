@@ -57,10 +57,8 @@ function wochenende(vormittag: Aufgabe): Tagesplan {
 export function standardWoche(): Record<TagId, Tagesplan> {
   const woche = {} as Record<TagId, Tagesplan>
   for (const t of TAGE) woche[t.id] = werktag()
-  woche.mo.nachmittag.push(a('Ergotherapie', 'ergotherapie', 0))
   woche.di.nachmittag.push(a('Kinderturnen', 'turnen', 0))
   woche.mi.nachmittag.push(a('Spielplatz', 'spielplatz', 0))
-  woche.do.nachmittag.push(a('Fr. Gardner', 'psychotherapie', 0))
   woche.fr.nachmittag.push(a('Spielplatz', 'spielplatz', 0))
   woche.fr.abend.push(a('Fernsehen', 'fernsehen', 0))
   woche.sa = wochenende(a('Schwimmen', 'schwimmen', 0))

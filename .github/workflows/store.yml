@@ -1,0 +1,74 @@
+name: Store-Version
+
+# Von Hand starten (Actions → Store-Version → Run workflow).
+# Baut die Version für den Play Store: ohne GitHub-Abgleich, Wetter und In-App-Update,
+# ohne Android-Datensicherung und ohne Berechtigung zum Installieren von Updates.
+# Ergebnis: .aab (Play Console) und .apk (zum Testen) als Artefakt.
+#
+# Signatur: Secret PLAY_KEYSTORE_BASE64 (Upload-Schlüssel als Base64) plus
+# PLAY_KEYSTORE_PASSWORT, PLAY_KEY_ALIAS, PLAY_KEY_PASSWORT. Ohne Secrets wird der Test-Schlüssel benutzt.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  store:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Webteil als Store-Version bauen
+        env:
+          STORE_BUILD: '1'
+        run: |
+          npm run check
+          npm run build
+          npx cap sync android
+      - name: Manifest für den Store anpassen
+        run: |
+          f=android/app/src/main/AndroidManifest.xml
+          sed -i 's/android:allowBackup="true"/android:allowBackup="false"/' $f
+          sed -i '/REQUEST_INSTALL_PACKAGES/d' $f
+          sed -i '/Updates aus der App heraus installieren/d' $f
+          grep -n "allowBackup\|INSTALL" $f || true
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: gradle
+      - name: Upload-Schlüssel bereitstellen
+        env:
+          KS: ${{ secrets.PLAY_KEYSTORE_BASE64 }}
+        run: |
+          if [ -n "$KS" ]; then
+            echo "$KS" | base64 -d > "$RUNNER_TEMP/play.jks"
+            echo "WP_KEYSTORE=$RUNNER_TEMP/play.jks" >> "$GITHUB_ENV"
+            echo "WP_KEYSTORE_PASSWORT=${{ secrets.PLAY_KEYSTORE_PASSWORT }}" >> "$GITHUB_ENV"
+            echo "WP_KEY_ALIAS=${{ secrets.PLAY_KEY_ALIAS }}" >> "$GITHUB_ENV"
+            echo "WP_KEY_PASSWORT=${{ secrets.PLAY_KEY_PASSWORT }}" >> "$GITHUB_ENV"
+          else
+            echo "Kein Play-Schlüssel hinterlegt – es wird mit dem Test-Schlüssel signiert (nicht für den Store geeignet)."
+          fi
+      - name: AAB und APK bauen
+        working-directory: android
+        env:
+          GITHUB_RUN_NUMBER: ${{ github.run_number }}
+        run: |
+          echo "sdk.dir=$ANDROID_HOME" > local.properties
+          chmod +x gradlew
+          ./gradlew bundleRelease assembleRelease --no-daemon
+      - name: Dateien sammeln
+        run: |
+          mkdir out
+          cp android/app/build/outputs/bundle/release/app-release.aab out/wochenplan-store.aab
+          cp android/app/build/outputs/apk/release/app-release.apk out/wochenplan-store.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wochenplan-store
+          path: out/

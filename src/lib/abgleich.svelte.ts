@@ -66,6 +66,7 @@ function standSpeichern() {
 }
 
 export function istEingerichtet(): boolean {
+  if (__STORE__) return false
   const e = abgleich.einst
   // Lesen geht nur mit Passwort; der Token (zum Hochladen) kommt notfalls verschlüsselt mit dem Plan
   return !!(e.passwort && e.besitzer && e.repo && e.zweig && e.datei)
@@ -516,6 +517,7 @@ export function lokalGeaendert() {
 
 /** Regelmäßig nachsehen (Plan: Fernseher alle 2 Minuten, Planer alle 10 Minuten) */
 export function abgleichStarten(): () => void {
+  if (__STORE__) return () => {}
   let aus = false
   const takt = () => {
     if (aus) return

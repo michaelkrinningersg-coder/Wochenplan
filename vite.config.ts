@@ -10,7 +10,11 @@ export default defineConfig(({ mode }) => {
   return {
     base: './',
     // Build-Nummer aus GitHub Actions (gleich wie die APK-Version)
-    define: { __VERSION__: JSON.stringify(Number(process.env.GITHUB_RUN_NUMBER ?? 0)) },
+    define: {
+      __VERSION__: JSON.stringify(Number(process.env.GITHUB_RUN_NUMBER ?? 0)),
+      // Store-Version: keine Verbindung zu GitHub oder Wetterdiensten
+      __STORE__: JSON.stringify(process.env.STORE_BUILD === '1'),
+    },
     plugins: single ? [svelte(), viteSingleFile()] : [svelte()],
     build: {
       outDir: single ? 'dist-single' : 'dist',
