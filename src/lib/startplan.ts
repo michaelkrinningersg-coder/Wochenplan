@@ -29,14 +29,14 @@ export function standardKinder(): Kind[] {
 /** Werktag (Mo–Fr): Kita bis zum Nachmittag, danach Spielzeit */
 function werktag(): Tagesplan {
   return {
-    aufstehen: [a('Aufstehen', 'wecker', 5), a('Toilette', 'toilette', 3)],
-    morgen: [a('Frühstück', 'fruehstueck', 20), a('Zähne putzen', 'zaehne', 3), a('Anziehen', 'anziehen', 10)],
+    aufstehen: [a('Aufstehen', 'wecker', 0), a('Toilette', 'toilette', 0)],
+    morgen: [a('Frühstück', 'fruehstueck', 0), a('Zähne putzen', 'zaehne', 0), a('Anziehen', 'anziehen', 0)],
     vormittag: [a('Kita', 'kita', 0)],
     mittag: [],
-    nachmittag: [a('Spielzeit', 'spielen', 30)],
-    frueh: [a('Abendessen', 'abendbrot', 30), a('Spielzeit', 'spielen', 20), a('Aufräumen', 'aufraeumen', 10)],
-    abend: [a('Schlafanzug anziehen', 'schlafanzug', 5), a('Zähne putzen', 'zaehne', 3)],
-    bett: [a('Toilette', 'toilette', 3, 'mond'), a('Lesen', 'lesen', 15)],
+    nachmittag: [a('Spielzeit', 'spielen', 0)],
+    frueh: [a('Abendessen', 'abendbrot', 0), a('Spielzeit', 'spielen', 0), a('Aufräumen', 'aufraeumen', 0)],
+    abend: [a('Schlafanzug anziehen', 'schlafanzug', 0), a('Zähne putzen', 'zaehne', 0)],
+    bett: [a('Toilette', 'toilette', 0, 'mond'), a('Lesen', 'lesen', 0)],
     schlafen: [a('Schlafen', 'schlafen', 0)],
   }
 }
@@ -44,14 +44,14 @@ function werktag(): Tagesplan {
 /** Wochenende: Sa mit Schwimmen am Vormittag, So mit Spielplatz am Vormittag */
 function wochenende(vormittag: Aufgabe): Tagesplan {
   return {
-    aufstehen: [a('Aufstehen', 'wecker', 5), a('Toilette', 'toilette', 3)],
-    morgen: [a('Frühstück', 'fruehstueck', 20), a('Zähne putzen', 'zaehne', 3), a('Anziehen', 'anziehen', 10)],
+    aufstehen: [a('Aufstehen', 'wecker', 0), a('Toilette', 'toilette', 0)],
+    morgen: [a('Frühstück', 'fruehstueck', 0), a('Zähne putzen', 'zaehne', 0), a('Anziehen', 'anziehen', 0)],
     vormittag: [vormittag],
-    mittag: [a('Mittagessen', 'essen', 30), a('Mittagsruhe', 'mittagsruhe', 30)],
-    nachmittag: [a('Spielplatz', 'spielplatz', 60), a('Hände waschen', 'waschen', 2)],
-    frueh: [a('Abendessen', 'abendbrot', 30), a('Spielzeit', 'spielen', 20), a('Aufräumen', 'aufraeumen', 10)],
-    abend: [a('Schlafanzug anziehen', 'schlafanzug', 5), a('Zähne putzen', 'zaehne', 3), a('Fernsehen', 'fernsehen', 20)],
-    bett: [a('Toilette', 'toilette', 3, 'mond'), a('Lesen', 'lesen', 15)],
+    mittag: [a('Mittagessen', 'essen', 0), a('Mittagsruhe', 'mittagsruhe', 0)],
+    nachmittag: [a('Spielplatz', 'spielplatz', 0), a('Hände waschen', 'waschen', 0)],
+    frueh: [a('Abendessen', 'abendbrot', 0), a('Spielzeit', 'spielen', 0), a('Aufräumen', 'aufraeumen', 0)],
+    abend: [a('Schlafanzug anziehen', 'schlafanzug', 0), a('Zähne putzen', 'zaehne', 0), a('Fernsehen', 'fernsehen', 0)],
+    bett: [a('Toilette', 'toilette', 0, 'mond'), a('Lesen', 'lesen', 0)],
     schlafen: [a('Schlafen', 'schlafen', 0)],
   }
 }
@@ -62,12 +62,12 @@ export function standardWoche(): Record<TagId, Tagesplan> {
   for (const t of TAGE) woche[t.id] = werktag()
   woche.mo.nachmittag.push(a('Ergotherapie', 'ergotherapie', 0))
   woche.di.nachmittag.push(a('Kinderturnen', 'turnen', 0))
-  woche.mi.nachmittag.push(a('Spielplatz', 'spielplatz', 60))
+  woche.mi.nachmittag.push(a('Spielplatz', 'spielplatz', 0))
   woche.do.nachmittag.push(a('Fr. Gardner', 'psychotherapie', 0))
-  woche.fr.nachmittag.push(a('Spielplatz', 'spielplatz', 60))
-  woche.fr.abend.push(a('Fernsehen', 'fernsehen', 20))
+  woche.fr.nachmittag.push(a('Spielplatz', 'spielplatz', 0))
+  woche.fr.abend.push(a('Fernsehen', 'fernsehen', 0))
   woche.sa = wochenende(a('Schwimmen', 'schwimmen', 0))
-  woche.so = wochenende(a('Spielplatz', 'spielplatz', 60))
+  woche.so = wochenende(a('Spielplatz', 'spielplatz', 0))
   return woche
 }
 
@@ -115,6 +115,7 @@ function aufgabeNormalisieren(x: Record<string, unknown>): Aufgabe | null {
     ...(typeof x.uhrzeit === 'string' && UHR.test(x.uhrzeit) ? { uhrzeit: x.uhrzeit } : {}),
     ...(fuer.length === 1 ? { fuer } : {}),
     ...(x.countdown === true ? { countdown: true } : {}),
+    ...(x.sternenregen === true ? { sternenregen: true } : {}),
     ...(typeof x.foto === 'string' && x.foto.startsWith('foto:') ? { foto: x.foto } : {}),
     ...(modus ? { fotoModus: modus } : {}),
     ...(Number.isFinite(x.wechselSek) ? { wechselSek: Math.max(2, Math.min(60, Math.round(x.wechselSek as number))) } : {}),
@@ -188,7 +189,7 @@ export function planNormalisieren(roh: unknown): Plan {
 }
 
 /** Stand der einmaligen Umstellungen. Erhöhen, wenn neue Regeln in UMZUG dazukommen. */
-const STAND = 3
+const STAND = 4
 
 /** Neue Bildkarten für vorhandene Aufgaben (Titel + altes Bild → neues Bild, ggf. neuer Titel) */
 const UMZUG: { titel: string; alt: string; neu: string; neuerTitel?: string }[] = [
@@ -203,6 +204,8 @@ const UMZUG: { titel: string; alt: string; neu: string; neuerTitel?: string }[] 
 function umstellen(plan: Plan, vonStand: number) {
   // Stand 3: neue Standardwoche (gewünschter Wochenablauf); Termine, Abläufe, Kinder und Zeiten bleiben
   if (vonStand < 3) plan.woche = standardWoche()
+  // Stand 4: Timer nur noch nach Auswahl – keine vorgegebenen Minuten in der Woche
+  if (vonStand < 4) for (const tp of Object.values(plan.woche)) for (const ab of ABSCHNITTE) for (const x of tp[ab.id]) x.minuten = 0
   const anpassen = (x: Aufgabe) => {
     const r = UMZUG.find((u) => u.titel === x.titel && u.alt === x.bild)
     if (!r) return

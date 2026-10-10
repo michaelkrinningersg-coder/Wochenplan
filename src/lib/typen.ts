@@ -26,6 +26,8 @@ export interface Aufgabe {
   fuer?: KindId[]
   /** „noch X× schlafen bis …“ anzeigen */
   countdown?: boolean
+  /** Sternenregen beim Erledigen (wenn in den Einstellungen „nur ausgewählte“ gilt) */
+  sternenregen?: boolean
   /** eigenes Foto ("foto:<id>") zusätzlich zum Bild */
   foto?: string
   /** was die Kachel zeigt: Bild, Foto oder abwechselnd */
@@ -99,6 +101,8 @@ export interface Einstellungen {
   tempo?: number
   /** Ansagen bei 5 Minuten / 1 Minute / Zeit um */
   zeitAnsagen?: boolean
+  /** Sterne vom Himmel beim Erledigen: bei allen, nur bei ausgewählten Aufgaben oder nie */
+  sternenregen?: 'alle' | 'auswahl' | 'aus'
 }
 
 export interface TimerZustand {

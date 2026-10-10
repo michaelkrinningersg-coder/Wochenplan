@@ -135,6 +135,11 @@ export function lobAnsagen(a: Aufgabe | undefined, alles: boolean) {
   void vorlesen(name ? `${lob} ${name}!` : lob)
 }
 
+/** Ansage, wenn ein Timer gewählt wurde */
+export function timerAnsagen(minuten: number) {
+  void vorlesen(`Du hast ${minutenText(minuten)} Zeit.`)
+}
+
 /** Zeitansagen des Timers */
 export function zeitAnsagen(art: 'gelb' | 'rot' | 'ende', titel: string, restMinuten: number) {
   if (app.einst.zeitAnsagen === false) return

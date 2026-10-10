@@ -63,7 +63,7 @@
 
   function speichern() {
     const fertig: Aufgabe = { ...$state.snapshot(entwurf), titel: entwurf.titel.trim() || 'Aufgabe' }
-    for (const f of ['zusatz', 'uhrzeit', 'fuer', 'countdown', 'foto', 'fotoModus', 'wechselSek'] as const)
+    for (const f of ['zusatz', 'uhrzeit', 'fuer', 'countdown', 'sternenregen', 'foto', 'fotoModus', 'wechselSek'] as const)
       if (fertig[f] === undefined || fertig[f] === false || fertig[f] === '') delete fertig[f]
     if (!fertig.foto) {
       delete fertig.fotoModus
@@ -198,6 +198,16 @@
             </button>
           </div>
         </div>
+        {#if app.einst.sternenregen === 'auswahl'}
+          <div>
+            <span class="name">Sternenregen</span>
+            <div class="reihe">
+              <button type="button" class="knopf klein" aria-pressed={!!entwurf.sternenregen} onclick={() => (entwurf.sternenregen = !entwurf.sternenregen)}>
+                {entwurf.sternenregen ? 'Ja ★' : 'Nein'}
+              </button>
+            </div>
+          </div>
+        {/if}
       </div>
 
       <div class="feld zwei">

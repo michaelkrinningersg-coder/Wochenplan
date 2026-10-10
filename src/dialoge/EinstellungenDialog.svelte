@@ -256,6 +256,10 @@
         <button class="knopf" aria-pressed={app.einst.vorlesen} onclick={() => (app.einst.vorlesen = !app.einst.vorlesen)}>
           Vorlesen {app.einst.vorlesen ? 'an' : 'aus'}
         </button>
+        <span class="name zeile">Sternenregen</span>
+        {#each [['alle', 'bei allen Aufgaben'], ['auswahl', 'nur ausgewählte'], ['aus', 'aus']] as [wert, text] (wert)}
+          <button class="knopf klein" aria-pressed={(app.einst.sternenregen ?? 'alle') === wert} onclick={() => (app.einst.sternenregen = wert as 'alle' | 'auswahl' | 'aus')}>{text}</button>
+        {/each}
         <button class="knopf" aria-pressed={app.einst.zeitAnsagen !== false} onclick={() => (app.einst.zeitAnsagen = app.einst.zeitAnsagen === false)}>
           Zeit ansagen: {app.einst.zeitAnsagen !== false ? 'ja' : 'nein'}
         </button>

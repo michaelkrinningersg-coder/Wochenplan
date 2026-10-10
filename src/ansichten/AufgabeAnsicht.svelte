@@ -4,6 +4,7 @@
   import Bild from '../komponenten/Bild.svelte'
   import Symbol from '../komponenten/Symbol.svelte'
   import Konfetti from '../komponenten/Konfetti.svelte'
+  import Sternenregen from '../komponenten/Sternenregen.svelte'
   import Sanduhr from '../komponenten/Sanduhr.svelte'
   import TimerScheibe from '../komponenten/TimerScheibe.svelte'
   import { ampelZustand } from '../lib/ampel'
@@ -26,7 +27,7 @@
     timerZuruecksetzen,
   } from '../lib/speicher.svelte'
   import { spieleTon } from '../lib/ton'
-  import { aufgabeAnsagen, lobAnsagen } from '../lib/vorlesen'
+  import { aufgabeAnsagen, lobAnsagen, timerAnsagen } from '../lib/vorlesen'
   import { untrack } from 'svelte'
   import type { AbschnittId, TagId } from '../lib/typen'
   import { dauerText, inText } from '../lib/zeit'
@@ -36,6 +37,7 @@
   let breite = $state(0)
   let hoehe = $state(0)
   let feiern = $state<null | 'eins' | 'alles'>(null)
+  let sterne = $state(false)
   const SCHNELL = [2, 5, 10, 15, 20, 30, 45, 60]
 
   const fund = $derived(finde(tag, id))
@@ -87,6 +89,9 @@
     const a = aufgabe
     setTimeout(() => lobAnsagen(a, alles), alles ? 2300 : 900)
     feiern = alles ? 'alles' : 'eins'
+    const regen = app.einst.sternenregen ?? 'alle'
+    sterne = regen === 'alle' || (regen === 'auswahl' && (!!aufgabe.sternenregen || alles))
+    if (sterne) setTimeout(() => (sterne = false), 5200)
     setTimeout(
       () => {
         feiern = null
@@ -176,7 +181,7 @@
         <div class="schnellwahl" role="group" aria-label="Timer einstellen">
           <span class="schnell-text">Timer</span>
           {#each SCHNELL as m (m)}
-            <button class="knopf klein" aria-pressed={mitTimer && dauerMs === m * 60_000} onclick={() => timerSetzen(id, m)}>{m} Min</button>
+            <button class="knopf klein" aria-pressed={mitTimer && dauerMs === m * 60_000} onclick={() => (timerSetzen(id, m), timerAnsagen(m))}>{m} Min</button>
           {/each}
         </div>
       {/if}
@@ -206,6 +211,9 @@
       {/if}
     </div>
 
+    {#if sterne}
+      <div class="sternenregen"><Sternenregen anzahl={feiern === 'alles' ? 34 : 22} /></div>
+    {/if}
     {#if feiern}
       <div class="feier" class:alles={feiern === 'alles'} aria-live="polite">
         <Konfetti anzahl={feiern === 'alles' ? 60 : 36} />
@@ -222,6 +230,12 @@
 {/if}
 
 <style>
+  .sternenregen {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    pointer-events: none;
+  }
   .aufgabe {
     position: relative;
     display: flex;

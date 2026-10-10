@@ -76,7 +76,7 @@ function erledigtLaden(): ErledigtStand {
 const gespeicherterPlan = laden<{ version?: number; stand?: number } | null>(SCHLUESSEL.plan, null)
 export const planErneuert = !!gespeicherterPlan && gespeicherterPlan.version !== 3
 /** Plan bekommt beim Laden neue Bildkarten / Namen (einmalige Umstellung) */
-export const planUmgestellt = !!gespeicherterPlan && !planErneuert && (gespeicherterPlan.stand ?? 1) < 3
+export const planUmgestellt = !!gespeicherterPlan && !planErneuert && (gespeicherterPlan.stand ?? 1) < 4
 
 export const app = $state({
   plan: (gespeicherterPlan && !planErneuert ? planNormalisieren(gespeicherterPlan) : startplan()) as Plan,
