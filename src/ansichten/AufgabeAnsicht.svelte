@@ -189,32 +189,39 @@
         {/if}
       </div>
 
-      {#if !erledigt && !tm.gestartet}
-        <div class="schnellwahl" role="group" aria-label={t('Timer einstellen')}>
-          <span class="schnell-text">{t('Timer')}</span>
-          {#each SCHNELL as m (m)}
-            <button class="knopf klein" aria-pressed={mitTimer && dauerMs === m * 60_000} onclick={() => (timerSetzen(id, m), timerAnsagen(m))}>{t('{n} Min', { n: m })}</button>
-          {/each}
-        </div>
-      {/if}
-
-      {#if mitTimer && !erledigt}
-        <div class="feinstellung">
-          <button class="knopf klein" onclick={() => timerAendern(id, -1, aufgabe.minuten)} aria-label={t('Eine Minute weniger')}>{t('− 1 Min')}</button>
-          <button class="knopf klein" onclick={() => timerAendern(id, 1, aufgabe.minuten)} aria-label={t('Eine Minute mehr')}>{t('+ 1 Min')}</button>
-          {#if tm.gestartet}
-            <button class="knopf klein" onclick={() => timerZuruecksetzen(id)}><Symbol name="neu" />{t('Neu')}</button>
+      {#if !erledigt && (!tm.gestartet || mitTimer)}
+        <div class="timerbox" role="group" aria-label={t('Timer einstellen')}>
+          <div class="timer-kopf">
+            <span class="schnell-text">{t('Timer')}</span>
+            {#if mitTimer}
+              <div class="stepper">
+                <button class="knopf klein rund-klein" onclick={() => timerAendern(id, -1, aufgabe.minuten)} aria-label={t('Eine Minute weniger')}>−</button>
+                <output class="stepper-wert">{t('{n} Min', { n: Math.round(dauerMs / 60_000) })}</output>
+                <button class="knopf klein rund-klein" onclick={() => timerAendern(id, 1, aufgabe.minuten)} aria-label={t('Eine Minute mehr')}>+</button>
+              </div>
+            {/if}
+            {#if tm.gestartet}
+              <button class="knopf klein" onclick={() => timerZuruecksetzen(id)}><Symbol name="neu" />{t('Neu')}</button>
+            {/if}
+          </div>
+          {#if !tm.gestartet}
+            <div class="chips">
+              {#each SCHNELL as m (m)}
+                <button class="knopf klein" aria-pressed={mitTimer && dauerMs === m * 60_000} onclick={() => (timerSetzen(id, m), timerAnsagen(m))}>{t('{n} Min', { n: m })}</button>
+              {/each}
+            </div>
           {/if}
         </div>
       {/if}
 
       {#if danach || davor}
-      <div class="folge">
+      <div class="folge" class:zwei={davor && danach}>
       {#if davor}
         <button
           class="danach davor"
           data-seg={segVon(davor.abschnitt)}
           data-fokus-id="davor"
+          aria-label={t('Davor') + ': ' + davor.aufgabe.titel}
           onclick={() => oeffnen({ art: 'aufgabe', tag, abschnitt: davor.abschnitt, id: davor.aufgabe.id })}
         >
           <Symbol name="weiter" />
@@ -228,6 +235,7 @@
           class="danach"
           data-seg={segVon(danach.abschnitt)}
           data-fokus-id="danach"
+          aria-label={t('Danach') + ': ' + danach.aufgabe.titel}
           onclick={() => oeffnen({ art: 'aufgabe', tag, abschnitt: danach.abschnitt, id: danach.aufgabe.id })}
         >
           <span class="danach-text">{t('Danach')}</span>
@@ -332,10 +340,39 @@
   .status.geschafft {
     color: var(--gruen);
   }
-  .schnellwahl {
+  .timerbox {
+    display: grid;
+    gap: 10px;
+    padding: 10px 14px 12px;
+    border-radius: 20px;
+    background: color-mix(in srgb, var(--tinte) 6%, transparent);
+  }
+  .timer-kopf {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
+    gap: 10px;
+  }
+  .stepper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .stepper-wert {
+    min-width: 4.6em;
+    text-align: center;
+    font-size: var(--t-text);
+    font-weight: 800;
+  }
+  .rund-klein {
+    min-width: 2.4em;
+    padding-inline: 0.6em;
+    font-size: var(--t-text);
+    font-weight: 800;
+  }
+  .chips {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 6px;
   }
   .schnell-text {
@@ -344,8 +381,7 @@
     font-weight: 700;
     margin-right: 4px;
   }
-  .knoepfe,
-  .feinstellung {
+  .knoepfe {
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
@@ -368,10 +404,11 @@
     border-color: var(--vormittag-tief);
     color: #ffffff;
   }
+  /* bewusst nicht grün: Grün heißt „schon erledigt“ (Ampel, Haken) */
   .knopf.fertig {
-    background: var(--gruen);
-    border-color: var(--gruen);
-    color: #ffffff;
+    background: var(--tinte);
+    border-color: var(--tinte);
+    color: var(--tafel);
   }
   .knopf.klein {
     font-size: var(--t-klein);
@@ -393,7 +430,29 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 12px;
+    gap: 10px;
+  }
+  /* beide Knöpfe nebeneinander, ohne Beschriftung (Pfeil und Bild zeigen die Richtung) */
+  .folge.zwei {
+    flex-wrap: nowrap;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  .folge.zwei .danach {
+    flex: 1 1 0;
+    min-width: 0;
+    gap: 8px;
+    padding: 6px 10px;
+  }
+  .folge.zwei .danach-text {
+    display: none;
+  }
+  .folge.zwei .danach-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
   }
   .davor :global(svg) {
     transform: scaleX(-1);
