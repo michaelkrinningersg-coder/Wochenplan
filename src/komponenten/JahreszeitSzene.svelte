@@ -2,7 +2,9 @@
   // Gemalte Landschaft je Jahreszeit (SVG + CSS): Himmel, Hügel, Baum, fallende Blätter/Schnee/Blüten.
   // Nachts dunkler Himmel mit Mond und Sternen.
   import type { Jahreszeit, Orte } from '../lib/jahreszeit'
+  import Figuren from './Figuren.svelte'
   import SzenenEreignisse from './SzenenEreignisse.svelte'
+  import { onDestroy } from 'svelte'
 
   import type { WetterArt } from '../lib/wetter.svelte'
 
@@ -35,13 +37,60 @@
       boden: hoch ? [70, 75] : [67, 72],
     }
   })
+  // ---------- Tageslauf: Himmel, Sonne und Mond folgen der Uhrzeit ----------
+  let jetzt = $state(new Date())
+  const uhr = setInterval(() => (jetzt = new Date()), 30_000)
+  onDestroy(() => clearInterval(uhr))
+  const stunde = $derived(jetzt.getHours() + jetzt.getMinutes() / 60)
+  const klemme = (v: number) => Math.max(0, Math.min(1, v))
+  /** 0 = Tag, 1 = tiefe Nacht (Übergang 19–20 Uhr und 5–6 Uhr) */
+  const dunkel = $derived(stunde >= 12 ? klemme(stunde - 19) : klemme(6 - stunde))
+  /** Morgen-/Abendrot (6–8 und 17–19 Uhr) */
+  const daemm = $derived(stunde < 12 ? klemme(1 - (stunde - 6) / 2) * klemme(stunde - 5) : klemme((stunde - 17) / 2) * klemme(20 - stunde))
+  const istNacht = $derived(dunkel > 0.5)
+  const bogen = (t: number) => ({ x: 22 + 116 * t, y: 52 - 42 * Math.sin(Math.PI * t) })
+  const sonnenPos = $derived(bogen(klemme((stunde - 6) / 14)))
+  const mondPos = $derived(bogen(klemme((stunde >= 12 ? stunde - 19 : stunde + 5) / 11)))
+  function mixHex(a: string, b: string, t: number): string {
+    const z = (h: string) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16))
+    const [r1, g1, b1] = z(a)
+    const [r2, g2, b2] = z(b)
+    const m = (x: number, y: number) => Math.round(x + (y - x) * t).toString(16).padStart(2, '0')
+    return `#${m(r1, r2)}${m(g1, g2)}${m(b1, b2)}`
+  }
+
+  // Regenschauer ab und zu, wenn kein echtes Wetter vorliegt (nicht im Winter: dort schneit es)
+  let schauer = $state(false)
+  $effect(() => {
+    if (wetterArt || jz === 'winter') {
+      schauer = false
+      return
+    }
+    let timer: ReturnType<typeof setTimeout>
+    const weiter = (regnet: boolean) => {
+      const dauer = regnet ? 45_000 + Math.random() * 60_000 : 4 * 60_000 + Math.random() * 8 * 60_000
+      timer = setTimeout(() => {
+        schauer = !regnet
+        weiter(!regnet)
+      }, dauer)
+    }
+    weiter(false)
+    return () => clearTimeout(timer)
+  })
+  const art = $derived<WetterArt | null>(wetterArt ?? (schauer ? 'regen' : null))
+
   const trueb = $derived(wetterArt === 'regen' || wetterArt === 'gewitter' || wetterArt === 'nebel' || wetterArt === 'wolkig' || wetterArt === 'schnee')
-  const himmel = $derived<[string, string]>(
-    nacht ? ['#13204a', '#3a4f86'] : wetterArt === 'gewitter' ? ['#5d6a80', '#a9b4c4'] : trueb ? ['#9fb2c6', '#dfe6ee'] : f.himmel,
-  )
+  const himmel = $derived.by((): [string, string] => {
+    const regnerisch = art === 'regen' || art === 'gewitter' || trueb
+    let basis: [string, string] = art === 'gewitter' ? ['#5d6a80', '#a9b4c4'] : regnerisch ? ['#9fb2c6', '#dfe6ee'] : f.himmel
+    if (daemm > 0) basis = [mixHex(basis[0], stunde < 12 ? '#f2a56a' : '#ee8662', daemm * 0.8), mixHex(basis[1], stunde < 12 ? '#ffe6b8' : '#ffd3a2', daemm * 0.8)]
+    return [mixHex(basis[0], '#13204a', dunkel), mixHex(basis[1], '#3a4f86', dunkel)]
+  })
+  const huegel0 = $derived(mixHex(f.huegel[0], '#2e4a3a', dunkel))
+  const huegel1 = $derived(mixHex(f.huegel[1], '#22382c', dunkel))
 
   // svelte-ignore state_referenced_locally
-  const teile = Array.from({ length: 26 }, (_, i) => ({
+  const teile = Array.from({ length: 40 }, (_, i) => ({
     x: Math.round(Math.random() * 100),
     groesse: 10 + Math.round(Math.random() * 16),
     dauer: (7 + Math.random() * 7).toFixed(1),
@@ -61,21 +110,32 @@
       </linearGradient>
     </defs>
     <rect width="160" height="90" fill="url(#himmel)" />
-    {#if nacht}
-      {#each sterne as s, i (i)}<circle cx={s.x * 1.6} cy={s.y} r={s.r} fill="#fff" opacity="0.85" />{/each}
-      <circle cx="128" cy="18" r="8" fill="#fff4c2" />
-      <circle cx="131" cy="16" r="7" fill={himmel[0]} />
-    {:else}
-      <circle cx="128" cy="18" r={jz === 'sommer' ? 10 : 8} fill={jz === 'winter' ? '#fff6d6' : '#ffd84a'} class="sonne" />
-      <g class="wolke"><ellipse cx="30" cy="18" rx="12" ry="4.5" fill="#fff" opacity="0.9" /><ellipse cx="37" cy="15" rx="7" ry="5" fill="#fff" opacity="0.9" /></g>
-      <g class="wolke langsam"><ellipse cx="85" cy="12" rx="9" ry="3.5" fill="#fff" opacity="0.8" /><ellipse cx="90" cy="10" rx="5" ry="3.5" fill="#fff" opacity="0.8" /></g>
+    {#if dunkel > 0}
+      {#each sterne as st, i (i)}<circle cx={st.x * 1.6} cy={st.y} r={st.r} fill="#fff" opacity={0.85 * dunkel} />{/each}
+    {/if}
+    {#if dunkel < 0.9}
+      <g opacity={1 - dunkel} transform="translate({sonnenPos.x - 128} {sonnenPos.y - 18})">
+        <circle cx="128" cy="18" r={jz === 'sommer' ? 10 : 8} fill={daemm > 0.2 ? '#ffb347' : jz === 'winter' ? '#fff6d6' : '#ffd84a'} class="sonne" />
+      </g>
+    {/if}
+    {#if dunkel > 0.1}
+      <g opacity={dunkel} transform="translate({mondPos.x - 128} {mondPos.y - 18})">
+        <circle cx="128" cy="18" r="8" fill="#fff4c2" />
+        <circle cx="131" cy="16" r="7" fill={himmel[0]} />
+      </g>
+    {/if}
+    {#if dunkel < 0.9}
+      <g class="wolke" opacity={1 - dunkel}><ellipse cx="30" cy="18" rx="12" ry="4.5" fill="#fff" opacity="0.9" /><ellipse cx="37" cy="15" rx="7" ry="5" fill="#fff" opacity="0.9" /></g>
+      <g class="wolke langsam" opacity={1 - dunkel}><ellipse cx="85" cy="12" rx="9" ry="3.5" fill="#fff" opacity="0.8" /><ellipse cx="90" cy="10" rx="5" ry="3.5" fill="#fff" opacity="0.8" /></g>
+      <g class="wolke mittel" opacity={1 - dunkel}><ellipse cx="128" cy="30" rx="10" ry="3.6" fill="#fff" opacity="0.75" /><ellipse cx="122" cy="28" rx="6" ry="3.6" fill="#fff" opacity="0.75" /></g>
     {/if}
     <!-- Hügel -->
-    <path d="M0 62 Q30 48 62 58 T122 54 T160 58 V90 H0 Z" fill={nacht ? '#2e4a3a' : f.huegel[0]} />
-    <path d="M0 74 Q40 62 82 72 T160 68 V90 H0 Z" fill={nacht ? '#22382c' : f.huegel[1]} />
+    <path d="M0 62 Q30 48 62 58 T122 54 T160 58 V90 H0 Z" fill={huegel0} />
+    <path d="M0 74 Q40 62 82 72 T160 68 V90 H0 Z" fill={huegel1} />
     <!-- Baum -->
     <g transform={hoch ? 'translate(30 0)' : undefined}>
     <rect x="38" y="44" width="4" height="22" rx="1.5" fill="#7a4e2d" />
+    <g class="krone">
     <circle cx="40" cy="40" r="11" fill={f.krone[0]} />
     <circle cx="33" cy="44" r="7.5" fill={f.krone[1]} />
     <circle cx="47" cy="44" r="7.5" fill={f.krone[2]} />
@@ -84,14 +144,15 @@
       <circle cx="37" cy="38" r="1.6" fill="#c94a2a" /><circle cx="44" cy="42" r="1.6" fill="#c94a2a" />
     {/if}
     </g>
+    </g>
     <!-- kleines Haus -->
     <g transform={hoch ? 'translate(82 54)' : 'translate(110 54)'}>
       <rect x="0" y="6" width="18" height="12" fill={jz === 'winter' ? '#f3e2c9' : '#f6d6a8'} />
       <path d="M-2 7 L9 -2 L20 7 Z" fill="#c9563c" />
       {#if jz === 'winter'}<path d="M-2.5 7.2 L9 -2.6 L20.5 7.2 L18 7.2 L9 0.4 L0 7.2 Z" fill="#ffffff" /><path d="M2 3.6 L9 -2 L16 3.6 Z" fill="#ffffff" />{/if}
       <rect x="7" y="11" width="4" height="7" fill="#7a4e2d" />
-      <rect x="2" y="9" width="3.5" height="3" fill={nacht ? '#ffd84a' : '#bfe3ff'} />
-      <rect x="12.5" y="9" width="3.5" height="3" fill={nacht ? '#ffd84a' : '#bfe3ff'} />
+      <rect x="2" y="9" width="3.5" height="3" fill={istNacht ? '#ffd84a' : '#bfe3ff'} />
+      <rect x="12.5" y="9" width="3.5" height="3" fill={istNacht ? '#ffd84a' : '#bfe3ff'} />
     </g>
     {#if jz === 'fruehling' || jz === 'sommer'}
       {#each [12, 22, 70, 78, 92, 140, 150] as x, i (i)}
@@ -103,31 +164,36 @@
       <ellipse cx="74" cy="82" rx="3" ry="2.4" fill="#f2a03d" />
     {/if}
     {#if jz === 'winter'}
+      <path d="M0 84 Q14 80.5 30 83 T62 82 T96 83.5 T130 81.5 T160 83 V90 H0 Z" fill="#fff" />
+      <path d="M0 87 Q22 84.5 46 86.5 T100 86 T160 86.5 V90 H0 Z" fill="#e6eff8" />
+      <ellipse cx="40" cy="66.3" rx="5.5" ry="1.2" fill="#fff" />
       <circle cx="70" cy="78" r="4.5" fill="#fff" /><circle cx="70" cy="71" r="3.2" fill="#fff" /><path d="M70 71 l3 0.6 -3 0.6 z" fill="#f08a24" />
     {/if}
   </svg>
 
+  <Figuren {jz} {orte} nacht={istNacht} regen={art === 'regen' || art === 'gewitter'} />
   <SzenenEreignisse {jz} {orte} />
 
-  {#if wetterArt === 'wolkig' || wetterArt === 'regen' || wetterArt === 'gewitter' || wetterArt === 'schnee'}
-    <div class="wetter-wolken" class:dunkel={wetterArt === 'gewitter'}>
+  {#if art === 'wolkig' || art === 'regen' || art === 'gewitter' || art === 'schnee'}
+    <div class="wetter-wolken" class:dunkel={art === 'gewitter'}>
       {#each [8, 30, 55, 78] as x, i (i)}<span style="left: {x}%; top: {4 + (i % 2) * 7}%; animation-delay: {-i * 9}s"></span>{/each}
     </div>
   {/if}
-  {#if wetterArt === 'regen' || wetterArt === 'gewitter'}
+  {#if art === 'regen' || art === 'gewitter'}
+    <div class="pfuetzen" style="top: {orte.boden[1] + 1}%">{#each [18, 34, 52, 71, 86] as x, i (i)}<span style="left: {x}%; animation-delay: {-i * 0.4}s"></span>{/each}</div>
     <div class="wetter-regen">{#each Array.from({ length: 60 }) as _, i (i)}<span style="left: {(i * 37) % 100}%; animation-delay: {((i * 13) % 10) / 10}s"></span>{/each}</div>
   {/if}
-  {#if wetterArt === 'gewitter'}<div class="blitz"></div>{/if}
-  {#if wetterArt === 'schnee' && jz !== 'winter'}
+  {#if art === 'gewitter'}<div class="blitz"></div>{/if}
+  {#if art === 'schnee' && jz !== 'winter'}
     <div class="wetter-schnee">{#each Array.from({ length: 40 }) as _, i (i)}<span style="left: {(i * 29) % 100}%; animation-delay: {-((i * 7) % 12)}s"></span>{/each}</div>
   {/if}
-  {#if wetterArt === 'nebel'}
+  {#if art === 'nebel'}
     <div class="wetter-nebel">{#each [30, 52, 70] as y, i (i)}<span style="top: {y}%; animation-delay: {-i * 12}s"></span>{/each}</div>
   {/if}
 
   {#if f.teilchen.length}
     <div class="teilchen" class:schnee={jz === 'winter'}>
-      {#each teile as t (t.i)}
+      {#each teile.slice(0, jz === 'winter' ? 40 : 26) as t (t.i)}
         <span
           style="left: {t.x}%; width: {t.groesse}px; height: {jz === 'winter' ? t.groesse : t.groesse * 0.7}px; background: {f.teilchen[t.i % f.teilchen.length]}; --dauer: {t.dauer}s; --pendel: {t.pendel}px; animation-delay: {t.verz}s, {t.verz}s"
         ></span>
@@ -236,10 +302,53 @@
     }
   }
   .wolke {
-    animation: ziehen 60s linear infinite alternate;
+    animation: ziehen 80s ease-in-out infinite alternate;
   }
   .wolke.langsam {
-    animation-duration: 90s;
+    animation-duration: 120s;
+  }
+  .wolke.mittel {
+    animation-duration: 100s;
+    animation-direction: alternate-reverse;
+  }
+  .krone {
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+    animation: wiegen 6s ease-in-out infinite alternate;
+  }
+  @keyframes wiegen {
+    from {
+      transform: rotate(-1.3deg);
+    }
+    to {
+      transform: rotate(1.5deg);
+    }
+  }
+  .pfuetzen {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 0;
+    pointer-events: none;
+  }
+  .pfuetzen span {
+    position: absolute;
+    width: 9vw;
+    height: 1.6vh;
+    translate: -50% 0;
+    border-radius: 50%;
+    background: radial-gradient(ellipse, rgba(120, 165, 215, 0.55), rgba(120, 165, 215, 0.15) 70%, transparent);
+    animation: pfuetze 2.4s ease-in-out infinite alternate;
+  }
+  @keyframes pfuetze {
+    from {
+      scale: 0.85 1;
+      opacity: 0.6;
+    }
+    to {
+      scale: 1.05 1;
+      opacity: 1;
+    }
   }
   .sonne {
     animation: leuchten 6s ease-in-out infinite alternate;
@@ -277,7 +386,7 @@
   }
   @keyframes ziehen {
     to {
-      transform: translateX(40px);
+      transform: translateX(60px);
     }
   }
   @keyframes leuchten {

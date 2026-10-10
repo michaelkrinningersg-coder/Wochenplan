@@ -113,6 +113,14 @@
     if (tm.gestartet && tm.restMs <= 0) timerZuruecksetzen(id)
     timerStart(id, app.timer[id] ? dauerMs / 60_000 : aufgabe.minuten)
   }
+
+  /** Antippen des großen Bildes: kleiner Hüpfer */
+  function huepfen(e: MouseEvent) {
+    const el = e.currentTarget as HTMLElement
+    el.classList.remove('huepft')
+    void el.offsetWidth
+    el.classList.add('huepft')
+  }
 </script>
 
 {#if aufgabe}
@@ -123,7 +131,7 @@
         farbe={(bisStart !== null && !mitTimer) || app.einst.timerArt === 'sanduhr' ? 'var(--seg)' : farbe}
         groesse={scheibe}
       >
-        <div class="bild" class:erledigt>
+        <div class="bild" class:erledigt role="presentation" onclick={huepfen}>
           <AufgabenBild {aufgabe} />
         </div>
       </TimerScheibe>
@@ -434,5 +442,28 @@
     align-items: center;
     gap: 1em;
     padding: var(--rand);
+  }
+  .bild:global(.huepft) {
+    animation: huepf 0.55s ease-out;
+  }
+  @keyframes huepf {
+    0%,
+    100% {
+      transform: translateY(0) scale(1);
+    }
+    30% {
+      transform: translateY(-5%) scale(1.05, 1.07) rotate(-2deg);
+    }
+    60% {
+      transform: translateY(0) scale(1.04, 0.95) rotate(1.5deg);
+    }
+    80% {
+      transform: translateY(-1.5%) scale(1) rotate(0);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .bild:global(.huepft) {
+      animation: none;
+    }
   }
 </style>

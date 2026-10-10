@@ -41,6 +41,14 @@
     return { rest, zustand: ampelZustand(rest, tm.dauerMs), laeuft: tm.gestartet !== null }
   })
   const kind = $derived(aufgabe.fuer?.length === 1 ? app.plan.kinder.find((k) => k.id === aufgabe.fuer![0]) : undefined)
+
+  /** kleines Wackeln beim Antippen (nicht im Bearbeiten-Modus, dort wird gezogen) */
+  function wackeln(el: HTMLElement) {
+    if (bearbeiten) return
+    el.classList.remove('wackel')
+    void el.offsetWidth
+    el.classList.add('wackel')
+  }
 </script>
 
 <button
@@ -58,7 +66,10 @@
   data-autofokus={autofokus ? true : undefined}
   aria-label={aufgabe.titel + (erledigt ? ', ' + t('erledigt') : '') + (status === 'jetzt' ? ', ' + t('jetzt dran') : '')}
   title={mini ? aufgabe.titel : undefined}
-  onclick={onwahl}
+  onclick={(e) => {
+    wackeln(e.currentTarget)
+    onwahl(e)
+  }}
   use:ziehbar={{
     id: aufgabe.id,
     tag,
@@ -107,6 +118,34 @@
     box-shadow: 0 calc(var(--s) * 0.04) 0 var(--seg-tief, var(--linie));
     transition: transform 0.15s ease;
     touch-action: manipulation;
+  }
+  .kachel:active:not(.bearbeiten) {
+    transform: scale(0.94);
+  }
+  .kachel:global(.wackel) {
+    animation: wackel 0.45s ease-out;
+  }
+  @keyframes wackel {
+    0% {
+      transform: scale(0.94) rotate(0);
+    }
+    25% {
+      transform: scale(1.06) rotate(-4deg);
+    }
+    50% {
+      transform: scale(1.04) rotate(3.5deg);
+    }
+    75% {
+      transform: scale(1.02) rotate(-1.5deg);
+    }
+    100% {
+      transform: scale(1) rotate(0);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .kachel:global(.wackel) {
+      animation: none;
+    }
   }
   .kachel.bearbeiten {
     touch-action: none;
