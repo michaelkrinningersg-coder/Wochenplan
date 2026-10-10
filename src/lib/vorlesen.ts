@@ -140,12 +140,20 @@ export function timerAnsagen(minuten: number) {
   void vorlesen(`Du hast ${minutenText(minuten)} Zeit.`)
 }
 
-/** Zeitansagen des Timers */
-export function zeitAnsagen(art: 'gelb' | 'rot' | 'ende', titel: string, restMinuten: number) {
+/** Zeitansagen des Timers: noch 10 / 5 / 1 Minute, Zeit um */
+export function restAnsagen(minuten: number, titel: string) {
   if (app.einst.zeitAnsagen === false) return
-  if (art === 'gelb') void vorlesen(`Noch ${minutenText(Math.max(1, restMinuten))} für ${titel}.`)
-  else if (art === 'rot') void vorlesen(`Noch eine Minute! Gleich ist ${titel} vorbei.`)
-  else void vorlesen(`Die Zeit für ${titel} ist um.`)
+  if (minuten <= 1) void vorlesen(`Noch eine Minute für ${titel}! Gleich ist die Zeit um.`)
+  else void vorlesen(`Noch ${minuten} Minuten für ${titel}.`)
+}
+export function endeAnsagen(titel: string) {
+  if (app.einst.zeitAnsagen === false) return
+  void vorlesen(`Die Zeit für ${titel} ist um.`)
+}
+/** Countdown bis zu einer Aufgabe mit fester Uhrzeit */
+export function startAnsagen(minuten: number, titel: string) {
+  if (app.einst.zeitAnsagen === false) return
+  void vorlesen(minuten <= 1 ? `In einer Minute geht es los: ${titel}.` : `In ${minuten} Minuten geht es los: ${titel}.`)
 }
 
 /** Uhrzeit laut und deutlich ansagen: „Es ist 10 Uhr 51.“ */

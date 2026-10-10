@@ -123,6 +123,8 @@ export interface TimerZustand {
   gelbGemeldet?: boolean
   rotGemeldet?: boolean
   endeGemeldet?: boolean
+  /** schon angesagte Restminuten (10, 5, 1) */
+  angesagt?: number[]
 }
 
 export type Ansicht =

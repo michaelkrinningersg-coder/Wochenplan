@@ -18,13 +18,13 @@
   import KopierenDialog from './dialoge/KopierenDialog.svelte'
   import Kopfzeile from './komponenten/Kopfzeile.svelte'
   import { updatePruefungStarten } from './lib/update.svelte'
-  import { zeitAnsagen } from './lib/vorlesen'
+  import { endeAnsagen, restAnsagen, startAnsagen } from './lib/vorlesen'
   import { abgleich, abgleichStarten, erledigtGeaendert, lokalGeaendert } from './lib/abgleich.svelte'
   import { gelbAb, rotAb } from './lib/ampel'
   import { abschnittInfo } from './lib/konstanten'
   import { bewegeFokus, ersterFokus, fokusSetzen, richtungAusTaste } from './lib/fokus'
   import { bildschirmAnlassen, zurueckTaste } from './lib/geraet'
-  import { app, finde, planErneuert, planUmgestellt, oeffnen, schrittVerschieben, speichern, tagVerschieben, zurueck } from './lib/speicher.svelte'
+  import { app, finde, minutenBisStart, tagesListe, planErneuert, planUmgestellt, oeffnen, schrittVerschieben, speichern, tagVerschieben, zurueck } from './lib/speicher.svelte'
   import { spieleTon, tonFreischalten } from './lib/ton'
   import { heuteTag, tagesPhase } from './lib/zeit'
 
@@ -121,12 +121,31 @@
     if (abgleich.einst.rolle === 'anzeige' && app.bearbeiten) app.bearbeiten = false
   })
 
+  // ---------- Countdown bis zu Aufgaben mit fester Uhrzeit (nur Anzeige-Geräte, damit nicht alle Handys sprechen) ----------
+  const startGesagt = new Set<string>()
+  let letzteMinute = -1
+  $effect(() => {
+    const minute = Math.floor(app.jetzt / 60_000)
+    if (minute === letzteMinute) return
+    letzteMinute = minute
+    untrack(() => {
+      if (abgleich.einst.rolle === 'planer') return
+      const tag = heuteTag()
+      for (const { aufgabe } of tagesListe(tag)) {
+        const bis = minutenBisStart(tag, aufgabe)
+        if (bis === null || !MARKEN.includes(bis)) continue
+        const key = `${new Date().toDateString()}:${aufgabe.id}:${bis}`
+        if (startGesagt.has(key)) continue
+        startGesagt.add(key)
+        startAnsagen(bis, aufgabe.titel)
+      }
+    })
+  })
+
   // ---------- Timer: Töne und Ansagen bei Gelb, Rot und am Ende ----------
-  function ansage(art: 'gelb' | 'rot' | 'ende', id: string, restMs: number) {
-    const titel = finde(heuteTag(), id)?.aufgabe.titel
-    if (!titel) return
-    // nach dem Ton sprechen
-    setTimeout(() => zeitAnsagen(art, titel, Math.round(restMs / 60_000)), 1200)
+  const MARKEN = [10, 5, 1]
+  function titelVon(id: string) {
+    return finde(heuteTag(), id)?.aufgabe.titel
   }
 
   $effect(() => {
@@ -134,20 +153,33 @@
     for (const [id, t] of Object.entries(app.timer)) {
       if (t.gestartet === null) continue
       const rest = t.dauerMs - (t.vergangenMs + (jetzt - t.gestartet))
+      // Sprecher: noch 10 / 5 / 1 Minute (nur Marken, die kürzer als der ganze Timer sind)
+      if (rest > 0) {
+        const faellig = MARKEN.filter((m) => t.dauerMs > m * 60_000 + 20_000 && rest <= m * 60_000 && !(t.angesagt ?? []).includes(m))
+        if (faellig.length) {
+          const m = Math.min(...faellig)
+          t.angesagt = [...(t.angesagt ?? []), ...MARKEN.filter((x) => x >= m)]
+          untrack(() => {
+            const titel = titelVon(id)
+            if (titel) setTimeout(() => restAnsagen(m, titel), 1200)
+          })
+        }
+      }
       if (!t.gelbGemeldet && rest <= gelbAb(t.dauerMs) && rest > rotAb(t.dauerMs)) {
         t.gelbGemeldet = true
         if (app.einst.ton) spieleTon('gelb')
-        untrack(() => ansage('gelb', id, rest))
       }
       if (!t.rotGemeldet && rest <= rotAb(t.dauerMs) && rest > 0) {
         t.rotGemeldet = t.gelbGemeldet = true
         if (app.einst.ton) spieleTon('rot')
-        untrack(() => ansage('rot', id, rest))
       }
       if (!t.endeGemeldet && rest <= 0) {
         t.endeGemeldet = true
         if (app.einst.ton) spieleTon('ende')
-        untrack(() => ansage('ende', id, 0))
+        untrack(() => {
+          const titel = titelVon(id)
+          if (titel) setTimeout(() => endeAnsagen(titel), 1200)
+        })
         // Kinder sehen sofort, welche Aufgabe abgelaufen ist
         untrack(() => {
           const tag = heuteTag()

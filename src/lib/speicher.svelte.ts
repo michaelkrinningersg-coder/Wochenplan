@@ -474,6 +474,7 @@ export function timerAendern(id: string, deltaMin: number, minutenStandard: numb
   if (rest > 0) t.endeGemeldet = false
   if (rest > rotAb(t.dauerMs)) t.rotGemeldet = false
   if (rest > gelbAb(t.dauerMs)) t.gelbGemeldet = false
+  if (t.angesagt) t.angesagt = t.angesagt.filter((m) => rest <= m * 60_000)
 }
 
 // ---------- Export / Import ----------
