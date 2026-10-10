@@ -26,30 +26,53 @@ export function standardKinder(): Kind[] {
   ]
 }
 
-/** Der gleiche Grundablauf für jeden Tag (jeweils mit eigenen IDs) */
-function grundtag(): Tagesplan {
+/** Werktag (Mo–Fr): Kita bis zum Nachmittag, danach Spielzeit */
+function werktag(): Tagesplan {
   return {
     aufstehen: [a('Aufstehen', 'wecker', 5), a('Toilette', 'toilette', 3)],
-    morgen: [a('Zähne putzen', 'zaehne', 3), a('Anziehen', 'anziehen', 10)],
-    vormittag: [],
-    mittag: [a('Mittagessen', 'essen', 30)],
-    nachmittag: [],
-    frueh: [a('Abendessen', 'abendbrot', 30), a('Aufräumen', 'aufraeumen', 10)],
+    morgen: [a('Frühstück', 'fruehstueck', 20), a('Zähne putzen', 'zaehne', 3), a('Anziehen', 'anziehen', 10)],
+    vormittag: [a('Kita', 'kita', 0)],
+    mittag: [],
+    nachmittag: [a('Spielzeit', 'spielen', 30)],
+    frueh: [a('Abendessen', 'abendbrot', 30), a('Spielzeit', 'spielen', 20), a('Aufräumen', 'aufraeumen', 10)],
+    abend: [a('Schlafanzug anziehen', 'schlafanzug', 5), a('Zähne putzen', 'zaehne', 3)],
+    bett: [a('Toilette', 'toilette', 3, 'mond'), a('Lesen', 'lesen', 15)],
+    schlafen: [a('Schlafen', 'schlafen', 0)],
+  }
+}
+
+/** Wochenende: Sa mit Schwimmen am Vormittag, So mit Spielplatz am Vormittag */
+function wochenende(vormittag: Aufgabe): Tagesplan {
+  return {
+    aufstehen: [a('Aufstehen', 'wecker', 5), a('Toilette', 'toilette', 3)],
+    morgen: [a('Frühstück', 'fruehstueck', 20), a('Zähne putzen', 'zaehne', 3), a('Anziehen', 'anziehen', 10)],
+    vormittag: [vormittag],
+    mittag: [a('Mittagessen', 'essen', 30), a('Mittagsruhe', 'mittagsruhe', 30)],
+    nachmittag: [a('Spielplatz', 'spielplatz', 60), a('Hände waschen', 'waschen', 2)],
+    frueh: [a('Abendessen', 'abendbrot', 30), a('Spielzeit', 'spielen', 20), a('Aufräumen', 'aufraeumen', 10)],
     abend: [a('Schlafanzug anziehen', 'schlafanzug', 5), a('Zähne putzen', 'zaehne', 3), a('Fernsehen', 'fernsehen', 20)],
     bett: [a('Toilette', 'toilette', 3, 'mond'), a('Lesen', 'lesen', 15)],
     schlafen: [a('Schlafen', 'schlafen', 0)],
   }
 }
 
-/** Vorbereitete Woche: jeden Tag gleich; Sa Schwimmen + Spielplatz, Mo Mittag Ergotherapie, Do Nachmittag Psychotherapie. */
-export function startplan(): Plan {
+/** Standardwoche */
+export function standardWoche(): Record<TagId, Tagesplan> {
   const woche = {} as Record<TagId, Tagesplan>
-  for (const t of TAGE) woche[t.id] = grundtag()
-
-  woche.sa.vormittag.push(a('Schwimmen', 'schwimmen', 0))
-  woche.sa.nachmittag.push(a('Spielplatz', 'spielplatz', 60))
-  woche.mo.mittag.push(a('Ergotherapie', 'ergotherapie', 0))
+  for (const t of TAGE) woche[t.id] = werktag()
+  woche.mo.nachmittag.push(a('Ergotherapie', 'ergotherapie', 0))
+  woche.di.nachmittag.push(a('Kinderturnen', 'turnen', 0))
+  woche.mi.nachmittag.push(a('Spielplatz', 'spielplatz', 60))
   woche.do.nachmittag.push(a('Fr. Gardner', 'psychotherapie', 0))
+  woche.fr.nachmittag.push(a('Spielplatz', 'spielplatz', 60))
+  woche.fr.abend.push(a('Fernsehen', 'fernsehen', 20))
+  woche.sa = wochenende(a('Schwimmen', 'schwimmen', 0))
+  woche.so = wochenende(a('Spielplatz', 'spielplatz', 60))
+  return woche
+}
+
+export function startplan(): Plan {
+  const woche = standardWoche()
 
   return {
     version: 3,
@@ -159,12 +182,13 @@ export function planNormalisieren(roh: unknown): Plan {
       if (name || bild) abschnitte[ab.id] = { ...(name ? { name } : {}), ...(bild ? { bild } : {}) }
     }
   const plan: Plan = { version: 3, stand: STAND, woche, zeiten, abendEnde, kinder, termine, vorlagen, datumVorlage, abschnitte }
-  if ((typeof p.stand === 'number' ? p.stand : 1) < STAND) umstellen(plan)
+  const vonStand = typeof p.stand === 'number' ? p.stand : 1
+  if (vonStand < STAND) umstellen(plan, vonStand)
   return plan
 }
 
 /** Stand der einmaligen Umstellungen. Erhöhen, wenn neue Regeln in UMZUG dazukommen. */
-const STAND = 2
+const STAND = 3
 
 /** Neue Bildkarten für vorhandene Aufgaben (Titel + altes Bild → neues Bild, ggf. neuer Titel) */
 const UMZUG: { titel: string; alt: string; neu: string; neuerTitel?: string }[] = [
@@ -176,7 +200,9 @@ const UMZUG: { titel: string; alt: string; neu: string; neuerTitel?: string }[] 
   { titel: 'Psychotherapie', alt: 'psychotherapie', neu: 'psychotherapie', neuerTitel: 'Fr. Gardner' },
 ]
 
-function umstellen(plan: Plan) {
+function umstellen(plan: Plan, vonStand: number) {
+  // Stand 3: neue Standardwoche (gewünschter Wochenablauf); Termine, Abläufe, Kinder und Zeiten bleiben
+  if (vonStand < 3) plan.woche = standardWoche()
   const anpassen = (x: Aufgabe) => {
     const r = UMZUG.find((u) => u.titel === x.titel && u.alt === x.bild)
     if (!r) return
