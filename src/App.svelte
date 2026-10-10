@@ -22,6 +22,7 @@
   import Kopfzeile from './komponenten/Kopfzeile.svelte'
   import { updatePruefungStarten } from './lib/update.svelte'
   import { endeAnsagen, restAnsagen, startAnsagen } from './lib/vorlesen'
+  import { dateiAbgleichStarten } from './lib/dateiabgleich.svelte'
   import { ruhebilderAbgleichen, abgleich, abgleichStarten, erledigtGeaendert, lokalGeaendert } from './lib/abgleich.svelte'
   import { gelbAb, rotAb } from './lib/ampel'
   import { abschnittInfo } from './lib/konstanten'
@@ -118,6 +119,8 @@
     void abgleich.einst.token
     return untrack(() => abgleichStarten())
   })
+
+  $effect(() => untrack(() => dateiAbgleichStarten()))
 
   // ---------- Darstellung ----------
   const thema = $derived.by(() => {

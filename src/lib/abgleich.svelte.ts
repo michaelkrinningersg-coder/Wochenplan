@@ -1,5 +1,6 @@
 // Abgleich über GitHub: Der Planer (Handy/PC) lädt den Plan verschlüsselt hoch,
 // der Fernseher holt ihn regelmäßig ab. Ohne Familien-Passwort ist die Datei nicht lesbar.
+import { dateiGeaendert } from './dateiabgleich.svelte'
 import { istApp } from './geraet'
 import { ruhe, ruhebildEntfernen, ruhebildSpeichern } from './ruhebilder.svelte'
 import { app, erledigtKuerzen, exportDaten, importDaten, zeigeHinweis, type ErledigtStand } from './speicher.svelte'
@@ -157,6 +158,19 @@ function fehlerText(status: number): string {
 
 let laeuft = false
 let anwenden = false
+
+/** Zeitstempel der letzten Änderung auf diesem Gerät */
+export const lokalStand = () => abgleich.stand.lokal
+
+/** Plan von außen übernehmen, ohne dass das als eigene Änderung gilt */
+export function ohneAbgleich(fn: () => void) {
+  anwenden = true
+  try {
+    fn()
+  } finally {
+    queueMicrotask(() => (anwenden = false))
+  }
+}
 
 /** Plan vom Server holen. Gibt true zurück, wenn ein neuer Plan übernommen wurde. */
 export async function holen(erzwingen = false): Promise<boolean> {
@@ -510,6 +524,7 @@ export function lokalGeaendert() {
   if (anwenden) return
   abgleich.stand.lokal = Date.now()
   standSpeichern()
+  dateiGeaendert()
   if (abgleich.einst.rolle !== 'planer' || !istEingerichtet()) return
   if (hochladenTimer) clearTimeout(hochladenTimer)
   hochladenTimer = setTimeout(() => void hochladen(), 2500)

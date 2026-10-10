@@ -7,6 +7,7 @@
   import { onDestroy, onMount } from 'svelte'
   import ZeitWahl from '../komponenten/ZeitWahl.svelte'
   import Lizenzen from '../komponenten/Lizenzen.svelte'
+  import { datei, dateiAbgleichen, dateiInfoLaden, dateiMoeglich, dateiTrennen, dateiWaehlen, passwortSpeichern } from '../lib/dateiabgleich.svelte'
   import { empfangStarten, empfangStoppen, fernseherSuchen, kopplung, kopplungMoeglich, planSenden, type Geraet } from '../lib/kopplung.svelte'
   import { abgleich, einstSpeichern, holen, hochladen, istEingerichtet, ruhebildFernLoeschen, ruhebildHochladen, statusHochladen } from '../lib/abgleich.svelte'
   import { ruhe, ruhebildEntfernen, ruhebildSpeichern, ruhebildVorbereiten } from '../lib/ruhebilder.svelte'
@@ -114,6 +115,7 @@
   let stimmenGeladen = $state(false)
   let stimmeWahl = $state(app.einst.stimme ?? '')
   onMount(() => {
+    void dateiInfoLaden()
     void deutscheStimmen().then((l) => {
       stimmen = l
       stimmenGeladen = true
@@ -586,6 +588,34 @@
       {/if}
     </section>
 
+    {/if}
+    {#if dateiMoeglich}
+    <section>
+      <h3>Gemeinsame Datei (eigener Speicher){__STORE__ ? '' : ' – Test'}</h3>
+      <p class="zh">
+        Du wählst selbst, wo der Plan liegt – zum Beispiel in Google Drive, Nextcloud oder auf dem Gerät. Die App legt dort eine verschlüsselte Datei ab
+        und gleicht sie auf allen Geräten ab, die dieselbe Datei und dasselbe Passwort nutzen. Die jüngere Änderung gewinnt. Es läuft nichts über Server des App-Anbieters.
+      </p>
+      <label class="feld">
+        <span class="name">Familien-Passwort (auf allen Geräten gleich)</span>
+        <input id="datei-passwort" type="password" bind:value={datei.passwort} onchange={passwortSpeichern} autocomplete="off" placeholder="z. B. hase-sonne-blau-17" />
+      </label>
+      <div class="reihe">
+        <button class="knopf" onclick={() => void dateiWaehlen(true)} disabled={!datei.passwort}>Neue Datei anlegen</button>
+        <button class="knopf" onclick={() => void dateiWaehlen(false)} disabled={!datei.passwort}>Vorhandene Datei wählen</button>
+        {#if datei.gewaehlt}
+          <button class="knopf haupt" onclick={() => void dateiAbgleichen()}><Symbol name="neu" />Jetzt abgleichen</button>
+          <button class="knopf" onclick={() => void dateiTrennen()}>Trennen</button>
+        {/if}
+      </div>
+      {#if datei.gewaehlt}<p class="hilfe">Datei: {datei.name}</p>{/if}
+      {#if datei.zustand === 'fehler'}
+        <p class="meldung fehler">{datei.meldung}</p>
+      {:else if datei.zuletzt}
+        <p class="meldung">Zuletzt abgeglichen um {new Date(datei.zuletzt).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })} Uhr.</p>
+      {/if}
+      <p class="hilfe">Tipp: Auf dem zweiten Gerät „Vorhandene Datei wählen“ und dieselbe Datei auswählen. Wer die Datei und das Passwort hat, kann den Plan lesen.</p>
+    </section>
     {/if}
     <section>
       <h3>{__STORE__ ? 'Plan sichern und teilen' : 'Sichern'}</h3>

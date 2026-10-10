@@ -12,6 +12,8 @@ public class MainActivity extends BridgeActivity {
         registerPlugin(Aktualisierer.class);
         // Plan im WLAN vom Handy auf den Fernseher übertragen
         registerPlugin(Kopplung.class);
+        // frei gewählte Abgleich-Datei (Drive, Nextcloud, Gerät)
+        registerPlugin(Dateispeicher.class);
         super.onCreate(savedInstanceState);
     }
 
