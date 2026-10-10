@@ -401,7 +401,10 @@ import { FREI_MAX_KACHELN, istPro } from '../lib/lizenz.svelte'
       <h3>{t('Tageszeiten')}</h3>
       <p class="hilfe">{t('Tippe auf Bild oder Namen, um eine Tageszeit umzubenennen, ihr ein Bild oder eine Farbe zu geben. Jeder Abschnitt endet, wenn der nächste beginnt. Änderst du ein „bis“, verschiebt sich der Beginn des nächsten Abschnitts mit. Die letzte Tageszeit dauert bis zum Aufstehen am nächsten Tag.')}</p>
       <div class="reihe">
-        <button class="knopf haupt klein" onclick={() => (app.dialog = { art: 'abschnittBild', id: abschnittAnlegen() })}>＋ {t('Neue Tageszeit')}</button>
+        <button class="knopf haupt klein" onclick={() => {
+            const neu = abschnittAnlegen()
+            if (neu) app.dialog = { art: 'abschnittBild', id: neu }
+          }}>＋ {t('Neue Tageszeit')}</button>
       </div>
       <div class="zeiten">
         {#each ABSCHNITTE as ab, i (ab.id)}

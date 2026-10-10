@@ -436,7 +436,12 @@ function hhmm(min: number): string {
 }
 
 /** Neue Tageszeit: teilt die längste vorhandene Tageszeit in der Mitte. Gibt die Kennung zurück. */
-export function abschnittAnlegen(): AbschnittId {
+export function abschnittAnlegen(): AbschnittId | null {
+  // kostenlose Version: keine weiteren Tageszeiten (außerdem würden die ausgeblendeten sonst aus der Liste fallen)
+  if (!istPro()) {
+    proHinweis()
+    return null
+  }
   const ids = ABSCHNITTE.map((a) => a.id)
   let beste = 0
   let laenge = -1
