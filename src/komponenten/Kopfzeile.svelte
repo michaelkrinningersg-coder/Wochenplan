@@ -2,8 +2,8 @@
   import { t } from '../lib/i18n.svelte'
   import { abgleich, holen } from '../lib/abgleich.svelte'
   import { abschnittInfo, tagName } from '../lib/konstanten'
-  import { app, istHeute, oeffnen, zeigeHinweis, zurueck } from '../lib/speicher.svelte'
-  import { datumLang, heuteTag, spanneText, uhrzeitJetzt } from '../lib/zeit'
+  import { app, datumVon, istHeute, oeffnen, tagSpringen, wocheSpringen, zeigeHinweis, zuHeute, zurueck } from '../lib/speicher.svelte'
+  import { ausKey, datumLang, spanneText, uhrzeitJetzt } from '../lib/zeit'
   import Bild from './Bild.svelte'
   import HalteKnopf from './HalteKnopf.svelte'
   import AnalogUhr from './AnalogUhr.svelte'
@@ -34,12 +34,12 @@
   const unter = $derived.by(() => {
     switch (a.art) {
       case 'woche':
-        return t('jede Woche gleich')
+        return app.wochenOffset === 0 ? t('diese Woche') : t('ab {datum}', { datum: datumLang(ausKey(datumVon('mo'))) })
       case 'monat':
       case 'jahr':
         return t('Termine und Geburtstage')
       case 'tag':
-        return istHeute(a.tag) ? t('heute, {datum}', { datum: datumLang(jetzt) }) : t('jede Woche')
+        return istHeute(a.tag) ? t('heute, {datum}', { datum: datumLang(jetzt) }) : datumLang(ausKey(datumVon(a.tag)))
       case 'abschnitt':
       case 'aufgabe':
         return t('{tag}, {zeit} Uhr', { tag: t(tagName(a.tag)), zeit: spanneText(app.plan, a.abschnitt) })
@@ -48,6 +48,11 @@
   const kopfBild = $derived(a.art === 'abschnitt' || a.art === 'aufgabe' ? abschnittInfo(a.abschnitt).bild : null)
   const istStart = $derived(a.art === 'tag' && istHeute(a.tag))
   const zeigeHeute = $derived(a.art === 'tag' && istHeute(a.tag))
+  const springbar = $derived(a.art === 'tag' || a.art === 'woche')
+  function springen(r: -1 | 1) {
+    if (a.art === 'woche') wocheSpringen(r)
+    else tagSpringen(r)
+  }
 </script>
 
 <header class="kopfzeile">
@@ -65,12 +70,18 @@
   </div>
 
   <div class="rechts">
+    {#if springbar}
+      <div class="sprung">
+        <button class="knopf rund" onclick={() => springen(-1)} aria-label={a.art === 'woche' ? t('Vorherige Woche') : t('Vorheriger Tag')}><Symbol name="zurueck" /></button>
+        <button class="knopf rund" onclick={() => springen(1)} aria-label={a.art === 'woche' ? t('Nächste Woche') : t('Nächster Tag')}><Symbol name="weiter" /></button>
+      </div>
+    {/if}
     <nav class="wechsel" aria-label={t('Ansicht')}>
       <button
         class="knopf"
         aria-label={t('Heute')}
         aria-pressed={zeigeHeute}
-        onclick={() => oeffnen({ art: 'tag', tag: heuteTag() })}
+        onclick={zuHeute}
       >
         <Symbol name="heute" /><span class="wort">{t('Heute')}</span>
       </button>
@@ -209,6 +220,10 @@
     font-size: var(--t-klein);
     color: var(--tinte-leise);
     white-space: nowrap;
+  }
+  .sprung {
+    display: flex;
+    gap: 6px;
   }
   .wechsel {
     display: flex;

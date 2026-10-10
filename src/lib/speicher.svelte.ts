@@ -88,6 +88,8 @@ export const app = $state({
   timer: timerLaden(),
   ansicht: { art: 'tag', tag: heuteTag() } as Ansicht,
   bearbeiten: false,
+  /** Wochen von der laufenden Woche weg (0 = diese Woche, 1 = nächste, -1 = letzte) */
+  wochenOffset: 0,
   /** Aufgabe, die gerade mit den Pfeiltasten verschoben wird */
   verschieben: null as null | { tag: TagId; id: string },
   dialog: null as Dialog | null,
@@ -110,7 +112,29 @@ abschnittAnpassungVon(
 // ---------- Navigation ----------
 
 export function istHeute(tag: TagId): boolean {
-  return tag === heuteTag(new Date(app.jetzt))
+  return app.wochenOffset === 0 && tag === heuteTag(new Date(app.jetzt))
+}
+
+const TAG_REIHE: TagId[] = ['mo', 'di', 'mi', 'do', 'fr', 'sa', 'so']
+
+/** Einen Tag vor/zurück, auch über Wochengrenzen und über heute hinaus */
+export function tagSpringen(richtung: -1 | 1) {
+  const a = app.ansicht
+  if (a.art !== 'tag') return
+  const i = TAG_REIHE.indexOf(a.tag) + richtung
+  if (i < 0) app.wochenOffset -= 1
+  else if (i > 6) app.wochenOffset += 1
+  oeffnen({ art: 'tag', tag: TAG_REIHE[(i + 7) % 7] })
+}
+
+export function wocheSpringen(richtung: -1 | 1) {
+  app.wochenOffset += richtung
+}
+
+/** Zurück zur laufenden Woche (Offset 0) und zum heutigen Tag */
+export function zuHeute() {
+  app.wochenOffset = 0
+  oeffnen({ art: 'tag', tag: heuteTag(new Date(app.jetzt)) })
 }
 
 export function oeffnen(ansicht: Ansicht, fokusZiel: string | null = null) {
@@ -143,6 +167,7 @@ export function zurueck(): boolean {
       return true
     case 'woche':
     case 'jahr':
+      app.wochenOffset = 0
       oeffnen({ art: 'tag', tag: heuteTag() })
       return true
     case 'monat':
@@ -164,7 +189,9 @@ export function zeigeHinweis(text: string) {
 
 /** Datum (Schlüssel) des Wochentags in der laufenden Woche */
 export function datumVon(tag: TagId): string {
-  return datumKey(datumFuerTag(tag, new Date(app.jetzt)))
+  const bezug = new Date(app.jetzt)
+  bezug.setDate(bezug.getDate() + 7 * app.wochenOffset)
+  return datumKey(datumFuerTag(tag, bezug))
 }
 
 /** Der Tagesplan, der an diesem Wochentag gilt: Tagesvorlage für das Datum oder der normale Wochentag */

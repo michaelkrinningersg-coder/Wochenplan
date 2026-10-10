@@ -1,6 +1,12 @@
 // Wörterbuch für src/ansichten/* und die meisten src/komponenten/* (Schlüssel = deutscher Originaltext)
 export const W: Record<'en' | 'es' | 'fr', Record<string, string>> = {
   en: {
+    'diese Woche': "this week",
+    'ab {datum}': "from {datum}",
+    'Vorherige Woche': "Previous week",
+    'Nächste Woche': "Next week",
+    'Vorheriger Tag': "Previous day",
+    'Nächster Tag': "Next day",
     '+ 1 Min': '+ 1 min',
     '− 1 Min': '− 1 min',
     '1 Termin': '1 appointment',
@@ -108,6 +114,12 @@ export const W: Record<'en' | 'es' | 'fr', Record<string, string>> = {
     '{zeit} Uhr': '{zeit}',
   },
   es: {
+    'diese Woche': "esta semana",
+    'ab {datum}': "desde el {datum}",
+    'Vorherige Woche': "Semana anterior",
+    'Nächste Woche': "Semana siguiente",
+    'Vorheriger Tag': "Día anterior",
+    'Nächster Tag': "Día siguiente",
     '+ 1 Min': '+ 1 min',
     '− 1 Min': '− 1 min',
     '1 Termin': '1 cita',
@@ -215,6 +227,12 @@ export const W: Record<'en' | 'es' | 'fr', Record<string, string>> = {
     '{zeit} Uhr': '{zeit} h',
   },
   fr: {
+    'diese Woche': "cette semaine",
+    'ab {datum}': "à partir du {datum}",
+    'Vorherige Woche': "Semaine précédente",
+    'Nächste Woche': "Semaine suivante",
+    'Vorheriger Tag': "Jour précédent",
+    'Nächster Tag': "Jour suivant",
     '+ 1 Min': '+ 1 min',
     '− 1 Min': '− 1 min',
     '1 Termin': '1 rendez-vous',
