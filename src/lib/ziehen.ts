@@ -13,13 +13,16 @@ export interface ZiehOptionen {
 const SCHWELLE = 8
 const RAND = 56
 
+/** Der Klick direkt nach dem Loslassen soll keine Aufgabe öffnen (Tastatur-Klicks bleiben erlaubt) */
 function klickNachZiehenSperren() {
-  const sperre = (e: Event) => {
+  const sperre = (e: MouseEvent) => {
+    if (e.detail === 0) return
     e.stopPropagation()
     e.preventDefault()
+    window.removeEventListener('click', sperre, true)
   }
   window.addEventListener('click', sperre, true)
-  setTimeout(() => window.removeEventListener('click', sperre, true), 350)
+  setTimeout(() => window.removeEventListener('click', sperre, true), 300)
 }
 
 function scrollbarerVorfahr(el: HTMLElement | null): HTMLElement | null {

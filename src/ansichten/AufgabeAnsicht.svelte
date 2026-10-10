@@ -121,9 +121,9 @@
         {#if !erledigt}
           {#if mitTimer}
             {#if t.laeuft}
-              <button class="knopf gross" onclick={() => timerPause(id)} data-autofokus><Symbol name="pause" />Pause</button>
+              <button class="knopf gross pause" onclick={() => timerPause(id)} data-autofokus><Symbol name="pause" />Pause</button>
             {:else}
-              <button class="knopf gross haupt" onclick={starten} data-autofokus>
+              <button class="knopf gross los" onclick={starten} data-autofokus>
                 <Symbol name="start" />{t.gestartet && t.restMs > 0 ? 'Weiter' : 'Los'}
               </button>
             {/if}
@@ -236,14 +236,28 @@
     flex-wrap: wrap;
     gap: 12px;
   }
+  /* Große Kinderknöpfe: am Symbol erkennbar, ohne lesen zu können */
   .knopf.gross {
-    font-size: var(--t-gross);
-    min-height: 2.4em;
-    padding-inline: 1.3em;
+    font-size: var(--t-titel);
+    min-height: 2.1em;
+    padding-inline: 0.9em 1.2em;
+    gap: 0.35em;
+    box-shadow: 0 0.12em 0 rgba(0, 0, 0, 0.22);
+  }
+  .knopf.gross :global(svg) {
+    width: 1.3em;
+    height: 1.3em;
+    stroke-width: 3;
+  }
+  .knopf.los {
+    background: var(--vormittag-tief);
+    border-color: var(--vormittag-tief);
+    color: #ffffff;
   }
   .knopf.fertig {
+    background: var(--gruen);
     border-color: var(--gruen);
-    color: var(--gruen);
+    color: #ffffff;
   }
   .knopf.klein {
     font-size: var(--t-klein);

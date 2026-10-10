@@ -5,7 +5,9 @@
   import { app, tagKopieren, tagLeeren, zeigeHinweis } from '../lib/speicher.svelte'
   import type { TagId } from '../lib/typen'
 
-  let { tag }: { tag: TagId } = $props()
+  let props: { tag: TagId } = $props()
+  // svelte-ignore state_referenced_locally
+  const { tag } = props
 
   let ziele = $state<TagId[]>([])
   let ersetzen = $state(true)

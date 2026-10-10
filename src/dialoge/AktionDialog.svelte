@@ -5,7 +5,10 @@
   import { app, aufgabeLoeschen, finde, zeigeHinweis } from '../lib/speicher.svelte'
   import type { TagId } from '../lib/typen'
 
-  let { tag, id }: { tag: TagId; id: string } = $props()
+  let props: { tag: TagId; id: string } = $props()
+  // Werte festhalten: Nach dem Schließen (app.dialog = null) sind die Props nicht mehr lesbar
+  // svelte-ignore state_referenced_locally
+  const { tag, id } = props
 
   const fund = $derived(finde(tag, id))
   let loeschenFragen = $state(false)
@@ -15,8 +18,8 @@
     app.dialog = { art: 'bearbeiten', tag, abschnitt: fund.abschnitt, aufgabe: { ...fund.aufgabe }, neu: false }
   }
   function verschieben() {
-    app.dialog = null
     app.verschieben = { tag, id }
+    app.dialog = null
     app.fokusZiel = 'aufgabe:' + id
     zeigeHinweis('Mit den Pfeiltasten verschieben, OK legt ab')
   }

@@ -9,12 +9,10 @@
   import { app, aufgabeLoeschen, aufgabeSpeichern, fotoHinzufuegen, zeigeHinweis } from '../lib/speicher.svelte'
   import type { AbschnittId, Aufgabe, TagId } from '../lib/typen'
 
-  let {
-    tag,
-    abschnitt: startAbschnitt,
-    aufgabe: start,
-    neu,
-  }: { tag: TagId; abschnitt: AbschnittId; aufgabe: Aufgabe; neu: boolean } = $props()
+  let props: { tag: TagId; abschnitt: AbschnittId; aufgabe: Aufgabe; neu: boolean } = $props()
+  // Werte festhalten: Nach dem Schließen (app.dialog = null) sind die Props nicht mehr lesbar
+  // svelte-ignore state_referenced_locally
+  const { tag, abschnitt: startAbschnitt, aufgabe: start, neu } = props
 
   // Arbeitskopie (die Props sind die Ausgangswerte; Änderungen gelten erst beim Speichern)
   // svelte-ignore state_referenced_locally

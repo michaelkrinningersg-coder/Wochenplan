@@ -29,6 +29,12 @@
   const jd = $derived(jetztUndDanach(tag))
   const anzahl = $derived(liste.length + (app.bearbeiten ? 1 : 0))
   const raster = $derived(flaechenRaster(anzahl, breite - 24, hoehe - 24, 22, 280))
+  /** Fokus beim Öffnen: die Jetzt-Aufgabe, sonst die erste offene, sonst die erste */
+  const fokusId = $derived(
+    liste.find((x) => x.id === jd.jetzt)?.id ??
+      liste.find((x) => !(heute && istErledigt(x.id)))?.id ??
+      liste[0]?.id,
+  )
 </script>
 
 <div class="abschnitt" data-seg={abschnitt}>
@@ -63,7 +69,7 @@
             {tag}
             groesse={raster.s}
             status={jd.jetzt === aufgabe.id ? 'jetzt' : jd.danach === aufgabe.id ? 'danach' : ''}
-            autofokus={jd.jetzt === aufgabe.id}
+            autofokus={fokusId === aufgabe.id}
             erledigt={heute && istErledigt(aufgabe.id)}
             bisStart={minutenBisStart(tag, aufgabe)}
             onwahl={(e) => aufgabeGewaehlt(e, tag, abschnitt, aufgabe)}
