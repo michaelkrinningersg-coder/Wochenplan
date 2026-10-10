@@ -1,6 +1,9 @@
 <script lang="ts">
   import Fenster from '../komponenten/Fenster.svelte'
   import Symbol from '../komponenten/Symbol.svelte'
+  import Bild from '../komponenten/Bild.svelte'
+  import { deutscheStimmen, probeSprechen, type Stimme } from '../lib/vorlesen'
+  import { onMount } from 'svelte'
   import ZeitWahl from '../komponenten/ZeitWahl.svelte'
   import { abgleich, einstSpeichern, holen, hochladen, istEingerichtet, statusHochladen } from '../lib/abgleich.svelte'
   import { dateiExportieren, istApp } from '../lib/geraet'
@@ -11,6 +14,26 @@
   import { installieren, suchen, update, updateVerfuegbar } from '../lib/update.svelte'
 
   let zuruecksetzenFragen = $state(false)
+
+  // Stimmen für die Sprachausgabe
+  const TEMPI = [
+    { name: 'Langsam', wert: 0.7 },
+    { name: 'Normal', wert: 0.85 },
+    { name: 'Schneller', wert: 1 },
+  ]
+  let stimmen = $state<Stimme[]>([])
+  let stimmenGeladen = $state(false)
+  let stimmeWahl = $state(app.einst.stimme ?? '')
+  onMount(() => {
+    void deutscheStimmen().then((l) => {
+      stimmen = l
+      stimmenGeladen = true
+    })
+  })
+  function stimmenName(s: Stimme): string {
+    const land = /AT/i.test(s.lang) ? ' (Österreich)' : /CH/i.test(s.lang) ? ' (Schweiz)' : ''
+    return `${s.name}${land}${s.lokal ? '' : ' – online'}`
+  }
   let passwortZeigen = $state(false)
   let erweitert = $state(false)
   let dateiFeld: HTMLInputElement | undefined = $state()
@@ -175,13 +198,25 @@
     </section>
 
     <section>
+      <h3>Tagesabläufe</h3>
+      <p class="hilfe">Abläufe wie „Kita-Tag“, „Ferien“ oder „Wochenende“ speichern und einer Woche (Mo–Fr, Sa, So getrennt) oder einem Datum zuordnen. Tage kopieren.</p>
+      <div class="reihe">
+        <button class="knopf haupt" onclick={() => (app.dialog = { art: 'ablaeufe' })}><Symbol name="kalender" />Tagesabläufe und Wochen</button>
+      </div>
+    </section>
+
+    <section>
       <h3>Tageszeiten</h3>
-      <p class="hilfe">Jeder Abschnitt endet, wenn der nächste beginnt. Änderst du ein „bis“, verschiebt sich der Beginn des nächsten Abschnitts mit.</p>
+      <p class="hilfe">Tippe auf Bild oder Namen, um eine Tageszeit umzubenennen oder ihr ein eigenes Bild zu geben. Jeder Abschnitt endet, wenn der nächste beginnt. Änderst du ein „bis“, verschiebt sich der Beginn des nächsten Abschnitts mit.</p>
       <div class="zeiten">
         {#each ABSCHNITTE as ab, i (ab.id)}
           {@const naechster = ABSCHNITTE[i + 1]}
           <div class="zeit" data-seg={ab.id}>
-            <span class="zeit-name">{ab.name}</span>
+            <button class="zeit-name" onclick={() => (app.dialog = { art: 'abschnittBild', id: ab.id })} aria-label="{ab.name}: Name und Bild ändern">
+              <span class="zeit-bild"><Bild id={ab.bild} /></span>
+              <span>{ab.name}</span>
+              <Symbol name="stift" />
+            </button>
             <div class="von-bis">
               <span class="name">von</span>
               <ZeitWahl bind:wert={app.plan.zeiten[ab.id]} label="{ab.name} von" />
@@ -221,10 +256,38 @@
         <button class="knopf" aria-pressed={app.einst.vorlesen} onclick={() => (app.einst.vorlesen = !app.einst.vorlesen)}>
           Vorlesen {app.einst.vorlesen ? 'an' : 'aus'}
         </button>
+        <button class="knopf" aria-pressed={app.einst.zeitAnsagen !== false} onclick={() => (app.einst.zeitAnsagen = app.einst.zeitAnsagen === false)}>
+          Zeit ansagen: {app.einst.zeitAnsagen !== false ? 'ja' : 'nein'}
+        </button>
         <button class="knopf" aria-pressed={app.einst.wach} onclick={() => (app.einst.wach = !app.einst.wach)}>
           Bildschirm anlassen: {app.einst.wach ? 'ja' : 'nein'}
         </button>
       </div>
+          {#if app.einst.vorlesen}
+        <div class="stimme">
+          <span class="name">Stimme zum Vorlesen</span>
+          {#if stimmen.length}
+            <div class="reihe">
+              <select id="stimme" bind:value={stimmeWahl} onchange={() => (app.einst.stimme = stimmeWahl || undefined)}>
+                <option value="">Automatisch (beste Stimme)</option>
+                {#each stimmen as s (s.uri)}
+                  <option value={s.uri}>{stimmenName(s)}</option>
+                {/each}
+              </select>
+              <button class="knopf" onclick={probeSprechen}><Symbol name="lautsprecher" />Probe hören</button>
+            </div>
+          {:else if stimmenGeladen}
+            <p class="hilfe">Auf diesem Gerät ist keine deutsche Stimme installiert. In den Android-Einstellungen unter „Sprachausgabe“ die Google-Sprachausgabe mit Deutsch installieren.</p>
+            <div class="reihe"><button class="knopf" onclick={probeSprechen}><Symbol name="lautsprecher" />Probe hören</button></div>
+          {/if}
+          <div class="reihe">
+            <span class="name zeile">Tempo</span>
+            {#each TEMPI as t (t.wert)}
+              <button class="knopf klein" aria-pressed={(app.einst.tempo ?? 0.85) === t.wert} onclick={() => ((app.einst.tempo = t.wert), probeSprechen())}>{t.name}</button>
+            {/each}
+          </div>
+        </div>
+      {/if}
     </section>
 
     <section>
@@ -273,6 +336,47 @@
 </Fenster>
 
 <style>
+  .stimme {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  select {
+    min-width: 0;
+    max-width: 100%;
+    padding: 0.5em 0.8em;
+    border: 2px solid var(--linie);
+    border-radius: 14px;
+    background: var(--himmel);
+    color: var(--tinte);
+    font: inherit;
+  }
+  .zeit-name {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 8px 4px 4px;
+    border: 2px solid transparent;
+    border-radius: 14px;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-weight: 700;
+    text-align: left;
+  }
+  .zeit-name:hover,
+  .zeit-name:focus-visible {
+    border-color: var(--tinte);
+  }
+  .zeit-name :global(svg) {
+    margin-left: auto;
+    opacity: 0.5;
+  }
+  .zeit-bild {
+    width: 36px;
+    height: 36px;
+    flex: none;
+  }
   progress {
     width: 100%;
     height: 14px;

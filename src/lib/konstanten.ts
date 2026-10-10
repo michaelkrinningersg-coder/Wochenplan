@@ -1,4 +1,4 @@
-import type { AbschnittId, TagId } from './typen'
+import type { AbschnittAnpassung, AbschnittId, TagId } from './typen'
 
 export const TAGE: { id: TagId; kurz: string; lang: string }[] = [
   { id: 'mo', kurz: 'Mo', lang: 'Montag' },
@@ -11,8 +11,8 @@ export const TAGE: { id: TagId; kurz: string; lang: string }[] = [
 ]
 
 /** Gliederung des Tages. „nacht“ = dunkle Darstellung und Mond statt Sonne. */
-export const ABSCHNITTE: { id: AbschnittId; name: string; bild: string; nacht: boolean }[] = [
-  { id: 'aufstehen', name: 'Aufstehen', bild: 'wecker', nacht: false },
+const GRUND: { id: AbschnittId; name: string; bild: string; nacht: boolean }[] = [
+  { id: 'aufstehen', name: 'Aufstehen', bild: '_wecker', nacht: false },
   { id: 'morgen', name: 'Morgen', bild: '_sonnenaufgang', nacht: false },
   { id: 'vormittag', name: 'Vormittag', bild: '_sonne', nacht: false },
   { id: 'mittag', name: 'Mittag', bild: '_sonnengesicht', nacht: false },
@@ -22,6 +22,35 @@ export const ABSCHNITTE: { id: AbschnittId; name: string; bild: string; nacht: b
   { id: 'bett', name: 'Bettgehzeit', bild: '_nacht', nacht: true },
   { id: 'schlafen', name: 'Schlafen', bild: '_sternennacht', nacht: true },
 ]
+
+// Eigene Namen/Bilder aus dem Plan (wird vom Speicher gesetzt, damit hier kein Kreisbezug entsteht)
+let anpassung: () => Partial<Record<AbschnittId, AbschnittAnpassung>> | undefined = () => undefined
+export function abschnittAnpassungVon(quelle: typeof anpassung) {
+  anpassung = quelle
+}
+
+export interface AbschnittDef {
+  id: AbschnittId
+  nacht: boolean
+  /** Name/Bild ohne eigene Anpassung */
+  grundName: string
+  grundBild: string
+  readonly name: string
+  readonly bild: string
+}
+
+export const ABSCHNITTE: AbschnittDef[] = GRUND.map((g) => ({
+  id: g.id,
+  nacht: g.nacht,
+  grundName: g.name,
+  grundBild: g.bild,
+  get name() {
+    return anpassung()?.[g.id]?.name?.trim() || g.name
+  },
+  get bild() {
+    return anpassung()?.[g.id]?.bild || g.bild
+  },
+}))
 
 export const ZUSAETZE: { id: string; name: string; bild: string }[] = [
   { id: 'mond', name: 'Mond', bild: 'mond' },

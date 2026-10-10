@@ -1,5 +1,5 @@
 import { gelbAb, rotAb } from './ampel'
-import { ABSCHNITTE, TAGE } from './konstanten'
+import { ABSCHNITTE, TAGE, abschnittAnpassungVon } from './konstanten'
 import { neueId, planNormalisieren, startplan } from './startplan'
 import type {
   AbschnittId,
@@ -73,8 +73,10 @@ function erledigtLaden(): ErledigtStand {
 }
 
 // Pläne älterer Versionen (andere Tagesgliederung) werden einmalig durch den vorbereiteten Wochenplan ersetzt
-const gespeicherterPlan = laden<{ version?: number } | null>(SCHLUESSEL.plan, null)
+const gespeicherterPlan = laden<{ version?: number; stand?: number } | null>(SCHLUESSEL.plan, null)
 export const planErneuert = !!gespeicherterPlan && gespeicherterPlan.version !== 3
+/** Plan bekommt beim Laden neue Bildkarten / Namen (einmalige Umstellung) */
+export const planUmgestellt = !!gespeicherterPlan && !planErneuert && (gespeicherterPlan.stand ?? 1) < 2
 
 export const app = $state({
   plan: (gespeicherterPlan && !planErneuert ? planNormalisieren(gespeicherterPlan) : startplan()) as Plan,
@@ -96,6 +98,8 @@ export const app = $state({
   abgehakt: 0,
 })
 
+abschnittAnpassungVon(() => app.plan.abschnitte)
+
 // ---------- Navigation ----------
 
 export function istHeute(tag: TagId): boolean {
@@ -110,7 +114,8 @@ export function oeffnen(ansicht: Ansicht, fokusZiel: string | null = null) {
 /** Eine Ebene zurück. Gibt false zurück, wenn wir schon ganz oben (heute) sind. */
 export function zurueck(): boolean {
   if (app.dialog) {
-    app.dialog = null
+    // Unterdialoge der Einstellungen führen zurück in die Einstellungen
+    app.dialog = app.dialog.art === 'abschnittBild' || app.dialog.art === 'ablaeufe' ? { art: 'einstellungen' } : null
     return true
   }
   if (app.verschieben) {
@@ -403,6 +408,7 @@ export function fotosAufraeumen() {
   const tage = [...TAGE.map((t) => app.plan.woche[t.id]), ...app.plan.vorlagen.map((v) => v.tag)]
   for (const tp of tage) for (const ab of ABSCHNITTE) tp[ab.id].forEach(merken)
   app.plan.termine.forEach(merken)
+  for (const ab of Object.values(app.plan.abschnitte)) if (ab?.bild?.startsWith('foto:')) benutzt.add(ab.bild.slice(5))
   for (const id of Object.keys(app.fotos)) if (!benutzt.has(id)) delete app.fotos[id]
 }
 

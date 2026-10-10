@@ -71,6 +71,15 @@ export interface Plan {
   vorlagen: TagesVorlage[]
   /** Datum "YYYY-MM-DD" → ID einer Tagesvorlage, die an diesem Tag statt des Wochentags gilt */
   datumVorlage: Record<string, string>
+  /** eigene Namen und Bilder der Tageszeiten */
+  abschnitte: Partial<Record<AbschnittId, AbschnittAnpassung>>
+  /** Stand der einmaligen Umstellungen (neue Bildkarten, Umbenennungen) */
+  stand?: number
+}
+
+export interface AbschnittAnpassung {
+  name?: string
+  bild?: string
 }
 
 export interface Einstellungen {
@@ -84,6 +93,12 @@ export interface Einstellungen {
   /** Ansicht für welches Kind */
   kind: 'alle' | KindId
   vorlesen: boolean
+  /** gewählte Stimme (voiceURI), leer = beste deutsche Stimme automatisch */
+  stimme?: string
+  /** Sprechtempo 0.6–1.2 */
+  tempo?: number
+  /** Ansagen bei 5 Minuten / 1 Minute / Zeit um */
+  zeitAnsagen?: boolean
 }
 
 export interface TimerZustand {
@@ -115,6 +130,8 @@ export type Dialog =
   | { art: 'datum'; datum: string }
   | { art: 'termin'; termin: Termin; neu: boolean }
   | { art: 'vorlage'; tag: TagId }
+  | { art: 'abschnittBild'; id: AbschnittId }
+  | { art: 'ablaeufe' }
 
 export interface Fundstelle {
   abschnitt: AbschnittId

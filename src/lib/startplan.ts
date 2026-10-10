@@ -48,11 +48,13 @@ export function startplan(): Plan {
 
   woche.sa.vormittag.push(a('Schwimmen', 'schwimmen', 0))
   woche.sa.nachmittag.push(a('Spielplatz', 'spielplatz', 60))
-  woche.mo.mittag.push(a('Ergotherapie', 'puzzle', 0))
-  woche.do.nachmittag.push(a('Psychotherapie', 'psychotherapie', 0))
+  woche.mo.mittag.push(a('Ergotherapie', 'ergotherapie', 0))
+  woche.do.nachmittag.push(a('Fr. Gardner', 'psychotherapie', 0))
 
   return {
     version: 3,
+    stand: STAND,
+    abschnitte: {},
     woche,
     kinder: standardKinder(),
     termine: [],
@@ -147,5 +149,41 @@ export function planNormalisieren(roh: unknown): Plan {
   if (p.datumVorlage && typeof p.datumVorlage === 'object')
     for (const [d, id] of Object.entries(p.datumVorlage))
       if (DATUM.test(d) && vorlagen.some((v) => v.id === id)) datumVorlage[d] = id
-  return { version: 3, woche, zeiten, abendEnde, kinder, termine, vorlagen, datumVorlage }
+  const abschnitte: Plan['abschnitte'] = {}
+  if (p.abschnitte && typeof p.abschnitte === 'object')
+    for (const ab of ABSCHNITTE) {
+      const x = (p.abschnitte as Record<string, { name?: unknown; bild?: unknown }>)[ab.id]
+      if (!x || typeof x !== 'object') continue
+      const name = typeof x.name === 'string' && x.name.trim() ? x.name.trim().slice(0, 30) : undefined
+      const bild = typeof x.bild === 'string' && x.bild ? x.bild : undefined
+      if (name || bild) abschnitte[ab.id] = { ...(name ? { name } : {}), ...(bild ? { bild } : {}) }
+    }
+  const plan: Plan = { version: 3, stand: STAND, woche, zeiten, abendEnde, kinder, termine, vorlagen, datumVorlage, abschnitte }
+  if ((typeof p.stand === 'number' ? p.stand : 1) < STAND) umstellen(plan)
+  return plan
+}
+
+/** Stand der einmaligen Umstellungen. Erhöhen, wenn neue Regeln in UMZUG dazukommen. */
+const STAND = 2
+
+/** Neue Bildkarten für vorhandene Aufgaben (Titel + altes Bild → neues Bild, ggf. neuer Titel) */
+const UMZUG: { titel: string; alt: string; neu: string; neuerTitel?: string }[] = [
+  { titel: 'Ergotherapie', alt: 'puzzle', neu: 'ergotherapie' },
+  { titel: 'Mittagsruhe', alt: 'bett', neu: 'mittagsruhe' },
+  { titel: 'Kita', alt: 'schule', neu: 'kita' },
+  { titel: 'Abholen', alt: 'zuhause', neu: 'abholen' },
+  { titel: 'Vorschulheft', alt: 'buntstift', neu: 'vorschule', neuerTitel: 'Vorschulaufgaben' },
+  { titel: 'Psychotherapie', alt: 'psychotherapie', neu: 'psychotherapie', neuerTitel: 'Fr. Gardner' },
+]
+
+function umstellen(plan: Plan) {
+  const anpassen = (x: Aufgabe) => {
+    const r = UMZUG.find((u) => u.titel === x.titel && u.alt === x.bild)
+    if (!r) return
+    x.bild = r.neu
+    if (r.neuerTitel) x.titel = r.neuerTitel
+  }
+  const tage = [...Object.values(plan.woche), ...plan.vorlagen.map((v) => v.tag)]
+  for (const tp of tage) for (const ab of ABSCHNITTE) tp[ab.id].forEach(anpassen)
+  plan.termine.forEach(anpassen)
 }

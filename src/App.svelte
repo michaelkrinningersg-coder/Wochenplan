@@ -7,6 +7,8 @@
   import DatumDialog from './dialoge/DatumDialog.svelte'
   import TagesAnsicht from './ansichten/TagesAnsicht.svelte'
   import WochenAnsicht from './ansichten/WochenAnsicht.svelte'
+  import AbschnittDialog from './dialoge/AbschnittDialog.svelte'
+  import AblaeufeDialog from './dialoge/AblaeufeDialog.svelte'
   import AktionDialog from './dialoge/AktionDialog.svelte'
   import AufgabeKopierenDialog from './dialoge/AufgabeKopierenDialog.svelte'
   import BearbeitenDialog from './dialoge/BearbeitenDialog.svelte'
@@ -14,12 +16,13 @@
   import KopierenDialog from './dialoge/KopierenDialog.svelte'
   import Kopfzeile from './komponenten/Kopfzeile.svelte'
   import { updatePruefungStarten } from './lib/update.svelte'
+  import { zeitAnsagen } from './lib/vorlesen'
   import { abgleich, abgleichStarten, erledigtGeaendert, lokalGeaendert } from './lib/abgleich.svelte'
   import { gelbAb, rotAb } from './lib/ampel'
   import { abschnittInfo } from './lib/konstanten'
   import { bewegeFokus, ersterFokus, fokusSetzen, richtungAusTaste } from './lib/fokus'
   import { bildschirmAnlassen, zurueckTaste } from './lib/geraet'
-  import { app, finde, planErneuert, oeffnen, schrittVerschieben, speichern, tagVerschieben, zurueck } from './lib/speicher.svelte'
+  import { app, finde, planErneuert, planUmgestellt, oeffnen, schrittVerschieben, speichern, tagVerschieben, zurueck } from './lib/speicher.svelte'
   import { spieleTon, tonFreischalten } from './lib/ton'
   import { heuteTag, tagesPhase } from './lib/zeit'
 
@@ -68,7 +71,7 @@
   onMount(() => {
     void zurueckTaste(() => zurueck())
     // Neuer Wochenplan nach dem Update: auf dem Planer-Gerät gleich hochladen
-    if (planErneuert) untrack(() => lokalGeaendert())
+    if (planErneuert || planUmgestellt) untrack(() => lokalGeaendert())
     return updatePruefungStarten()
   })
 
@@ -93,7 +96,14 @@
     if (abgleich.einst.rolle === 'anzeige' && app.bearbeiten) app.bearbeiten = false
   })
 
-  // ---------- Timer: Töne bei Gelb und am Ende ----------
+  // ---------- Timer: Töne und Ansagen bei Gelb, Rot und am Ende ----------
+  function ansage(art: 'gelb' | 'rot' | 'ende', id: string, restMs: number) {
+    const titel = finde(heuteTag(), id)?.aufgabe.titel
+    if (!titel) return
+    // nach dem Ton sprechen
+    setTimeout(() => zeitAnsagen(art, titel, Math.round(restMs / 60_000)), 1200)
+  }
+
   $effect(() => {
     const jetzt = app.jetzt
     for (const [id, t] of Object.entries(app.timer)) {
@@ -102,14 +112,17 @@
       if (!t.gelbGemeldet && rest <= gelbAb(t.dauerMs) && rest > rotAb(t.dauerMs)) {
         t.gelbGemeldet = true
         if (app.einst.ton) spieleTon('gelb')
+        untrack(() => ansage('gelb', id, rest))
       }
       if (!t.rotGemeldet && rest <= rotAb(t.dauerMs) && rest > 0) {
         t.rotGemeldet = t.gelbGemeldet = true
         if (app.einst.ton) spieleTon('rot')
+        untrack(() => ansage('rot', id, rest))
       }
       if (!t.endeGemeldet && rest <= 0) {
         t.endeGemeldet = true
         if (app.einst.ton) spieleTon('ende')
+        untrack(() => ansage('ende', id, 0))
         // Kinder sehen sofort, welche Aufgabe abgelaufen ist
         untrack(() => {
           const tag = heuteTag()
@@ -251,6 +264,10 @@
     <KopierenDialog tag={app.dialog.tag} />
   {:else if app.dialog?.art === 'einstellungen'}
     <EinstellungenDialog />
+  {:else if app.dialog?.art === 'abschnittBild'}
+    <AbschnittDialog id={app.dialog.id} />
+  {:else if app.dialog?.art === 'ablaeufe'}
+    <AblaeufeDialog />
   {/if}
 
   {#if app.hinweis}

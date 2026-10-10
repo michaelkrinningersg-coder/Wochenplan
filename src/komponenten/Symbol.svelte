@@ -39,6 +39,8 @@
     <rect x="3.5" y="5" width="17" height="14" rx="2.5" /><circle cx="9" cy="10" r="1.8" /><path d="M20.5 16l-5-5-8.5 8" />
   {:else if name === 'schloss'}
     <rect x="5" y="11" width="14" height="9.5" rx="2.5" /><path d="M8 11V8a4 4 0 0 1 8 0v3" />
+  {:else if name === 'lautsprecher'}
+    <path d="M4 9.5h3.5L12.5 5v14l-5-4.5H4z" fill="currentColor" stroke-linejoin="round" /><path d="M16 9a4 4 0 0 1 0 6M18.6 6.5a7.5 7.5 0 0 1 0 11" />
   {:else if name === 'kreuz'}
     <path d="M6 6l12 12M18 6L6 18" />
   {/if}

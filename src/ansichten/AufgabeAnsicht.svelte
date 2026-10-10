@@ -26,7 +26,7 @@
     timerZuruecksetzen,
   } from '../lib/speicher.svelte'
   import { spieleTon } from '../lib/ton'
-  import { vorlesen } from '../lib/vorlesen'
+  import { aufgabeAnsagen, lobAnsagen } from '../lib/vorlesen'
   import { untrack } from 'svelte'
   import type { AbschnittId, TagId } from '../lib/typen'
   import { dauerText, inText } from '../lib/zeit'
@@ -73,8 +73,8 @@
   $effect(() => {
     const i = id
     untrack(() => {
-      const t = finde(tag, i)?.aufgabe.titel
-      if (t) void vorlesen(t)
+      const a = finde(tag, i)?.aufgabe
+      if (a) aufgabeAnsagen(a, istHeute(tag) && istErledigt(a))
     })
   })
 
@@ -84,7 +84,8 @@
     timerPause(id)
     const alles = allesErledigt(tag)
     if (app.einst.ton) spieleTon(alles ? 'alles' : 'fertig')
-    setTimeout(() => void vorlesen(alles ? 'Alles geschafft! Super!' : 'Super gemacht!'), alles ? 2300 : 900)
+    const a = aufgabe
+    setTimeout(() => lobAnsagen(a, alles), alles ? 2300 : 900)
     feiern = alles ? 'alles' : 'eins'
     setTimeout(
       () => {
@@ -129,7 +130,14 @@
     </div>
 
     <div class="seite">
-      <h1 class="titel">{aufgabe.titel}</h1>
+      <div class="titelzeile">
+        <h1 class="titel">{aufgabe.titel}</h1>
+        {#if app.einst.vorlesen}
+          <button class="knopf rund vorlesen" onclick={() => aufgabeAnsagen(aufgabe, erledigt)} aria-label="Vorlesen">
+            <Symbol name="lautsprecher" />
+          </button>
+        {/if}
+      </div>
 
       {#if erledigt}
         <p class="status geschafft">Geschafft!</p>
@@ -251,7 +259,20 @@
     align-items: center;
     text-align: center;
   }
+  .titelzeile {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .aufgabe:not(.quer) .titelzeile {
+    justify-content: center;
+  }
+  .vorlesen {
+    font-size: 1.3em;
+  }
   .titel {
+    margin: 0;
     font-size: var(--t-riesig);
     line-height: 1;
   }
