@@ -34,7 +34,7 @@ function werktag(): Tagesplan {
     vormittag: [a('Kita', 'kita', 0)],
     mittag: [],
     nachmittag: [a('Spielzeit', 'spielen', 0)],
-    frueh: [a('Abendessen', 'abendbrot', 0), a('Spielzeit', 'spielen', 0), a('Aufräumen', 'aufraeumen', 0)],
+    frueh: [a('Hände waschen', 'waschen', 0), a('Abendessen', 'abendbrot', 0), a('Spielzeit', 'spielen', 0), a('Aufräumen', 'aufraeumen', 0)],
     abend: [a('Schlafanzug anziehen', 'schlafanzug', 0), a('Zähne putzen', 'zaehne', 0)],
     bett: [a('Toilette', 'toilette', 0, 'mond'), a('Lesen', 'lesen', 0)],
     schlafen: [a('Schlafen', 'schlafen', 0)],
@@ -48,8 +48,8 @@ function wochenende(vormittag: Aufgabe): Tagesplan {
     morgen: [a('Frühstück', 'fruehstueck', 0), a('Zähne putzen', 'zaehne', 0), a('Anziehen', 'anziehen', 0)],
     vormittag: [vormittag],
     mittag: [a('Mittagessen', 'essen', 0), a('Mittagsruhe', 'mittagsruhe', 0)],
-    nachmittag: [a('Spielplatz', 'spielplatz', 0), a('Hände waschen', 'waschen', 0)],
-    frueh: [a('Abendessen', 'abendbrot', 0), a('Spielzeit', 'spielen', 0), a('Aufräumen', 'aufraeumen', 0)],
+    nachmittag: [a('Spielplatz', 'spielplatz', 0)],
+    frueh: [a('Hände waschen', 'waschen', 0), a('Abendessen', 'abendbrot', 0), a('Spielzeit', 'spielen', 0), a('Aufräumen', 'aufraeumen', 0)],
     abend: [a('Schlafanzug anziehen', 'schlafanzug', 0), a('Zähne putzen', 'zaehne', 0), a('Fernsehen', 'fernsehen', 0)],
     bett: [a('Toilette', 'toilette', 0, 'mond'), a('Lesen', 'lesen', 0)],
     schlafen: [a('Schlafen', 'schlafen', 0)],
@@ -189,7 +189,7 @@ export function planNormalisieren(roh: unknown): Plan {
 }
 
 /** Stand der einmaligen Umstellungen. Erhöhen, wenn neue Regeln in UMZUG dazukommen. */
-const STAND = 4
+const STAND = 5
 
 /** Neue Bildkarten für vorhandene Aufgaben (Titel + altes Bild → neues Bild, ggf. neuer Titel) */
 const UMZUG: { titel: string; alt: string; neu: string; neuerTitel?: string }[] = [
@@ -206,6 +206,16 @@ function umstellen(plan: Plan, vonStand: number) {
   if (vonStand < 3) plan.woche = standardWoche()
   // Stand 4: Timer nur noch nach Auswahl – keine vorgegebenen Minuten in der Woche
   if (vonStand < 4) for (const tp of Object.values(plan.woche)) for (const ab of ABSCHNITTE) for (const x of tp[ab.id]) x.minuten = 0
+  // Stand 5: vor dem Abendessen immer Hände waschen
+  if (vonStand < 5)
+    for (const tp of Object.values(plan.woche)) {
+      const i = tp.frueh.findIndex((x) => x.titel === 'Abendessen')
+      if (i < 0 || tp.frueh[i - 1]?.bild === 'waschen') continue
+      // am Wochenende stand es bisher am Ende des Nachmittags – dorthin nicht doppelt
+      const letzte = tp.nachmittag[tp.nachmittag.length - 1]
+      if (letzte?.bild === 'waschen') tp.nachmittag.pop()
+      tp.frueh.splice(i, 0, { id: neueId(), titel: 'Hände waschen', bild: 'waschen', minuten: 0 })
+    }
   const anpassen = (x: Aufgabe) => {
     const r = UMZUG.find((u) => u.titel === x.titel && u.alt === x.bild)
     if (!r) return

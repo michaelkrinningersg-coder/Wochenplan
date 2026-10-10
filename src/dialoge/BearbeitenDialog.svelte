@@ -7,6 +7,7 @@
   import ZeitWahl from '../komponenten/ZeitWahl.svelte'
   import { bildUrl, fotoVerkleinern } from '../lib/bilder'
   import { ICON_GROUPS, ICON_LIST } from '../lib/iconliste'
+  import { bilderSuchen, vorlagenSuchen } from '../lib/suche'
   import { ABSCHNITTE, ZUSAETZE, tagName } from '../lib/konstanten'
   import { app, aufgabeLoeschen, aufgabeSpeichern, fotoHinzufuegen, zeigeHinweis } from '../lib/speicher.svelte'
   import type { AbschnittId, Aufgabe, KindId, TagId, Termin } from '../lib/typen'
@@ -106,7 +107,10 @@
     zeigeVorlagen = false
   }
 
-  const gruppenIcons = $derived(ICON_LIST.filter((i) => i.group === gruppe))
+  let bildSuche = $state('')
+  let vorlagenSuche = $state('')
+  const gruppenIcons = $derived(bildSuche.trim() ? bilderSuchen(bildSuche) : ICON_LIST.filter((i) => i.group === gruppe))
+  const gezeigteVorlagen = $derived(vorlagenSuchen(vorlagenSuche, passendeVorlagen))
 </script>
 
 <Fenster
@@ -134,8 +138,10 @@
         <div class="feld">
           <span class="name">Aus der Bibliothek</span>
           {#if zeigeVorlagen}
+            <input class="suche" id="vorlagen-suche" type="search" bind:value={vorlagenSuche} placeholder="Vorlage suchen, z. B. Spielplatz" autocomplete="off" aria-label="Vorlage suchen" />
+            {#if !gezeigteVorlagen.length}<p class="leer">Keine Vorlage gefunden.</p>{/if}
             <div class="vorlagen">
-              {#each passendeVorlagen as v (v.titel + v.abschnitt)}
+              {#each gezeigteVorlagen as v (v.titel + v.abschnitt)}
                 <button type="button" class="vorlage" data-seg={v.abschnitt} onclick={() => vorlageWaehlen(v)}>
                   <span class="vorlage-bild"><Bild id={v.bild} zusatz={v.zusatz} /></span>
                   <span>{v.titel}</span>
@@ -227,11 +233,13 @@
 
       <div class="feld">
         <span class="name">Bild</span>
+        <input class="suche" id="bild-suche" type="search" bind:value={bildSuche} placeholder="Bild suchen, z. B. Spielplatz" autocomplete="off" aria-label="Bild suchen" />
         <div class="reihe gruppen" role="group" aria-label="Bildgruppen">
           {#each ICON_GROUPS as g (g)}
-            <button type="button" class="knopf klein" aria-pressed={gruppe === g} onclick={() => (gruppe = g)}>{g}</button>
+            <button type="button" class="knopf klein" aria-pressed={!bildSuche.trim() && gruppe === g} onclick={() => ((gruppe = g), (bildSuche = ''))}>{g}</button>
           {/each}
         </div>
+        {#if bildSuche.trim() && !gruppenIcons.length}<p class="leer">Kein Bild gefunden. Tipp: ein eigenes Foto geht immer.</p>{/if}
         {#if true}
           <div class="bildwahl">
             {#each gruppenIcons as ic (ic.id)}
@@ -321,6 +329,21 @@
 </Fenster>
 
 <style>
+  .suche {
+    width: 100%;
+    min-width: 0;
+    padding: 0.5em 0.8em;
+    border: 2px solid var(--linie);
+    border-radius: 14px;
+    background: var(--himmel);
+    color: var(--tinte);
+    font: inherit;
+  }
+  .leer {
+    margin: 0;
+    font-size: var(--t-klein);
+    color: var(--tinte-leise);
+  }
   .formular {
     display: grid;
     grid-template-columns: minmax(140px, 220px) minmax(0, 1fr);

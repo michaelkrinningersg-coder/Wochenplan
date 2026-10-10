@@ -7,6 +7,7 @@
   import ZeitWahl from '../komponenten/ZeitWahl.svelte'
   import { bildUrl, fotoVerkleinern } from '../lib/bilder'
   import { ICON_GROUPS, ICON_LIST } from '../lib/iconliste'
+  import { bilderSuchen } from '../lib/suche'
   import { ABSCHNITTE, abschnittInfo } from '../lib/konstanten'
   import { app, fotoHinzufuegen, fotosAufraeumen, zeigeHinweis } from '../lib/speicher.svelte'
   import type { AbschnittId } from '../lib/typen'
@@ -26,7 +27,8 @@
   const gruppen = [HIMMEL, ...ICON_GROUPS]
   let gruppe = $state(HIMMEL)
   const himmel = [...new Set(ABSCHNITTE.map((a) => a.grundBild))].map((b) => ({ id: b, name: b.replace(/^_/, '') }))
-  const icons = $derived(gruppe === HIMMEL ? himmel : ICON_LIST.filter((i) => i.group === gruppe))
+  let suche = $state('')
+  const icons = $derived(suche.trim() ? bilderSuchen(suche) : gruppe === HIMMEL ? himmel : ICON_LIST.filter((i) => i.group === gruppe))
   const vorschau = $derived(bild || info.grundBild)
   const naechster = ABSCHNITTE[ABSCHNITTE.findIndex((a) => a.id === abId) + 1]
 
@@ -82,9 +84,10 @@
 
     <div class="feld">
       <span class="name">Bild</span>
+      <input id="abschnitt-suche" type="search" bind:value={suche} placeholder="Bild suchen" autocomplete="off" aria-label="Bild suchen" />
       <div class="reihe" role="group" aria-label="Bildgruppen">
         {#each gruppen as g (g)}
-          <button type="button" class="knopf klein" aria-pressed={gruppe === g} onclick={() => (gruppe = g)}>{g}</button>
+          <button type="button" class="knopf klein" aria-pressed={!suche.trim() && gruppe === g} onclick={() => ((gruppe = g), (suche = ''))}>{g}</button>
         {/each}
       </div>
       <div class="bildwahl">
@@ -155,7 +158,8 @@
     color: var(--tinte-leise);
     font-weight: 700;
   }
-  input[type='text'] {
+  input[type='text'],
+  input[type='search'] {
     width: 100%;
     min-width: 0;
     padding: 0.5em 0.8em;
