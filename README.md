@@ -21,6 +21,8 @@ Ohne Passwort kann ihn niemand lesen. Plan und Fotos landen nie im Code.
 
 ## Einrichtung
 
+Ausführlich mit Bildern: [Anleitung Fernseher (PDF)](docs/Wochenplan-Anleitung-Fernseher.pdf) – Spiegeln vom Handy, Downloader mit Adresse oder über die Installationsseite `…/Wochenplan/app`.
+
 ### 1. Webseite einschalten (einmalig)
 GitHub → Repo → **Settings → Pages** → Source „Deploy from a branch“ → Branch **gh-pages** / root → Save.
 
