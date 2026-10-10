@@ -1,7 +1,7 @@
 // Abgleich über GitHub: Der Planer (Handy/PC) lädt den Plan verschlüsselt hoch,
 // der Fernseher holt ihn regelmäßig ab. Ohne Familien-Passwort ist die Datei nicht lesbar.
 import { istApp } from './geraet'
-import { exportDaten, importDaten } from './speicher.svelte'
+import { app, erledigtKuerzen, exportDaten, importDaten, type ErledigtStand } from './speicher.svelte'
 
 export interface AbgleichEinst {
   rolle: 'planer' | 'anzeige'
@@ -123,9 +123,16 @@ export async function entschluesseln(p: Paket, passwort: string): Promise<string
 
 // ---------- GitHub ----------
 
-function apiUrl(): string {
+/** Erledigt-Stand liegt neben dem Plan in status.json */
+function statusDatei(): string {
+  const teile = abgleich.einst.datei.split('/')
+  teile[teile.length - 1] = 'status.json'
+  return teile.join('/')
+}
+
+function apiUrl(datei = abgleich.einst.datei): string {
   const e = abgleich.einst
-  return `https://api.github.com/repos/${encodeURIComponent(e.besitzer)}/${encodeURIComponent(e.repo)}/contents/${e.datei
+  return `https://api.github.com/repos/${encodeURIComponent(e.besitzer)}/${encodeURIComponent(e.repo)}/contents/${datei
     .split('/')
     .map(encodeURIComponent)
     .join('/')}`
@@ -190,6 +197,7 @@ export async function holen(erzwingen = false): Promise<boolean> {
     } catch {
       throw new Error('Das Familien-Passwort passt nicht zum Plan.')
     }
+    tokenUebernehmen(text)
     anwenden = true
     const erfolg = importDaten(text)
     queueMicrotask(() => (anwenden = false))
@@ -214,7 +222,9 @@ export async function hochladen(): Promise<boolean> {
   abgleich.zustand = 'laeuft'
   try {
     const geaendert = Math.max(abgleich.stand.lokal, Date.now())
-    const paket = await verschluesseln(exportDaten(), abgleich.einst.passwort, geaendert)
+    // Der Schreib-Token reist verschlüsselt mit, damit der Fernseher „Erledigt“ melden kann
+    const daten = { ...JSON.parse(exportDaten()), zugang: { token: abgleich.einst.token.trim() } }
+    const paket = await verschluesseln(JSON.stringify(daten), abgleich.einst.passwort, geaendert)
     const inhalt = zuB64(enc.encode(JSON.stringify(paket)))
     const ref = encodeURIComponent(abgleich.einst.zweig)
 
@@ -258,6 +268,132 @@ export async function hochladen(): Promise<boolean> {
   }
 }
 
+function tokenUebernehmen(text: string) {
+  if (abgleich.einst.rolle !== 'anzeige') return
+  try {
+    const t = JSON.parse(text)?.zugang?.token
+    if (typeof t === 'string' && t && t !== abgleich.einst.token) {
+      abgleich.einst.token = t
+      einstSpeichern()
+    }
+  } catch {
+    /* egal */
+  }
+}
+
+// ---------- Erledigt-Stand (status.json) ----------
+
+/** Zwei Stände zusammenführen: je Eintrag gewinnt die jüngere Änderung */
+export function erledigtMischen(a: ErledigtStand, b: ErledigtStand): ErledigtStand {
+  const out: ErledigtStand = {}
+  for (const quelle of [a, b])
+    for (const [datum, eintraege] of Object.entries(quelle ?? {})) {
+      if (!eintraege || typeof eintraege !== 'object') continue
+      const ziel = (out[datum] ??= {})
+      for (const [k, v] of Object.entries(eintraege)) {
+        if (typeof v !== 'number') continue
+        if (ziel[k] === undefined || Math.abs(v) > Math.abs(ziel[k])) ziel[k] = v
+      }
+    }
+  return erledigtKuerzen(out)
+}
+
+function gleich(a: ErledigtStand, b: ErledigtStand): boolean {
+  return JSON.stringify(a) === JSON.stringify(b)
+}
+
+let statusEtag = ''
+let statusLaeuft = false
+
+/** Erledigt-Stand der anderen Geräte holen und einmischen */
+export async function statusHolen(): Promise<void> {
+  if (!istEingerichtet() || statusLaeuft) return
+  statusLaeuft = true
+  try {
+    const ref = encodeURIComponent(abgleich.einst.zweig)
+    const r = await fetch(`${apiUrl(statusDatei())}?ref=${ref}`, {
+      headers: kopf({ Accept: 'application/vnd.github.raw+json', ...(statusEtag ? { 'If-None-Match': statusEtag } : {}) }),
+      cache: 'no-store',
+    })
+    if (!r.ok) return
+    statusEtag = r.headers.get('ETag') ?? ''
+    const fern = JSON.parse(await entschluesseln((await r.json()) as Paket, abgleich.einst.passwort)) as {
+      erledigt?: ErledigtStand
+    }
+    const neu = erledigtMischen($state.snapshot(app.erledigt), fern.erledigt ?? {})
+    if (!gleich(neu, $state.snapshot(app.erledigt))) app.erledigt = neu
+  } catch (e) {
+    console.warn('Status holen', e)
+  } finally {
+    statusLaeuft = false
+  }
+}
+
+/** Eigenen Erledigt-Stand hochladen (mit dem Stand auf GitHub zusammengeführt) */
+export async function statusHochladen(): Promise<boolean> {
+  if (!istEingerichtet() || !abgleich.einst.token || statusLaeuft) return false
+  statusLaeuft = true
+  try {
+    const ref = encodeURIComponent(abgleich.einst.zweig)
+    for (let versuch = 0; versuch < 3; versuch++) {
+      let sha: string | undefined
+      let fern: ErledigtStand = {}
+      const meta = await fetch(`${apiUrl(statusDatei())}?ref=${ref}`, {
+        headers: kopf({ Accept: 'application/vnd.github+json' }),
+        cache: 'no-store',
+      })
+      if (meta.ok) {
+        const m = (await meta.json()) as { sha?: string; content?: string }
+        sha = m.sha
+        try {
+          const paket = JSON.parse(dec.decode(ausB64(m.content ?? ''))) as Paket
+          fern = (JSON.parse(await entschluesseln(paket, abgleich.einst.passwort)) as { erledigt?: ErledigtStand }).erledigt ?? {}
+        } catch {
+          fern = {}
+        }
+      } else if (meta.status !== 404) throw new Error(fehlerText(meta.status))
+
+      const lokal = $state.snapshot(app.erledigt) as ErledigtStand
+      const neu = erledigtMischen(lokal, fern)
+      if (!gleich(neu, lokal)) app.erledigt = neu
+      if (sha && gleich(neu, erledigtKuerzen(fern))) return true // nichts Neues
+
+      const paket = await verschluesseln(JSON.stringify({ erledigt: neu }), abgleich.einst.passwort, Date.now())
+      const r = await fetch(apiUrl(statusDatei()), {
+        method: 'PUT',
+        headers: kopf({ Accept: 'application/vnd.github+json', 'Content-Type': 'application/json' }),
+        body: JSON.stringify({
+          message: 'Erledigt-Stand',
+          content: zuB64(enc.encode(JSON.stringify(paket))),
+          branch: abgleich.einst.zweig,
+          ...(sha ? { sha } : {}),
+        }),
+      })
+      if (r.ok) {
+        statusEtag = ''
+        return true
+      }
+      if (r.status === 409 || r.status === 422) continue
+      throw new Error(fehlerText(r.status))
+    }
+    return false
+  } catch (e) {
+    console.warn('Status hochladen', e)
+    return false
+  } finally {
+    statusLaeuft = false
+  }
+}
+
+let statusTimer: ReturnType<typeof setTimeout> | null = null
+
+/** Wird aufgerufen, wenn auf diesem Gerät etwas abgehakt wurde */
+export function erledigtGeaendert() {
+  if (!istEingerichtet() || !abgleich.einst.token) return
+  if (statusTimer) clearTimeout(statusTimer)
+  statusTimer = setTimeout(() => void statusHochladen(), 3000)
+}
+
 function ok(meldung = '') {
   abgleich.zustand = 'ok'
   abgleich.meldung = meldung
@@ -282,16 +418,21 @@ export function lokalGeaendert() {
   hochladenTimer = setTimeout(() => void hochladen(), 2500)
 }
 
-/** Regelmäßig nachsehen (Fernseher alle 2 Minuten, Planer alle 10 Minuten) */
+/** Regelmäßig nachsehen (Plan: Fernseher alle 2 Minuten, Planer alle 10 Minuten) */
 export function abgleichStarten(): () => void {
   let aus = false
   const takt = () => {
     if (aus) return
     if (abgleich.einst.rolle === 'planer' && abgleich.stand.lokal > abgleich.stand.synchron) void hochladen()
     else void holen()
+    void statusHolen()
   }
   takt()
   const id = setInterval(takt, abgleich.einst.rolle === 'anzeige' ? 120_000 : 600_000)
+  // Erledigt-Stand öfter nachsehen, solange die App sichtbar ist (Handy sieht, was abgehakt wurde)
+  const statusId = setInterval(() => {
+    if (!aus && document.visibilityState === 'visible') void statusHolen()
+  }, abgleich.einst.token ? 45_000 : 120_000)
   const sichtbar = () => {
     if (document.visibilityState === 'visible') takt()
   }
@@ -299,6 +440,7 @@ export function abgleichStarten(): () => void {
   return () => {
     aus = true
     clearInterval(id)
+    clearInterval(statusId)
     document.removeEventListener('visibilitychange', sichtbar)
   }
 }

@@ -92,6 +92,8 @@ export const app = $state({
   /** Element, das nach einem Ansichtswechsel den Fokus bekommen soll */
   fokusZiel: null as string | null,
   hinweis: null as string | null,
+  /** Zeitpunkt des letzten Abhakens auf diesem Gerät (löst den Abgleich aus) */
+  abgehakt: 0,
 })
 
 // ---------- Navigation ----------
@@ -235,6 +237,7 @@ export function setzeErledigt(a: Aufgabe, wert: boolean) {
   const t = Date.now()
   for (const kind of kinder) tag[kind + ':' + a.id] = wert ? t : -t
   app.erledigt[datum] = tag
+  app.abgehakt = t
 }
 
 /** Sterne eines Kindes: erledigte Aufgaben heute und in den letzten 7 Tagen */

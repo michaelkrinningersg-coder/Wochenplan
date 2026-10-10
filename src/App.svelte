@@ -13,7 +13,8 @@
   import EinstellungenDialog from './dialoge/EinstellungenDialog.svelte'
   import KopierenDialog from './dialoge/KopierenDialog.svelte'
   import Kopfzeile from './komponenten/Kopfzeile.svelte'
-  import { abgleich, abgleichStarten, lokalGeaendert } from './lib/abgleich.svelte'
+  import { updatePruefungStarten } from './lib/update.svelte'
+  import { abgleich, abgleichStarten, erledigtGeaendert, lokalGeaendert } from './lib/abgleich.svelte'
   import { gelbAb, rotAb } from './lib/ampel'
   import { abschnittInfo } from './lib/konstanten'
   import { bewegeFokus, ersterFokus, fokusSetzen, richtungAusTaste } from './lib/fokus'
@@ -49,6 +50,10 @@
   $effect(() => {
     speichern('erledigt', $state.snapshot(app.erledigt))
   })
+  // Abhaken auf diesem Gerät an die anderen Geräte melden
+  $effect(() => {
+    if (app.abgehakt) untrack(() => erledigtGeaendert())
+  })
   $effect(() => {
     speichern('einst', $state.snapshot(app.einst))
   })
@@ -64,6 +69,7 @@
     void zurueckTaste(() => zurueck())
     // Neuer Wochenplan nach dem Update: auf dem Planer-Gerät gleich hochladen
     if (planErneuert) untrack(() => lokalGeaendert())
+    return updatePruefungStarten()
   })
 
   // ---------- Abgleich ----------

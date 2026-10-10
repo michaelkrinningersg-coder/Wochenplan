@@ -9,6 +9,8 @@ export default defineConfig(({ mode }) => {
   const single = mode === 'single'
   return {
     base: './',
+    // Build-Nummer aus GitHub Actions (gleich wie die APK-Version)
+    define: { __VERSION__: JSON.stringify(Number(process.env.GITHUB_RUN_NUMBER ?? 0)) },
     plugins: single ? [svelte(), viteSingleFile()] : [svelte()],
     build: {
       outDir: single ? 'dist-single' : 'dist',

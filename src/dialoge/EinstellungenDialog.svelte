@@ -2,12 +2,13 @@
   import Fenster from '../komponenten/Fenster.svelte'
   import Symbol from '../komponenten/Symbol.svelte'
   import ZeitWahl from '../komponenten/ZeitWahl.svelte'
-  import { abgleich, einstSpeichern, holen, hochladen, istEingerichtet } from '../lib/abgleich.svelte'
+  import { abgleich, einstSpeichern, holen, hochladen, istEingerichtet, statusHochladen } from '../lib/abgleich.svelte'
   import { dateiExportieren, istApp } from '../lib/geraet'
   import { ABSCHNITTE } from '../lib/konstanten'
   import { app, exportDaten, importDaten, zeigeHinweis } from '../lib/speicher.svelte'
   import { KIND_FARBEN, startplan } from '../lib/startplan'
   import { minutenVon } from '../lib/zeit'
+  import { installieren, suchen, update, updateVerfuegbar } from '../lib/update.svelte'
 
   let zuruecksetzenFragen = $state(false)
   let passwortZeigen = $state(false)
@@ -28,6 +29,7 @@
     } else {
       await holen(true)
     }
+    await statusHochladen()
     if (abgleich.zustand === 'ok') zeigeHinweis(abgleich.meldung || 'Plan ist abgeglichen.')
   }
 
@@ -138,6 +140,11 @@
           <span class="name">GitHub-Token (nur zum Hochladen nötig)</span>
           <input id="abgleich-token" type="password" bind:value={e.token} onchange={aenderung} autocomplete="off" placeholder="github_pat_…" />
         </label>
+        <p class="hilfe">Der Token wird verschlüsselt mit dem Plan übertragen. So kann auch der Fernseher melden, was die Kinder abgehakt haben, und du siehst es hier.</p>
+      {:else if istEingerichtet()}
+        <p class="hilfe">
+          {e.token ? 'Abgehakte Aufgaben werden an Handy und PC gemeldet.' : 'Abhaken wird gemeldet, sobald der Plan einmal vom Planer-Gerät hochgeladen wurde.'}
+        </p>
       {/if}
       <div class="reihe">
         <button class="knopf haupt" onclick={jetztAbgleichen} disabled={!istEingerichtet()}>
@@ -234,6 +241,31 @@
       </div>
     </section>
 
+    <section>
+      <h3>App-Version</h3>
+      <p class="hilfe">
+        Installiert: {update.aktuell ? `1.0.${update.aktuell}` : 'Testversion'}{update.neu ? ` · neueste: 1.0.${update.neu}` : ''}
+      </p>
+      <div class="reihe">
+        {#if updateVerfuegbar() || !istApp}
+          <button class="knopf haupt" onclick={() => void installieren()} disabled={update.zustand === 'laden'}>
+            <Symbol name="neu" />{istApp ? 'Jetzt aktualisieren' : 'Seite neu laden'}
+          </button>
+        {/if}
+        {#if istApp}
+          <button class="knopf" onclick={() => void suchen()} disabled={update.zustand === 'suche' || update.zustand === 'laden'}>
+            Nach Update suchen
+          </button>
+        {/if}
+      </div>
+      {#if update.zustand === 'laden'}
+        <progress max="100" value={update.prozent}>{update.prozent} %</progress>
+      {/if}
+      {#if update.meldung}
+        <p class="meldung" class:fehler={update.zustand === 'fehler'}>{update.meldung}</p>
+      {/if}
+    </section>
+
     <p class="info">
       Wochenplan {istApp ? 'App' : 'im Browser'}. Bilder: Microsoft Fluent Emoji (MIT-Lizenz). Schriften: Fredoka und Andika (SIL Open Font License).
     </p>
@@ -241,6 +273,11 @@
 </Fenster>
 
 <style>
+  progress {
+    width: 100%;
+    height: 14px;
+    accent-color: var(--gruen);
+  }
   .einstellungen {
     display: flex;
     flex-direction: column;

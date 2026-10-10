@@ -35,6 +35,8 @@
     <!-- Permissions -->
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Updates aus der App heraus installieren (Android fragt jedes Mal nach) -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
     <!-- Läuft auf Tablet und Fernseher: Touchscreen und TV-Oberfläche sind beide optional -->
     <uses-feature android:name="android.hardware.touchscreen" android:required="false" />

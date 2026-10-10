@@ -6,6 +6,7 @@
   import Bild from './Bild.svelte'
   import HalteKnopf from './HalteKnopf.svelte'
   import KinderWahl from './KinderWahl.svelte'
+  import { installieren, update, updateVerfuegbar } from '../lib/update.svelte'
   import Symbol from './Symbol.svelte'
 
   const a = $derived(app.ansicht)
@@ -67,22 +68,34 @@
     <nav class="wechsel" aria-label="Ansicht">
       <button
         class="knopf"
+        aria-label="Heute"
         aria-pressed={zeigeHeute}
         onclick={() => oeffnen({ art: 'tag', tag: heuteTag() })}
       >
         <Symbol name="heute" /><span class="wort">Heute</span>
       </button>
-      <button class="knopf" aria-pressed={a.art === 'woche'} onclick={() => oeffnen({ art: 'woche' })}>
+      <button class="knopf" aria-label="Woche" aria-pressed={a.art === 'woche'} onclick={() => oeffnen({ art: 'woche' })}>
         <Symbol name="woche" /><span class="wort">Woche</span>
       </button>
       <button
         class="knopf"
+        aria-label="Kalender"
         aria-pressed={a.art === 'monat' || a.art === 'jahr'}
         onclick={() => oeffnen({ art: 'monat', jahr: jetzt.getFullYear(), monat: jetzt.getMonth() })}
       >
         <Symbol name="kalender" /><span class="wort">Kalender</span>
       </button>
     </nav>
+
+    {#if updateVerfuegbar()}
+      <HalteKnopf
+        label="Neue Version installieren (gedrückt halten)"
+        onhalten={() => void installieren()}
+        onkurz={() => zeigeHinweis(update.meldung && update.zustand !== 'suche' ? update.meldung : 'Neue Version: zum Installieren gedrückt halten')}
+      >
+        <span class="update-punkt"><Symbol name="neu" /></span>
+      </HalteKnopf>
+    {/if}
 
     <span class="uhr" aria-label="Uhrzeit">{uhrzeitJetzt(jetzt)}</span>
 
@@ -190,6 +203,11 @@
     font-variant-numeric: tabular-nums;
     min-width: 2.6em;
     text-align: right;
+  }
+  .update-punkt {
+    display: grid;
+    place-items: center;
+    color: var(--gruen);
   }
   .wolke {
     display: grid;
