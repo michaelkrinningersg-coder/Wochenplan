@@ -10,6 +10,8 @@ public class MainActivity extends BridgeActivity {
     public void onCreate(Bundle savedInstanceState) {
         // eigenes Plugin für Updates aus der App heraus
         registerPlugin(Aktualisierer.class);
+        // Plan im WLAN vom Handy auf den Fernseher übertragen
+        registerPlugin(Kopplung.class);
         super.onCreate(savedInstanceState);
     }
 

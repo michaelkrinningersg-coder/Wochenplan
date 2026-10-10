@@ -3,9 +3,10 @@
   import Symbol from '../komponenten/Symbol.svelte'
   import Bild from '../komponenten/Bild.svelte'
   import { deutscheStimmen, probeSprechen, type Stimme } from '../lib/vorlesen'
-  import { onMount } from 'svelte'
+  import { onDestroy, onMount } from 'svelte'
   import ZeitWahl from '../komponenten/ZeitWahl.svelte'
   import Lizenzen from '../komponenten/Lizenzen.svelte'
+  import { empfangStarten, empfangStoppen, fernseherSuchen, kopplung, kopplungMoeglich, planSenden, type Geraet } from '../lib/kopplung.svelte'
   import { abgleich, einstSpeichern, holen, hochladen, istEingerichtet, ruhebildFernLoeschen, ruhebildHochladen, statusHochladen } from '../lib/abgleich.svelte'
   import { ruhe, ruhebildEntfernen, ruhebildSpeichern, ruhebildVorbereiten } from '../lib/ruhebilder.svelte'
   import { ortSuchen, ortTeile, wetterAktualisieren } from '../lib/wetter.svelte'
@@ -17,6 +18,13 @@
   import { installieren, suchen, update, updateVerfuegbar } from '../lib/update.svelte'
 
   let zuruecksetzenFragen = $state(false)
+  // Kopplung Handy → Fernseher
+  let gewaehlt = $state<Geraet | null>(null)
+  let codeEingabe = $state('')
+  let ipEingabe = $state('')
+  onDestroy(() => {
+    if (kopplung.modus === 'wartet') void empfangStoppen()
+  })
   let ruheUnter = $state<'wann' | 'bild'>('wann')
 
   // Reiter
@@ -211,6 +219,55 @@
         <div class="zr">{@render schalter(app.einst.wach, (v) => (app.einst.wach = v))}</div>
       </div>
     </section>
+
+    {#if kopplungMoeglich}
+      <section>
+        <h3>Plan auf den Fernseher übertragen</h3>
+        <p class="zh">Beide Geräte müssen im selben WLAN sein. Es läuft kein Server dazwischen: Der Plan wird mit dem Code verschlüsselt und direkt gesendet.</p>
+        <div class="z">
+          <span class="zl">1. Am Fernseher</span>
+          <div class="zr">
+            {#if kopplung.modus === 'wartet'}
+              <div class="kopplung-code">
+                <span class="gross">{kopplung.code}</span>
+                <span>Adresse {kopplung.ip}{kopplung.port !== 8765 ? ':' + kopplung.port : ''}</span>
+              </div>
+              <button class="knopf klein" onclick={() => void empfangStoppen()}>Abbrechen</button>
+            {:else}
+              <button class="knopf klein" onclick={() => void empfangStarten()}>Plan empfangen</button>
+            {/if}
+          </div>
+          {#if kopplung.modus === 'wartet'}<p class="zh">Warte auf das Handy … Am Handy „Fernseher suchen“ wählen und den Code eintippen.</p>{/if}
+        </div>
+        <div class="z">
+          <span class="zl">2. Am Handy</span>
+          <div class="zr">
+            <button class="knopf klein" onclick={() => ((gewaehlt = null), void fernseherSuchen())} disabled={kopplung.modus === 'sucht' || kopplung.modus === 'sendet'}>
+              {kopplung.modus === 'sucht' ? 'Suche …' : 'Fernseher suchen'}
+            </button>
+            {#each kopplung.geraete as g (g.ip + g.port)}
+              <button class="knopf klein" aria-pressed={gewaehlt?.ip === g.ip} onclick={() => (gewaehlt = g)}>{g.name} ({g.ip})</button>
+            {/each}
+          </div>
+          {#if kopplung.modus === 'bereit' || kopplung.modus === 'sendet' || kopplung.modus === 'fertig'}
+            <div class="zr">
+              <input type="text" bind:value={ipEingabe} placeholder="oder Adresse des Fernsehers, z. B. 192.168.0.23" aria-label="Adresse des Fernsehers" />
+            </div>
+            <div class="zr">
+              <input type="text" inputmode="numeric" maxlength="6" bind:value={codeEingabe} placeholder="Code vom Fernseher" aria-label="Code vom Fernseher" />
+              <button
+                class="knopf haupt klein"
+                disabled={kopplung.modus === 'sendet' || codeEingabe.trim().length !== 6 || (!gewaehlt && !ipEingabe.trim())}
+                onclick={() => void planSenden(gewaehlt ?? { ip: ipEingabe.trim(), port: 8765, name: ipEingabe.trim() }, codeEingabe)}
+              >
+                {kopplung.modus === 'sendet' ? 'Sende …' : 'Plan senden'}
+              </button>
+            </div>
+          {/if}
+        </div>
+        {#if kopplung.meldung}<p class="meldung" class:fehler={kopplung.modus === 'bereit'}>{kopplung.meldung}</p>{/if}
+      </section>
+    {/if}
     {:else if reiter === 'anzeige'}
     <section>
       <h3>Aussehen</h3>
@@ -821,6 +878,19 @@
   .zeit :global(.zeitwahl .wert) {
     min-width: 3em;
     font-size: 22px;
+  }
+  .kopplung-code {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: var(--t-klein);
+  }
+  .kopplung-code .gross {
+    font-family: var(--schrift-titel);
+    font-weight: 700;
+    font-size: 48px;
+    letter-spacing: 0.15em;
+    line-height: 1.1;
   }
   .bis-auto {
     font-weight: 700;

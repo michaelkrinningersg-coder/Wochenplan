@@ -29,6 +29,7 @@
     {:else}
       <p>Der Plan wird auf dem Gerät mit deinem Familien-Passwort verschlüsselt, bevor er bei GitHub gespeichert wird. Wetter und Ortssuche (optional) senden den Ort an Open-Meteo, die Update-Suche fragt GitHub ab. Es gibt keine Werbung und keine Statistik.</p>
     {/if}
+    <p>Wenn du den Plan per Kopplungscode auf den Fernseher überträgst, geht er verschlüsselt direkt zwischen den beiden Geräten im WLAN; es ist kein Server beteiligt.</p>
     <p>Die ausführliche Datenschutzerklärung steht unter michaelkrinningersg-coder.github.io/Wochenplan/datenschutz.html.</p>
   </div>
 </details>
@@ -36,7 +37,7 @@
 <details>
   <summary>Bilder und Lizenzen</summary>
   <div class="text">
-    <p>Die großen Szenenbilder auf den Karten wurden mit KI-Unterstützung erstellt. Die kleinen Symbole stammen von Microsoft Fluent Emoji (MIT-Lizenz). Schriften: Fredoka und Andika (SIL Open Font License 1.1).</p>
+    <p>Die großen Szenenbilder auf den Karten sind KI-generiert (Google Gemini). Die kleinen Symbole stammen von Microsoft Fluent Emoji (MIT-Lizenz). Schriften: Fredoka und Andika (SIL Open Font License 1.1).</p>
     {#each LIZENZEN as l (l.name)}
       <details class="innen">
         <summary>{l.name}</summary>
