@@ -1,3 +1,5 @@
+import { app } from './speicher.svelte'
+
 const dateien = import.meta.glob('../assets/icons/*.svg', {
   eager: true,
   query: '?url',
@@ -10,6 +12,17 @@ const karten = import.meta.glob('../assets/karten/*.webp', {
   query: '?url',
   import: 'default',
 }) as Record<string, string>
+
+// Mädchen-Variante der Bildkarten (nur wo vorhanden, sonst die Standardkarte)
+const kartenM = import.meta.glob('../assets/karten-maedchen/*.webp', {
+  eager: true,
+  query: '?url',
+  import: 'default',
+}) as Record<string, string>
+const MAEDCHEN_URL: Record<string, string> = {}
+for (const [pfad, url] of Object.entries(kartenM)) {
+  MAEDCHEN_URL[pfad.split('/').pop()!.replace(/\.webp$/, '')] = url
+}
 
 export const ICON_URL: Record<string, string> = {}
 export const IST_KARTE = new Set<string>()
@@ -24,6 +37,7 @@ for (const [pfad, url] of Object.entries(karten)) {
 
 export function bildUrl(id: string, fotos: Record<string, string>): string {
   if (id.startsWith('foto:')) return fotos[id.slice(5)] ?? ICON_URL['stern']
+  if (app.einst.kartenstil === 'maedchen' && MAEDCHEN_URL[id]) return MAEDCHEN_URL[id]
   return ICON_URL[id] ?? ICON_URL['stern']
 }
 

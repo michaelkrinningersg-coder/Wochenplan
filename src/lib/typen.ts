@@ -127,10 +127,12 @@ export interface Einstellungen {
   ruheNamen?: boolean
   /** kleinen Countdown bis zum Ruhebild in der Ecke zeigen */
   ruheCountdown?: boolean
+  /** Bildkarten: Junge (Standard) oder Mädchen, wo es die Karte gibt */
+  kartenstil?: 'junge' | 'maedchen'
 }
 
 /** Optionen, die mit dem Plan auf alle Geräte gehen (nicht: Kind-Auswahl, Bildschirm anlassen, Stimme) */
-export const GETEILTE_OPTIONEN = ['thema', 'ton', 'timerArt', 'vorlesen', 'tempo', 'zeitAnsagen', 'sternenregen', 'uhrArt', 'ruhe', 'ruheWarten', 'ruheArt', 'ruheWechsel', 'ruheNamen', 'ruheNacht', 'wetterOrt', 'ruheCountdown'] as const
+export const GETEILTE_OPTIONEN = ['thema', 'ton', 'timerArt', 'vorlesen', 'tempo', 'zeitAnsagen', 'sternenregen', 'uhrArt', 'ruhe', 'ruheWarten', 'ruheArt', 'ruheWechsel', 'ruheNamen', 'ruheNacht', 'wetterOrt', 'ruheCountdown', 'kartenstil'] as const
 export type GeteilteOptionen = Partial<Pick<Einstellungen, (typeof GETEILTE_OPTIONEN)[number]>>
 
 export interface TimerZustand {

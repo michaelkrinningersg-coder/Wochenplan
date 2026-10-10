@@ -220,6 +220,7 @@ function optionenNormalisieren(roh: unknown): GeteilteOptionen | undefined {
   const r: GeteilteOptionen = {}
   if (o.thema === 'auto' || o.thema === 'tag' || o.thema === 'nacht') r.thema = o.thema
   if (typeof o.ton === 'boolean') r.ton = o.ton
+  if (o.kartenstil === 'junge' || o.kartenstil === 'maedchen') r.kartenstil = o.kartenstil
   if (o.timerArt === 'ampel' || o.timerArt === 'sanduhr') r.timerArt = o.timerArt
   if (typeof o.vorlesen === 'boolean') r.vorlesen = o.vorlesen
   if (typeof o.tempo === 'number' && o.tempo >= 0.5 && o.tempo <= 1.5) r.tempo = o.tempo

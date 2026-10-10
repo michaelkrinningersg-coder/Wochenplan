@@ -290,6 +290,13 @@
       <h3>{t('Aussehen')}</h3>
       <p class="zh">{t('Gilt für alle Geräte.')}</p>
       <div class="z">
+        <span class="zl">{t('Bildkarten')}</span>
+        <div class="zr">
+          <button class="knopf klein" aria-pressed={app.einst.kartenstil !== 'maedchen'} onclick={() => (app.einst.kartenstil = 'junge')}>{t('Junge')}</button>
+          <button class="knopf klein" aria-pressed={app.einst.kartenstil === 'maedchen'} onclick={() => (app.einst.kartenstil = 'maedchen')}>{t('Mädchen')}</button>
+        </div>
+      </div>
+      <div class="z">
         <span class="zl">{t('Helligkeit')}</span>
         <div class="zr">
           <button class="knopf klein" aria-pressed={app.einst.thema === 'auto'} onclick={() => (app.einst.thema = 'auto')}>{t('Abends dunkel')}</button>
