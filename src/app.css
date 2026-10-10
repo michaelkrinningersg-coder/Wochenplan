@@ -51,6 +51,9 @@
   --abend: #8a7fe0;
   --abend-tief: #4b3f9e;
   --abend-hell: #e6e3fa;
+  --bett: #7b93e3;
+  --bett-tief: #3a4fa8;
+  --bett-hell: #e1e7fb;
 
   --gruen: #2fae66;
   --gruen-tief: #1f7a47;
@@ -91,6 +94,8 @@
     --mittag-hell: #3b3628;
     --nachmittag-hell: #223a31;
     --abend-hell: #302b62;
+  --bett-hell: #232c5e;
+    --bett-hell: #232c5e;
     --gehaeuse: #0e1228;
   --gruen-hell: #1d4636;
   --gruen-tief: #8fe0b2;
@@ -111,6 +116,7 @@
   --mittag-hell: #3b3628;
   --nachmittag-hell: #223a31;
   --abend-hell: #302b62;
+  --bett-hell: #232c5e;
   --gehaeuse: #0e1228;
   --gruen-hell: #1d4636;
   --gruen-tief: #8fe0b2;
@@ -132,6 +138,7 @@
   --mittag-hell: #fff3cc;
   --nachmittag-hell: #e2f5dc;
   --abend-hell: #e6e3fa;
+  --bett-hell: #e1e7fb;
   --gehaeuse: #22304f;
   --gruen-hell: #dcf5e6;
   --gruen-tief: #1f7a47;
@@ -151,6 +158,7 @@
   --mittag-hell: #3b3628;
   --nachmittag-hell: #223a31;
   --abend-hell: #302b62;
+  --bett-hell: #232c5e;
   --gehaeuse: #0e1228;
   --gruen-hell: #1d4636;
   --gruen-tief: #8fe0b2;
@@ -163,6 +171,7 @@
 [data-seg='mittag'] { --seg: var(--mittag); --seg-tief: var(--mittag-tief); --seg-hell: var(--mittag-hell); }
 [data-seg='nachmittag'] { --seg: var(--nachmittag); --seg-tief: var(--nachmittag-tief); --seg-hell: var(--nachmittag-hell); }
 [data-seg='abend'] { --seg: var(--abend); --seg-tief: var(--abend-tief); --seg-hell: var(--abend-hell); }
+[data-seg='bett'] { --seg: var(--bett); --seg-tief: var(--bett-tief); --seg-hell: var(--bett-hell); }
 
 *,
 *::before,

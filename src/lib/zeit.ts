@@ -45,7 +45,7 @@ export type TagesPhase =
 export function tagesPhase(plan: Plan, d = new Date()): TagesPhase {
   const jetzt = minutenJetzt(d)
   const [ersterStart] = abschnittSpanne(plan, 'morgen')
-  const [, letztesEnde] = abschnittSpanne(plan, 'abend')
+  const [, letztesEnde] = abschnittSpanne(plan, 'bett')
   if (jetzt < ersterStart) return { art: 'vorher' }
   if (jetzt >= letztesEnde) return { art: 'nachher' }
   for (const a of ABSCHNITTE) {

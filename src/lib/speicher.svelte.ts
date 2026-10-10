@@ -41,7 +41,7 @@ export function speichern(key: keyof typeof SCHLUESSEL, wert: unknown): boolean 
   }
 }
 
-const STANDARD_EINST: Einstellungen = { thema: 'auto', ton: true, wach: true }
+const STANDARD_EINST: Einstellungen = { thema: 'auto', ton: true, wach: true, timerArt: 'ampel' }
 
 function timerLaden(): Record<string, TimerZustand> {
   const roh = laden<Record<string, TimerZustand>>(SCHLUESSEL.timer, {})
@@ -60,8 +60,12 @@ function erledigtLaden(): Record<string, string[]> {
   return sauber
 }
 
+// Pläne der ersten Version (ohne Bettzeit) werden einmalig durch den vorbereiteten Wochenplan ersetzt
+const gespeicherterPlan = laden<{ version?: number } | null>(SCHLUESSEL.plan, null)
+export const planErneuert = !!gespeicherterPlan && gespeicherterPlan.version !== 2
+
 export const app = $state({
-  plan: planNormalisieren(laden<unknown>(SCHLUESSEL.plan, startplan())) as Plan,
+  plan: (gespeicherterPlan && !planErneuert ? planNormalisieren(gespeicherterPlan) : startplan()) as Plan,
   fotos: laden<Record<string, string>>(SCHLUESSEL.fotos, {}),
   erledigt: erledigtLaden(),
   einst: { ...STANDARD_EINST, ...laden<Partial<Einstellungen>>(SCHLUESSEL.einst, {}) } as Einstellungen,

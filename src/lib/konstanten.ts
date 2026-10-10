@@ -15,7 +15,8 @@ export const ABSCHNITTE: { id: AbschnittId; name: string; bild: string }[] = [
   { id: 'vormittag', name: 'Vormittag', bild: '_sonne' },
   { id: 'mittag', name: 'Mittag', bild: '_sonnengesicht' },
   { id: 'nachmittag', name: 'Nachmittag', bild: '_sonnewolke' },
-  { id: 'abend', name: 'Abend', bild: '_nacht' },
+  { id: 'abend', name: 'Abend', bild: '_sonnenuntergang' },
+  { id: 'bett', name: 'Bettzeit', bild: '_nacht' },
 ]
 
 export const ZUSAETZE: { id: string; name: string; bild: string }[] = [

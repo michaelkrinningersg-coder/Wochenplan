@@ -14,7 +14,7 @@
   import { gelbAb, rotAb } from './lib/ampel'
   import { bewegeFokus, ersterFokus, fokusSetzen, richtungAusTaste } from './lib/fokus'
   import { bildschirmAnlassen, zurueckTaste } from './lib/geraet'
-  import { app, finde, oeffnen, schrittVerschieben, speichern, tagVerschieben, zurueck } from './lib/speicher.svelte'
+  import { app, finde, planErneuert, oeffnen, schrittVerschieben, speichern, tagVerschieben, zurueck } from './lib/speicher.svelte'
   import { spieleTon, tonFreischalten } from './lib/ton'
   import { heuteTag, tagesPhase } from './lib/zeit'
 
@@ -58,6 +58,8 @@
   })
   onMount(() => {
     void zurueckTaste(() => zurueck())
+    // Neuer Wochenplan nach dem Update: auf dem Planer-Gerät gleich hochladen
+    if (planErneuert) untrack(() => lokalGeaendert())
   })
 
   // ---------- Abgleich ----------
@@ -73,7 +75,7 @@
   const thema = $derived.by(() => {
     if (app.einst.thema !== 'auto') return app.einst.thema
     const p = tagesPhase(app.plan, new Date(app.jetzt))
-    return p.art === 'abschnitt' && p.id !== 'abend' ? 'tag' : 'nacht'
+    return p.art === 'abschnitt' && p.id !== 'abend' && p.id !== 'bett' ? 'tag' : 'nacht'
   })
 
   // Bearbeiten nur auf dem Planer-Gerät

@@ -3,6 +3,7 @@
   import Bild from '../komponenten/Bild.svelte'
   import Symbol from '../komponenten/Symbol.svelte'
   import Konfetti from '../komponenten/Konfetti.svelte'
+  import Sanduhr from '../komponenten/Sanduhr.svelte'
   import TimerScheibe from '../komponenten/TimerScheibe.svelte'
   import { ampelZustand } from '../lib/ampel'
   import { ICON_URL } from '../lib/bilder'
@@ -96,13 +97,21 @@
 {#if aufgabe}
   <div class="aufgabe" class:quer data-seg={seg} bind:clientWidth={breite} bind:clientHeight={hoehe}>
     <div class="bildteil">
-      <TimerScheibe anteil={erledigt ? null : anteil} farbe={bisStart !== null && !mitTimer ? 'var(--seg)' : farbe} groesse={scheibe}>
+      <TimerScheibe
+        anteil={erledigt ? null : anteil}
+        farbe={(bisStart !== null && !mitTimer) || app.einst.timerArt === 'sanduhr' ? 'var(--seg)' : farbe}
+        groesse={scheibe}
+      >
         <div class="bild" class:erledigt>
           <Bild id={aufgabe.bild} zusatz={aufgabe.zusatz} />
         </div>
       </TimerScheibe>
       {#if mitTimer && !erledigt}
-        <Ampel zustand={ampel} blinken={t.gestartet && t.restMs <= 0} hoehe={ampelHoehe} />
+        {#if app.einst.timerArt === 'sanduhr'}
+          <Sanduhr anteil={dauerMs > 0 ? t.restMs / dauerMs : 0} laeuft={t.laeuft} vorbei={t.gestartet && t.restMs <= 0} hoehe={ampelHoehe} />
+        {:else}
+          <Ampel zustand={ampel} blinken={t.gestartet && t.restMs <= 0} hoehe={ampelHoehe} />
+        {/if}
       {/if}
     </div>
 

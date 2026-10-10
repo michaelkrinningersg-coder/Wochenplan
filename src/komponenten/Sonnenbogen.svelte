@@ -30,7 +30,7 @@
     const l = lagen[i]
     if (!l) return null
     const x = l.links + l.breite * phase.anteil
-    return { x, mond: phase.id === 'abend' }
+    return { x, mond: phase.id === 'abend' || phase.id === 'bett' }
   })
 
   const pfad = $derived(`M 0 ${UNTEN} Q ${breite / 2} ${2 * OBEN - UNTEN} ${breite} ${UNTEN}`)

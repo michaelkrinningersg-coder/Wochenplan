@@ -1,5 +1,5 @@
 export type TagId = 'mo' | 'di' | 'mi' | 'do' | 'fr' | 'sa' | 'so'
-export type AbschnittId = 'morgen' | 'vormittag' | 'mittag' | 'nachmittag' | 'abend'
+export type AbschnittId = 'morgen' | 'vormittag' | 'mittag' | 'nachmittag' | 'abend' | 'bett'
 
 /** Eine Aufgabe im Plan, z. B. „Zähne putzen“. */
 export interface Aufgabe {
@@ -18,11 +18,11 @@ export interface Aufgabe {
 export type Tagesplan = Record<AbschnittId, Aufgabe[]>
 
 export interface Plan {
-  version: 1
+  version: 2
   woche: Record<TagId, Tagesplan>
   /** Beginn jedes Tagesabschnitts "HH:MM" – ein Abschnitt endet, wenn der nächste beginnt */
   zeiten: Record<AbschnittId, string>
-  /** Ende des Abends "HH:MM" */
+  /** Ende der Bettzeit (Schlafenszeit) "HH:MM" */
   abendEnde: string
 }
 
@@ -32,6 +32,8 @@ export interface Einstellungen {
   ton: boolean
   /** Bildschirm anlassen (Fernseher geht nicht in den Bildschirmschoner) */
   wach: boolean
+  /** Timer als Ampel oder als Sanduhr anzeigen */
+  timerArt: 'ampel' | 'sanduhr'
 }
 
 export interface TimerZustand {

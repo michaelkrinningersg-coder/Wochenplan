@@ -7,6 +7,7 @@
   import { ABSCHNITTE } from '../lib/konstanten'
   import { app, exportDaten, importDaten, zeigeHinweis } from '../lib/speicher.svelte'
   import { startplan } from '../lib/startplan'
+  import { minutenVon } from '../lib/zeit'
 
   let zuruecksetzenFragen = $state(false)
   let passwortZeigen = $state(false)
@@ -141,17 +142,29 @@
 
     <section>
       <h3>Tageszeiten</h3>
+      <p class="hilfe">Jeder Abschnitt endet, wenn der nächste beginnt. Änderst du ein „bis“, verschiebt sich der Beginn des nächsten Abschnitts mit.</p>
       <div class="zeiten">
-        {#each ABSCHNITTE as ab (ab.id)}
+        {#each ABSCHNITTE as ab, i (ab.id)}
+          {@const naechster = ABSCHNITTE[i + 1]}
           <div class="zeit" data-seg={ab.id}>
-            <span class="name">{ab.name} ab</span>
-            <ZeitWahl bind:wert={app.plan.zeiten[ab.id]} label="{ab.name} ab" />
+            <span class="zeit-name">{ab.name}</span>
+            <div class="von-bis">
+              <span class="name">von</span>
+              <ZeitWahl bind:wert={app.plan.zeiten[ab.id]} label="{ab.name} von" />
+            </div>
+            <div class="von-bis">
+              <span class="name">bis</span>
+              {#if naechster}
+                <ZeitWahl bind:wert={app.plan.zeiten[naechster.id]} label="{ab.name} bis" />
+              {:else}
+                <ZeitWahl bind:wert={app.plan.abendEnde} label="{ab.name} bis" />
+              {/if}
+            </div>
+            {#if minutenVon(app.plan.zeiten[ab.id]) >= minutenVon(naechster ? app.plan.zeiten[naechster.id] : app.plan.abendEnde)}
+              <span class="warnung">„bis“ muss nach „von“ liegen</span>
+            {/if}
           </div>
         {/each}
-        <div class="zeit" data-seg="abend">
-          <span class="name">Abend bis</span>
-          <ZeitWahl bind:wert={app.plan.abendEnde} label="Abend bis" />
-        </div>
       </div>
     </section>
 
@@ -161,6 +174,11 @@
         <button class="knopf" aria-pressed={app.einst.thema === 'auto'} onclick={() => (app.einst.thema = 'auto')}>Abends dunkel</button>
         <button class="knopf" aria-pressed={app.einst.thema === 'tag'} onclick={() => (app.einst.thema = 'tag')}>Immer hell</button>
         <button class="knopf" aria-pressed={app.einst.thema === 'nacht'} onclick={() => (app.einst.thema = 'nacht')}>Immer dunkel</button>
+      </div>
+      <div class="reihe">
+        <span class="name zeile">Timer zeigen als</span>
+        <button class="knopf" aria-pressed={app.einst.timerArt === 'ampel'} onclick={() => (app.einst.timerArt = 'ampel')}>Ampel</button>
+        <button class="knopf" aria-pressed={app.einst.timerArt === 'sanduhr'} onclick={() => (app.einst.timerArt = 'sanduhr')}>Sanduhr</button>
       </div>
       <div class="reihe">
         <button class="knopf" aria-pressed={app.einst.ton} onclick={() => (app.einst.ton = !app.einst.ton)}>
@@ -205,6 +223,10 @@
   }
   h3 {
     font-size: var(--t-text);
+  }
+  .name.zeile {
+    align-self: center;
+    margin-right: 6px;
   }
   .reihe {
     display: flex;
@@ -256,8 +278,25 @@
   }
   .zeiten {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
     gap: 10px;
+  }
+  .zeit-name {
+    font-family: var(--schrift-titel);
+    font-weight: 600;
+  }
+  .von-bis {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .von-bis .name {
+    width: 2em;
+  }
+  .warnung {
+    color: var(--rot);
+    font-weight: 700;
+    font-size: var(--t-klein);
   }
   .zeit {
     display: flex;
