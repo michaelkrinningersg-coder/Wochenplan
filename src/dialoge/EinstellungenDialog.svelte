@@ -7,6 +7,7 @@
   import ZeitWahl from '../komponenten/ZeitWahl.svelte'
   import { abgleich, einstSpeichern, holen, hochladen, istEingerichtet, ruhebildFernLoeschen, ruhebildHochladen, statusHochladen } from '../lib/abgleich.svelte'
   import { ruhe, ruhebildEntfernen, ruhebildSpeichern, ruhebildVorbereiten } from '../lib/ruhebilder.svelte'
+  import { ortSuchen, ortTeile, wetterAktualisieren } from '../lib/wetter.svelte'
   import { dateiExportieren, istApp } from '../lib/geraet'
   import { ABSCHNITTE } from '../lib/konstanten'
   import { app, exportDaten, importDaten, zeigeHinweis } from '../lib/speicher.svelte'
@@ -42,6 +43,22 @@
       /* egal */
     }
   })
+
+  // ---------- Wetter-Ort ----------
+  let ortEingabe = $state('')
+  let ortTreffer = $state<{ name: string; lat: number; lon: number; land: string }[]>([])
+  let ortMeldung = $state('')
+  const wetterName = $derived(ortTeile(app.einst.wetterOrt)?.name ?? '')
+  async function ortSuche() {
+    ortMeldung = ''
+    if (!ortEingabe.trim()) return
+    try {
+      ortTreffer = await ortSuchen(ortEingabe.trim())
+      if (!ortTreffer.length) ortMeldung = 'Kein Ort gefunden.'
+    } catch {
+      ortMeldung = 'Die Ortssuche ist gerade nicht erreichbar.'
+    }
+  }
 
   // ---------- Fotos für das Ruhebild ----------
   let fotoFeld = $state<HTMLInputElement>()
@@ -346,9 +363,34 @@
         <span class="name zeile">Bild</span>
         <button class="knopf klein" aria-pressed={(app.einst.ruheArt ?? 'jahreszeit') === 'jahreszeit'} onclick={() => (app.einst.ruheArt = 'jahreszeit')}>Jahreszeit</button>
         <button class="knopf klein" aria-pressed={app.einst.ruheArt === 'fotos'} onclick={() => (app.einst.ruheArt = 'fotos')}>Eigene Fotos</button>
+        <button class="knopf klein" aria-pressed={app.einst.ruheArt === 'schwarz'} onclick={() => (app.einst.ruheArt = 'schwarz')}>Schwarz</button>
         <button class="knopf klein" onclick={() => ((app.dialog = null), (app.ruheVorschau = true))}>Vorschau zeigen</button>
       </div>
+      <div class="reihe">
+        <button class="knopf klein" aria-pressed={!!app.einst.ruheNacht} onclick={() => (app.einst.ruheNacht = !app.einst.ruheNacht)}>
+          Nachts schwarz (Schlafen bis Aufstehen): {app.einst.ruheNacht ? 'ja' : 'nein'}
+        </button>
+      </div>
+      <p class="hilfe">„Schwarz“ macht den Bildschirm ganz dunkel. Bewegen, Antippen oder eine Taste auf der Fernbedienung holt die App zurück.</p>
       {#if (app.einst.ruheArt ?? 'jahreszeit') === 'jahreszeit'}
+        <div class="feld">
+          <span class="name">Echtes Wetter im Bild {wetterName ? `(jetzt: ${wetterName})` : ''}</span>
+          <div class="reihe">
+            <input type="text" bind:value={ortEingabe} placeholder="Ort, z. B. Göttingen" aria-label="Ort für das Wetter" onkeydown={(ev) => ev.key === 'Enter' && void ortSuche()} />
+            <button class="knopf klein" onclick={() => void ortSuche()}>Suchen</button>
+            {#if app.einst.wetterOrt}<button class="knopf klein" onclick={() => (app.einst.wetterOrt = undefined)}>Kein Wetter</button>{/if}
+          </div>
+          {#if ortTreffer.length}
+            <div class="reihe">
+              {#each ortTreffer as t (t.lat + ',' + t.lon)}
+                <button class="knopf klein" onclick={() => ((app.einst.wetterOrt = `${t.name}|${t.lat}|${t.lon}`), (ortTreffer = []), void wetterAktualisieren(true))}>
+                  {t.name}{t.land ? ` (${t.land})` : ''}
+                </button>
+              {/each}
+            </div>
+          {/if}
+          {#if ortMeldung}<p class="hilfe">{ortMeldung}</p>{/if}
+        </div>
         <div class="reihe">
           <button class="knopf klein" aria-pressed={!!app.einst.ruheNamen} onclick={() => (app.einst.ruheNamen = !app.einst.ruheNamen)}>
             Namen unter den Bildern: {app.einst.ruheNamen ? 'ja' : 'nein'}

@@ -4,7 +4,9 @@
   import type { Jahreszeit, Orte } from '../lib/jahreszeit'
   import SzenenEreignisse from './SzenenEreignisse.svelte'
 
-  let { jz, nacht = false }: { jz: Jahreszeit; nacht?: boolean } = $props()
+  import type { WetterArt } from '../lib/wetter.svelte'
+
+  let { jz, nacht = false, wetterArt = null }: { jz: Jahreszeit; nacht?: boolean; wetterArt?: WetterArt | null } = $props()
 
   const FARBEN: Record<Jahreszeit, { himmel: [string, string]; huegel: [string, string]; krone: string[]; teilchen: string[] }> = {
     fruehling: { himmel: ['#8fd3ff', '#e6f7ff'], huegel: ['#8fd16a', '#5fb24a'], krone: ['#ffc8dd', '#ffafcc', '#ffe5ef'], teilchen: ['#ffafcc', '#ffffff'] },
@@ -33,7 +35,10 @@
       boden: hoch ? [68, 74] : [62, 68],
     }
   })
-  const himmel = $derived<[string, string]>(nacht ? ['#13204a', '#3a4f86'] : f.himmel)
+  const trueb = $derived(wetterArt === 'regen' || wetterArt === 'gewitter' || wetterArt === 'nebel' || wetterArt === 'wolkig' || wetterArt === 'schnee')
+  const himmel = $derived<[string, string]>(
+    nacht ? ['#13204a', '#3a4f86'] : wetterArt === 'gewitter' ? ['#5d6a80', '#a9b4c4'] : trueb ? ['#9fb2c6', '#dfe6ee'] : f.himmel,
+  )
 
   // svelte-ignore state_referenced_locally
   const teile = Array.from({ length: 26 }, (_, i) => ({
@@ -104,6 +109,22 @@
 
   <SzenenEreignisse {jz} {orte} />
 
+  {#if wetterArt === 'wolkig' || wetterArt === 'regen' || wetterArt === 'gewitter' || wetterArt === 'schnee'}
+    <div class="wetter-wolken" class:dunkel={wetterArt === 'gewitter'}>
+      {#each [8, 30, 55, 78] as x, i (i)}<span style="left: {x}%; top: {4 + (i % 2) * 7}%; animation-delay: {-i * 9}s"></span>{/each}
+    </div>
+  {/if}
+  {#if wetterArt === 'regen' || wetterArt === 'gewitter'}
+    <div class="wetter-regen">{#each Array.from({ length: 60 }) as _, i (i)}<span style="left: {(i * 37) % 100}%; animation-delay: {((i * 13) % 10) / 10}s"></span>{/each}</div>
+  {/if}
+  {#if wetterArt === 'gewitter'}<div class="blitz"></div>{/if}
+  {#if wetterArt === 'schnee' && jz !== 'winter'}
+    <div class="wetter-schnee">{#each Array.from({ length: 40 }) as _, i (i)}<span style="left: {(i * 29) % 100}%; animation-delay: {-((i * 7) % 12)}s"></span>{/each}</div>
+  {/if}
+  {#if wetterArt === 'nebel'}
+    <div class="wetter-nebel">{#each [30, 52, 70] as y, i (i)}<span style="top: {y}%; animation-delay: {-i * 12}s"></span>{/each}</div>
+  {/if}
+
   {#if f.teilchen.length}
     <div class="teilchen" class:schnee={jz === 'winter'}>
       {#each teile as t (t.i)}
@@ -127,6 +148,92 @@
     inset: 0;
     width: 100%;
     height: 100%;
+  }
+  .wetter-wolken,
+  .wetter-regen,
+  .wetter-schnee,
+  .wetter-nebel,
+  .blitz {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  .wetter-wolken span {
+    position: absolute;
+    width: 26vw;
+    height: 9vw;
+    border-radius: 999px;
+    background: radial-gradient(ellipse at 40% 40%, #ffffff, #d5dce6 70%);
+    opacity: 0.9;
+    animation: treiben 40s linear infinite alternate;
+  }
+  .wetter-wolken.dunkel span {
+    background: radial-gradient(ellipse at 40% 40%, #8e98a8, #59647a 70%);
+  }
+  .wetter-regen span {
+    position: absolute;
+    top: -10%;
+    width: 2px;
+    height: 24px;
+    background: rgba(60, 100, 170, 0.5);
+    animation: regen 0.8s linear infinite;
+  }
+  .wetter-schnee span {
+    position: absolute;
+    top: -5%;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #fff;
+    animation: schnee 12s linear infinite;
+  }
+  .wetter-nebel span {
+    position: absolute;
+    left: -30%;
+    width: 160%;
+    height: 14%;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.45);
+    filter: blur(14px);
+    animation: nebel 36s ease-in-out infinite alternate;
+  }
+  .blitz {
+    background: #fff;
+    opacity: 0;
+    animation: blitz 9s infinite;
+  }
+  @keyframes treiben {
+    to {
+      translate: 8vw 0;
+    }
+  }
+  @keyframes regen {
+    to {
+      top: 105%;
+    }
+  }
+  @keyframes schnee {
+    to {
+      top: 105%;
+      translate: -40px 0;
+    }
+  }
+  @keyframes nebel {
+    to {
+      translate: 20% 0;
+    }
+  }
+  @keyframes blitz {
+    0%,
+    90%,
+    94%,
+    100% {
+      opacity: 0;
+    }
+    91%,
+    93% {
+      opacity: 0.7;
+    }
   }
   .wolke {
     animation: ziehen 60s linear infinite alternate;

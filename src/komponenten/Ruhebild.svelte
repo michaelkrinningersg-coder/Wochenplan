@@ -6,6 +6,7 @@
   import { app, istErledigt, tagesListe } from '../lib/speicher.svelte'
   import { ruhe } from '../lib/ruhebilder.svelte'
   import { heuteTag, minutenVon } from '../lib/zeit'
+  import { wetter, wetterAktualisieren } from '../lib/wetter.svelte'
   import AnalogUhr from './AnalogUhr.svelte'
   import AufgabenBild from './AufgabenBild.svelte'
   import JahreszeitSzene from './JahreszeitSzene.svelte'
@@ -48,6 +49,19 @@
 
   // Eigene Fotos
   const fotos = $derived((app.plan.ruhebilder ?? []).map((id) => ruhe.bilder[id]).filter(Boolean))
+  // Schwarz: ganz dunkel (Strom sparen, nachts nicht blenden)
+  const nachtzeit = $derived.by(() => {
+    const m = jetzt.getHours() * 60 + jetzt.getMinutes()
+    const von = minutenVon(app.plan.zeiten.schlafen)
+    const bis = minutenVon(app.plan.zeiten.aufstehen)
+    return von > bis ? m >= von || m < bis : m >= von && m < bis
+  })
+  const schwarz = $derived(app.einst.ruheArt === 'schwarz' || (!!app.einst.ruheNacht && nachtzeit))
+  onMount(() => {
+    void wetterAktualisieren()
+    const id = setInterval(() => void wetterAktualisieren(), 10 * 60_000)
+    return () => clearInterval(id)
+  })
   const mitFotos = $derived((app.einst.ruheArt ?? 'jahreszeit') === 'fotos' && fotos.length > 0)
   let fotoNr = $state(Math.floor(Math.random() * 1000))
   $effect(() => {
@@ -73,6 +87,8 @@
         <span class="live-uhr">{hh}:{mm}</span>
       </div>
     </div>
+  {:else if schwarz}
+    <div class="schwarz"></div>
   {:else if mitFotos}
     {#key fotoNr}
       <img class="foto" src={fotos[fotoNr % fotos.length]} alt="" />
@@ -83,12 +99,12 @@
       <span class="ecke-datum">{datum}</span>
     </div>
   {:else}
-    <JahreszeitSzene {jz} {nacht} />
+    <JahreszeitSzene {jz} {nacht} wetterArt={wetter.art} />
     <div class="inhalt">
       <div class="kopf">
         <div class="datum-block">
           <span class="jz">{JAHRESZEIT_NAME[jz]}</span>
-          <span class="datum">{datum}</span>
+          <span class="datum">{datum}{#if wetter.temperatur !== null}{` · ${wetter.temperatur} °C`}{/if}</span>
         </div>
         {#if analog}
           <AnalogUhr zeit={jetzt} groesse={170} />
@@ -117,6 +133,11 @@
     background: #13204a;
     cursor: none;
     outline: none;
+  }
+  .schwarz {
+    position: absolute;
+    inset: 0;
+    background: #000;
   }
   .inhalt {
     position: absolute;
