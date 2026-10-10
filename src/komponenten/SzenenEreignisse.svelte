@@ -71,7 +71,7 @@
   }
   function bodenWeg(): Keyframe[] {
     const vonLinks = Math.random() < 0.5
-    const y = zufall(80, 88)
+    const y = zufall(64, 70)
     return [
       { left: vonLinks ? '-8%' : '108%', top: `${y}%`, transform: `scaleX(${vonLinks ? -1 : 1})` },
       { left: vonLinks ? '108%' : '-8%', top: `${y - zufall(-3, 3)}%`, transform: `scaleX(${vonLinks ? -1 : 1})` },
@@ -94,11 +94,11 @@
     return [
       { left: `${x}%`, top: '44%', opacity: 1, transform: 'rotate(0deg)', offset: 0 },
       { left: `${x}%`, top: '44%', opacity: 1, transform: 'rotate(0deg)', offset: 0.18 },
-      { left: `${x}%`, top: '82%', opacity: 1, transform: 'rotate(40deg)', offset: 0.36, easing: 'ease-out' },
-      { left: `${x + richtung * 2}%`, top: '76%', opacity: 1, transform: 'rotate(80deg)', offset: 0.44, easing: 'ease-in' },
-      { left: `${x + richtung * 4}%`, top: '82%', opacity: 1, transform: 'rotate(140deg)', offset: 0.52 },
-      { left: `${x + richtung * 9}%`, top: '83%', opacity: 1, transform: `rotate(${richtung * 400}deg)`, offset: 0.75 },
-      { left: `${x + richtung * 9}%`, top: '83%', opacity: 0, transform: `rotate(${richtung * 400}deg)`, offset: 1 },
+      { left: `${x}%`, top: '68%', opacity: 1, transform: 'rotate(40deg)', offset: 0.36, easing: 'ease-out' },
+      { left: `${x + richtung * 2}%`, top: '63%', opacity: 1, transform: 'rotate(80deg)', offset: 0.44, easing: 'ease-in' },
+      { left: `${x + richtung * 4}%`, top: '68%', opacity: 1, transform: 'rotate(140deg)', offset: 0.52 },
+      { left: `${x + richtung * 9}%`, top: '69%', opacity: 1, transform: `rotate(${richtung * 400}deg)`, offset: 0.75 },
+      { left: `${x + richtung * 9}%`, top: '69%', opacity: 0, transform: `rotate(${richtung * 400}deg)`, offset: 1 },
     ]
   }
   function ballonWeg(): Keyframe[] {
@@ -113,7 +113,7 @@
     const vonRechts = Math.random() < 0.5
     return [
       { left: vonRechts ? '96%' : '-6%', top: '58%', transform: `scaleX(${vonRechts ? 1 : -1}) rotate(${vonRechts ? -8 : 8}deg)` },
-      { left: vonRechts ? '-8%' : '104%', top: '80%', transform: `scaleX(${vonRechts ? 1 : -1}) rotate(${vonRechts ? -14 : 14}deg)` },
+      { left: vonRechts ? '-8%' : '104%', top: '70%', transform: `scaleX(${vonRechts ? 1 : -1}) rotate(${vonRechts ? -14 : 14}deg)` },
     ]
   }
   function wachsen(i: number): Keyframe[] {
@@ -154,7 +154,7 @@
       {:else if aktuell.art === 'pilze' || aktuell.art === 'blumen'}
         <div class="reihe-boden" use:animiere={{ keyframes: [{ opacity: 1 }, { opacity: 1 }], dauer: 12000 }}>
           {#each aktuell.stellen ?? [] as x, i (i)}
-            <div class="ding wachsend" style="left: {x}%; top: {80 + (i % 3) * 3}%" use:animiere={{ keyframes: wachsen(i), dauer: 12000, ende: false }}>
+            <div class="ding wachsend" style="left: {x}%; top: {64 + (i % 3) * 3}%" use:animiere={{ keyframes: wachsen(i), dauer: 12000, ende: false }}>
               {#if aktuell.art === 'pilze'}
                 <svg viewBox="0 0 40 40" width="100%" height="100%">
                   <rect x="15" y="20" width="10" height="16" rx="4" fill="#f6ecd8" stroke="#b39b78" stroke-width="1.2" />

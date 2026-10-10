@@ -66,7 +66,8 @@
     <!-- kleines Haus -->
     <g transform={hoch ? 'translate(82 54)' : 'translate(110 54)'}>
       <rect x="0" y="6" width="18" height="12" fill={jz === 'winter' ? '#f3e2c9' : '#f6d6a8'} />
-      <path d="M-2 7 L9 -2 L20 7 Z" fill={jz === 'winter' ? '#ffffff' : '#c9563c'} />
+      <path d="M-2 7 L9 -2 L20 7 Z" fill="#c9563c" />
+      {#if jz === 'winter'}<path d="M-2.5 7.2 L9 -2.6 L20.5 7.2 L18 7.2 L9 0.4 L0 7.2 Z" fill="#ffffff" /><path d="M2 3.6 L9 -2 L16 3.6 Z" fill="#ffffff" />{/if}
       <rect x="7" y="11" width="4" height="7" fill="#7a4e2d" />
       <rect x="2" y="9" width="3.5" height="3" fill={nacht ? '#ffd84a' : '#bfe3ff'} />
       <rect x="12.5" y="9" width="3.5" height="3" fill={nacht ? '#ffd84a' : '#bfe3ff'} />
