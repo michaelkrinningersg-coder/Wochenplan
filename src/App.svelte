@@ -13,6 +13,8 @@
   import GrosseUhr from './komponenten/GrosseUhr.svelte'
   import LaufendeTimer from './komponenten/LaufendeTimer.svelte'
   import Ruhebild from './komponenten/Ruhebild.svelte'
+  import ProDialog from './dialoge/ProDialog.svelte'
+  import { istPro, lizenzLaden } from './lib/lizenz.svelte'
   import { ruhebilderLaden } from './lib/ruhebilder.svelte'
   import AktionDialog from './dialoge/AktionDialog.svelte'
   import AufgabeKopierenDialog from './dialoge/AufgabeKopierenDialog.svelte'
@@ -38,6 +40,7 @@
 
   // ---------- Uhr ----------
   onMount(() => {
+    void lizenzLaden()
     const id = setInterval(() => (app.jetzt = Date.now()), 1000)
     return () => clearInterval(id)
   })
@@ -283,14 +286,15 @@
   )
   /** Ruhebild käme, wenn lange genug nichts passiert (alles außer der Wartezeit erfüllt) */
   const ruheMoeglich = $derived(
-    (app.einst.ruheHier === 'an' || ((app.einst.ruheHier ?? 'auto') === 'auto' && abgleich.einst.rolle === 'anzeige')) &&
+    istPro() &&
+      (app.einst.ruheHier === 'an' || ((app.einst.ruheHier ?? 'auto') === 'auto' && abgleich.einst.rolle === 'anzeige')) &&
       (app.einst.ruhe ?? 'an') === 'an' &&
       !timerLaeuft &&
       !app.dialog &&
       !app.bearbeiten,
   )
   const ruheRestMs = $derived((app.einst.ruheWarten ?? 5) * 60_000 - (app.jetzt - letzteAktivitaet))
-  const ruheAktiv = $derived(app.ruheVorschau || (ruheMoeglich && ruheRestMs < 0))
+  const ruheAktiv = $derived((app.ruheVorschau && istPro()) || (ruheMoeglich && ruheRestMs < 0))
   function aufwachen() {
     const warAktiv = ruheAktiv
     letzteAktivitaet = Date.now()
@@ -414,6 +418,8 @@
     <AblaeufeDialog />
   {:else if app.dialog?.art === 'uhr'}
     <GrosseUhr />
+  {:else if app.dialog?.art === 'pro'}
+    <ProDialog />
   {/if}
 
   {#if app.hinweis}

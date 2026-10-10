@@ -2,6 +2,7 @@
 // App: Android-Sprachmodul, Browser: Web-Sprachausgabe (beides über das Capacitor-Plugin).
 // Es wird automatisch die beste Stimme der Oberflächensprache gewählt; in den Einstellungen lässt sie sich ändern.
 import { lokale, spr, t, type Sprache } from './i18n.svelte'
+import { istPro } from './lizenz.svelte'
 import { app, kindName, kinderVon } from './speicher.svelte'
 import type { Aufgabe } from './typen'
 import { baustein as b, clipsSpielen, clipsStoppen } from './clips'
@@ -82,6 +83,7 @@ let letzteZeit = 0
 
 /** Feste Ansage aus vorgerenderten Bausteinen; ohne Bausteine (oder bei gewählter Gerätestimme) Sprachmodul */
 async function vorlesenMit(teile: string[] | null, text: string, erzwingen = false) {
+  if (!istPro()) return
   if ((!app.einst.vorlesen && !erzwingen) || !text) return
   if (teile && !app.einst.stimme && spr.aktuell === 'de') {
     if (!erzwingen && text === letzter && Date.now() - letzteZeit < 1500) return
@@ -93,6 +95,7 @@ async function vorlesenMit(teile: string[] | null, text: string, erzwingen = fal
 }
 
 export async function vorlesen(text: string, erzwingen = false) {
+  if (!istPro()) return
   if ((!app.einst.vorlesen && !erzwingen) || !text) return
   // dieselbe Ansage nicht doppelt kurz hintereinander
   if (!erzwingen && text === letzter && Date.now() - letzteZeit < 1500) return

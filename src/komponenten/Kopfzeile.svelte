@@ -7,6 +7,7 @@
   import Bild from './Bild.svelte'
   import HalteKnopf from './HalteKnopf.svelte'
   import AnalogUhr from './AnalogUhr.svelte'
+  import { istPro } from '../lib/lizenz.svelte'
   import { uhrzeitAnsagen } from '../lib/vorlesen'
   import { installieren, update, updateVerfuegbar } from '../lib/update.svelte'
   import Symbol from './Symbol.svelte'
@@ -96,6 +97,7 @@
       </HalteKnopf>
     {/if}
 
+    {#if istPro()}
     <button
       class="uhr"
       onclick={() => {
@@ -110,6 +112,7 @@
         {uhrzeitJetzt(jetzt)}
       {/if}
     </button>
+    {/if}
 
     {#if planer && abgleich.zustand !== 'aus'}
       <button

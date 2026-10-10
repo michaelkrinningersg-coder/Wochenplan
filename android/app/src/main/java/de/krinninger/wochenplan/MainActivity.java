@@ -14,6 +14,8 @@ public class MainActivity extends BridgeActivity {
         registerPlugin(Kopplung.class);
         // frei gewählte Abgleich-Datei (Drive, Nextcloud, Gerät)
         registerPlugin(Dateispeicher.class);
+        // Kauf „Wochenplan Pro“ (nur in der Store-Version genutzt)
+        registerPlugin(Kauf.class);
         super.onCreate(savedInstanceState);
     }
 

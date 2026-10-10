@@ -1,3 +1,4 @@
+import { FREI_ABSCHNITT, istPro } from './lizenz.svelte'
 import type { AbschnittAnpassung, AbschnittId, TagId } from './typen'
 
 export const TAGE: { id: TagId; kurz: string; lang: string }[] = [
@@ -77,7 +78,11 @@ function defVon(id: AbschnittId): AbschnittDef {
 }
 
 function aktuelle(): AbschnittDef[] {
-  return (listeVon() ?? STANDARD_ABSCHNITTE).map(defVon)
+  const alle = listeVon() ?? STANDARD_ABSCHNITTE
+  if (istPro()) return alle.map(defVon)
+  // kostenlose Version: nur die Morgenroutine
+  const frei = alle.filter((id) => id === FREI_ABSCHNITT)
+  return (frei.length ? frei : alle.slice(0, 1)).map(defVon)
 }
 
 /** Die Tageszeiten des Plans in Reihenfolge (lesen wie ein Array; ändert sich mit dem Plan) */

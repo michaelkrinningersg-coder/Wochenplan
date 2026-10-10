@@ -15,7 +15,8 @@
   import { ortSuchen, ortTeile, wetterAktualisieren } from '../lib/wetter.svelte'
   import { dateiExportieren, istApp } from '../lib/geraet'
   import { ABSCHNITTE } from '../lib/konstanten'
-  import { abschnittAnlegen, abschnittLoeschen, app, exportDaten, importDaten, zeigeHinweis } from '../lib/speicher.svelte'
+  import { abschnittAnlegen, abschnittLoeschen, app, exportDaten, importDaten, proHinweis, zeigeHinweis } from '../lib/speicher.svelte'
+import { FREI_MAX_KACHELN, istPro } from '../lib/lizenz.svelte'
   import { neueId, startplan } from '../lib/startplan'
   import { minutenVon } from '../lib/zeit'
   import { installieren, suchen, update, updateVerfuegbar } from '../lib/update.svelte'
@@ -304,6 +305,7 @@
           <button class="knopf klein" aria-pressed={app.einst.thema === 'nacht'} onclick={() => (app.einst.thema = 'nacht')}>{t('Immer dunkel')}</button>
         </div>
       </div>
+      {#if istPro()}
       <div class="z">
         <span class="zl">{t('Uhr')}</span>
         <div class="zr">
@@ -311,6 +313,7 @@
           <button class="knopf klein" aria-pressed={app.einst.uhrArt === 'analog'} onclick={() => (app.einst.uhrArt = 'analog')}>{t('Analog')}</button>
         </div>
       </div>
+      {/if}
     </section>
 
     <section>
@@ -334,6 +337,12 @@
           {/each}
         </div>
       </div>
+    </section>
+    {:else if !istPro() && (reiter === 'sprache' || reiter === 'ruhe' || reiter === 'tag')}
+    <section>
+      <h3>{t('Nur in Pro')}</h3>
+      <p class="hilfe">{reiter === 'sprache' ? t('Die Sprachausgabe gehört zu Wochenplan Pro.') : reiter === 'ruhe' ? t('Das Ruhebild mit Jahreszeiten, Wetter und Figuren gehört zu Wochenplan Pro.') : t('Weitere Tageszeiten und Tagesabläufe gehören zu Wochenplan Pro.')}</p>
+      <div class="reihe"><button class="knopf" onclick={proHinweis}>{t('Pro ansehen')}</button></div>
     </section>
     {:else if reiter === 'sprache'}
     <section>
@@ -552,6 +561,13 @@
     {/if}
     {/if}
     {:else if reiter === 'abgleich'}
+    {#if __STORE__}
+    <section>
+      <h3>{t('Wochenplan Pro')}</h3>
+      <p class="hilfe">{istPro() ? t('Pro ist freigeschaltet. Vielen Dank!') : t('Du nutzt die kostenlose Version: Morgenroutine mit bis zu {n} Kacheln.', { n: FREI_MAX_KACHELN })}</p>
+      {#if !istPro()}<div class="reihe"><button class="knopf" onclick={proHinweis}>{t('Pro ansehen')}</button></div>{/if}
+    </section>
+    {/if}
     {#if !__STORE__}
     <section>
       <h3>{t('Abgleich')}</h3>

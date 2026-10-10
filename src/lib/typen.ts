@@ -169,6 +169,7 @@ export type Dialog =
   | { art: 'abschnittBild'; id: AbschnittId }
   | { art: 'ablaeufe' }
   | { art: 'uhr' }
+  | { art: 'pro' }
 
 export interface Fundstelle {
   abschnitt: AbschnittId

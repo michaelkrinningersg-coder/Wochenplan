@@ -5,6 +5,7 @@
   import Countdowns from '../komponenten/Countdowns.svelte'
   import GeburtstagsBanner from '../komponenten/GeburtstagsBanner.svelte'
   import Sonnenbogen from '../komponenten/Sonnenbogen.svelte'
+  import { istPro } from '../lib/lizenz.svelte'
   import { geburtstageHeute } from '../lib/countdown'
   import Symbol from '../komponenten/Symbol.svelte'
   import { aufgabeGewaehlt } from '../lib/aktionen'
@@ -86,7 +87,7 @@
     <GeburtstagsBanner />
   {:else if heute && !schmal}
     <div class="oben">
-      <Sonnenbogen {phase} {lagen} {breite} />
+      {#if istPro()}<Sonnenbogen {phase} {lagen} {breite} />{/if}
       <div class="countdowns"><Countdowns max={2} /></div>
     </div>
   {:else if heute}

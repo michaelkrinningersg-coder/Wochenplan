@@ -1,6 +1,7 @@
 import { gelbAb, rotAb } from './ampel'
 import { t } from './i18n.svelte'
 import { ABSCHNITTE, TAGE, abschnittAnpassungVon } from './konstanten'
+import { FREI_MAX_KACHELN, istPro } from './lizenz.svelte'
 import { neueId, planNormalisieren, startplan } from './startplan'
 import type {
   AbschnittId,
@@ -191,10 +192,11 @@ export function termineAm(datum: string): Termin[] {
 /** Alle Aufgaben eines Abschnitts, die angezeigt werden (Plan + Termine des Datums, gefiltert nach Kind) */
 export function aufgabenIn(tag: TagId, abschnitt: AbschnittId): Aufgabe[] {
   const datum = datumVon(tag)
-  return [
+  const alle = [
     ...(planFuer(tag)[abschnitt] ?? []).filter(sichtbar),
     ...app.plan.termine.filter((t) => t.datum === datum && t.abschnitt === abschnitt && sichtbar(t)),
   ]
+  return istPro() ? alle : alle.slice(0, FREI_MAX_KACHELN)
 }
 
 export function istTermin(id: string): boolean {
@@ -349,7 +351,16 @@ export function tagVerschieben(tag: TagId, id: string, richtung: -1 | 1): TagId 
   return ziel.id
 }
 
+/** Hinweisfenster „Pro freischalten“ */
+export function proHinweis() {
+  app.dialog = { art: 'pro' }
+}
+
 export function neueAufgabe(tag: TagId, abschnitt: AbschnittId) {
+  if (!istPro() && aufgabenIn(tag, abschnitt).length >= FREI_MAX_KACHELN) {
+    proHinweis()
+    return
+  }
   app.dialog = {
     art: 'bearbeiten',
     tag,
