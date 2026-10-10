@@ -382,6 +382,9 @@
         <button class="knopf klein" aria-pressed={!!app.einst.ruheNacht} onclick={() => (app.einst.ruheNacht = !app.einst.ruheNacht)}>
           Nachts schwarz (Schlafen bis Aufstehen): {app.einst.ruheNacht ? 'ja' : 'nein'}
         </button>
+        <button class="knopf klein" aria-pressed={app.einst.ruheCountdown !== false} onclick={() => (app.einst.ruheCountdown = app.einst.ruheCountdown === false)}>
+          Mini-Countdown in der Ecke: {app.einst.ruheCountdown !== false ? 'ja' : 'nein'}
+        </button>
       </div>
       <p class="hilfe">„Schwarz“ macht den Bildschirm ganz dunkel. Bewegen, Antippen oder eine Taste auf der Fernbedienung holt die App zurück.</p>
       {#if (app.einst.ruheArt ?? 'jahreszeit') === 'jahreszeit'}

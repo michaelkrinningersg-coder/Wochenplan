@@ -266,15 +266,16 @@
   const timerLaeuft = $derived(
     Object.values(app.timer).some((t) => t.gestartet !== null && t.dauerMs - (t.vergangenMs + (app.jetzt - t.gestartet)) > 0),
   )
-  const ruheAktiv = $derived(
-    app.ruheVorschau ||
-      ((app.einst.ruheHier === 'an' || ((app.einst.ruheHier ?? 'auto') === 'auto' && abgleich.einst.rolle === 'anzeige')) &&
-        (app.einst.ruhe ?? 'an') === 'an' &&
-        !timerLaeuft &&
-        !app.dialog &&
-        !app.bearbeiten &&
-        app.jetzt - letzteAktivitaet > (app.einst.ruheWarten ?? 5) * 60_000),
+  /** Ruhebild käme, wenn lange genug nichts passiert (alles außer der Wartezeit erfüllt) */
+  const ruheMoeglich = $derived(
+    (app.einst.ruheHier === 'an' || ((app.einst.ruheHier ?? 'auto') === 'auto' && abgleich.einst.rolle === 'anzeige')) &&
+      (app.einst.ruhe ?? 'an') === 'an' &&
+      !timerLaeuft &&
+      !app.dialog &&
+      !app.bearbeiten,
   )
+  const ruheRestMs = $derived((app.einst.ruheWarten ?? 5) * 60_000 - (app.jetzt - letzteAktivitaet))
+  const ruheAktiv = $derived(app.ruheVorschau || (ruheMoeglich && ruheRestMs < 0))
   function aufwachen() {
     const warAktiv = ruheAktiv
     letzteAktivitaet = Date.now()
@@ -360,6 +361,10 @@
   <LaufendeTimer />
   {#if ruheAktiv}
     <Ruhebild onwecken={aufwachen} />
+  {:else if ruheMoeglich && app.einst.ruheCountdown !== false}
+    <div class="ruhe-countdown" aria-hidden="true" title="Bis zum Ruhebild">
+      ☾ {Math.floor(Math.max(0, ruheRestMs) / 60_000)}:{String(Math.floor((Math.max(0, ruheRestMs) % 60_000) / 1000)).padStart(2, '0')}
+    </div>
   {/if}
 
   {#if app.dialog?.art === 'bearbeiten'}
@@ -436,5 +441,18 @@
     .buehne {
       overflow: auto;
     }
+  }
+  .ruhe-countdown {
+    position: fixed;
+    left: 10px;
+    bottom: 8px;
+    z-index: 20;
+    padding: 2px 9px;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.08);
+    color: var(--tinte-leise);
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+    pointer-events: none;
   }
 </style>
