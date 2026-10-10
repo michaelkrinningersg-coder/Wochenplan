@@ -52,7 +52,7 @@ export const VORLAGEN: Vorlage[] = [
   { titel: 'Kuchen essen', bild: 'kuchen', minuten: 0, abschnitt: 'nachmittag' },
   { titel: 'Geburtstag', bild: 'geburtstag', minuten: 0, abschnitt: 'nachmittag' },
   // Ausflüge
-  { titel: 'Ausflug Miniaturland', bild: 'miniaturland', minuten: 0, abschnitt: 'vormittag' },
+  { titel: 'Ausflug Modellbahn', bild: 'miniaturland', minuten: 0, abschnitt: 'vormittag' },
   { titel: 'Ausflug Zoo', bild: 'zoo', minuten: 0, abschnitt: 'vormittag' },
   // Einkaufen
   { titel: 'Einkaufen', bild: 'einkaufen', minuten: 0, abschnitt: 'vormittag' },

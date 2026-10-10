@@ -112,7 +112,7 @@ export const ICON_LIST: IconInfo[] = [
   { id: "arzt", name: "Arzt", group: "Unterwegs" },
   { id: "telefon", name: "Telefonieren", group: "Unterwegs" },
   { id: "wecker", name: "Aufstehen", group: "Unterwegs" },
-  { id: "miniaturland", name: "Ausflug Miniaturland", group: "Unterwegs" },
+  { id: "miniaturland", name: "Ausflug Modellbahn", group: "Unterwegs" },
   { id: "zoo", name: "Ausflug Zoo", group: "Unterwegs" },
   { id: "einkaufen", name: "Einkaufen", group: "Einkaufen" },
   { id: "croissant", name: "Bäcker", group: "Einkaufen" },
