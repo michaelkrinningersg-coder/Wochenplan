@@ -33,6 +33,7 @@
     {/if}
     <span class="datum">{datumLang(jetzt)}</span>
   </button>
+  <button class="zu" onclick={() => zurueck()} aria-label="Uhr schließen">✕</button>
   <button class="knopf nochmal" onclick={() => uhrzeitAnsagen(new Date())}>Nochmal sagen</button>
 </div>
 
@@ -74,6 +75,21 @@
   .datum {
     font-size: clamp(18px, 3.4vh, 34px);
     color: var(--tinte-leise);
+  }
+  .zu {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    border: none;
+    font-size: 30px;
+    background: rgba(0, 0, 0, 0.12);
+    color: var(--tinte);
+  }
+  .zu:focus-visible {
+    outline: 4px solid var(--tinte);
   }
   .nochmal {
     position: absolute;
