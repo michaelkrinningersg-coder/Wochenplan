@@ -13,7 +13,7 @@ Mit großen Bildern, Timer-Scheibe und Ampel. Läuft auf dem Fernseher (Google T
 
 | | Wo | Rolle |
 |---|---|---|
-| Planen | Webseite auf Handy oder PC: <https://michaelkrinningersg-coder.github.io/wochenplan/> | „Planen“ – Änderungen werden verschlüsselt hochgeladen |
+| Planen | Webseite auf Handy oder PC: <https://michaelkrinningersg-coder.github.io/Wochenplan/> | „Planen“ – Änderungen werden verschlüsselt hochgeladen |
 | Anzeigen | App auf dem Google TV (oder Handy-Bildschirm auf den Fernseher spiegeln) | „Nur anzeigen“ – holt den Plan alle 2 Minuten |
 
 Der Plan liegt verschlüsselt (AES-GCM, Schlüssel aus dem Familien-Passwort) im Zweig `plan-daten` dieses Repos.
