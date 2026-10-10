@@ -27,13 +27,14 @@ export function abschnittSpanne(plan: Plan, id: AbschnittId): [number, number] {
   const i = ABSCHNITTE.findIndex((a) => a.id === id)
   const start = minutenVon(plan.zeiten[id])
   const naechster = ABSCHNITTE[i + 1]
-  const ende = naechster ? minutenVon(plan.zeiten[naechster.id]) : minutenVon(plan.abendEnde)
+  // Der letzte Abschnitt (Schlafen) dauert bis zum Aufstehen am nächsten Tag
+  const ende = naechster ? minutenVon(plan.zeiten[naechster.id]) : 24 * 60
   return [start, Math.max(start + 1, ende)]
 }
 
 export function spanneText(plan: Plan, id: AbschnittId): string {
   const [s, e] = abschnittSpanne(plan, id)
-  return `${uhr(s)}–${uhr(e)}`
+  return e >= 24 * 60 ? `ab ${uhr(s)}` : `${uhr(s)}–${uhr(e)}`
 }
 
 export type TagesPhase =

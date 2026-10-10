@@ -327,10 +327,10 @@
               {#if naechster}
                 <ZeitWahl bind:wert={app.plan.zeiten[naechster.id]} label="{ab.name} bis" />
               {:else}
-                <ZeitWahl bind:wert={app.plan.abendEnde} label="{ab.name} bis" />
+                <span class="bis-auto">bis Aufstehen</span>
               {/if}
             </div>
-            {#if minutenVon(app.plan.zeiten[ab.id]) >= minutenVon(naechster ? app.plan.zeiten[naechster.id] : app.plan.abendEnde)}
+            {#if naechster && minutenVon(app.plan.zeiten[ab.id]) >= minutenVon(app.plan.zeiten[naechster.id])}
               <span class="warnung">„bis“ muss nach „von“ liegen</span>
             {/if}
           </div>
@@ -793,6 +793,27 @@
     display: flex;
     align-items: center;
     gap: 8px;
+  }
+  .zeit :global(.zeitwahl) {
+    flex-wrap: nowrap;
+    gap: 6px;
+  }
+  .zeit :global(.zeitwahl .knopf.rund) {
+    width: 44px;
+    height: 44px;
+    min-height: 0;
+    padding: 0;
+  }
+  .zeit :global(.zeitwahl .wert) {
+    min-width: 3em;
+    font-size: 22px;
+  }
+  .bis-auto {
+    font-weight: 700;
+    color: var(--tinte-leise);
+  }
+  .von-bis {
+    flex-wrap: wrap;
   }
   .von-bis .name {
     width: 2em;

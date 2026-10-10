@@ -78,7 +78,7 @@
       {#if naechster}
         <ZeitWahl bind:wert={app.plan.zeiten[naechster.id]} label="{info.name} bis" />
       {:else}
-        <ZeitWahl bind:wert={app.plan.abendEnde} label="{info.name} bis" />
+        <span class="name">Aufstehen am nächsten Tag</span>
       {/if}
     </div>
 
