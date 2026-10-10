@@ -36,11 +36,15 @@ function glocke(c: AudioContext, frequenz: number, start: number, dauer: number,
   note(c, frequenz * 2, start, dauer * 0.6, lautstaerke * 0.35)
 }
 
-export function spieleTon(art: 'gelb' | 'rot' | 'ende' | 'fertig' | 'alles') {
+export function spieleTon(art: 'gelb' | 'rot' | 'ende' | 'fertig' | 'alles' | 'piep' | 'piepLetzte') {
   const c = kontext()
   if (!c) return
   const t = c.currentTime + 0.02
-  if (art === 'gelb') {
+  if (art === 'piep') {
+    note(c, 880, t, 0.14, 0.16)
+  } else if (art === 'piepLetzte') {
+    note(c, 1175, t, 0.3, 0.2)
+  } else if (art === 'gelb') {
     note(c, 587, t, 0.5, 0.14)
   } else if (art === 'rot') {
     note(c, 659, t, 0.35, 0.15)

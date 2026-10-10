@@ -154,6 +154,7 @@
 
   // ---------- Timer: Töne und Ansagen bei Gelb, Rot und am Ende ----------
   const MARKEN = [10, 5, 1]
+  const piepSek = new Map<string, number>()
   function titelVon(id: string) {
     return finde(heuteTag(), id)?.aufgabe.titel
   }
@@ -174,6 +175,16 @@
             if (titel) setTimeout(() => restAnsagen(m, titel), 1200)
           })
         }
+      }
+      // Akustischer Countdown: letzte 10 Sekunden ein Piepen je Sekunde (nur bei laufendem Timer)
+      if (rest > 0 && rest <= 10_000 && t.dauerMs > 12_000) {
+        const sek = Math.ceil(rest / 1000)
+        if (piepSek.get(id) !== sek) {
+          piepSek.set(id, sek)
+          if (app.einst.ton) spieleTon(sek === 1 ? 'piepLetzte' : 'piep')
+        }
+      } else if (rest > 10_000) {
+        piepSek.delete(id)
       }
       if (!t.gelbGemeldet && rest <= gelbAb(t.dauerMs) && rest > rotAb(t.dauerMs)) {
         t.gelbGemeldet = true
