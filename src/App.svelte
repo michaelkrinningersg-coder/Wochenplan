@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount, tick } from 'svelte'
+  import { onMount, tick, untrack } from 'svelte'
   import AbschnittAnsicht from './ansichten/AbschnittAnsicht.svelte'
   import AufgabeAnsicht from './ansichten/AufgabeAnsicht.svelte'
   import TagesAnsicht from './ansichten/TagesAnsicht.svelte'
@@ -38,7 +38,8 @@
       ersterPlanLauf = false
       return
     }
-    lokalGeaendert()
+    // untrack: der Abgleich liest/schreibt eigenen Zustand, das soll diesen Effekt nicht neu auslösen
+    untrack(() => lokalGeaendert())
   })
   $effect(() => {
     speichern('erledigt', $state.snapshot(app.erledigt))
@@ -64,7 +65,7 @@
     void abgleich.einst.rolle
     void abgleich.einst.passwort
     void abgleich.einst.token
-    return abgleichStarten()
+    return untrack(() => abgleichStarten())
   })
 
   // ---------- Darstellung ----------
@@ -93,11 +94,13 @@
         t.endeGemeldet = true
         if (app.einst.ton) spieleTon('ende')
         // Kinder sehen sofort, welche Aufgabe abgelaufen ist
-        const tag = heuteTag()
-        const f = finde(tag, id)
-        if (f && app.ansicht.art !== 'aufgabe' && !app.dialog && !app.bearbeiten) {
-          oeffnen({ art: 'aufgabe', tag, abschnitt: f.abschnitt, id })
-        }
+        untrack(() => {
+          const tag = heuteTag()
+          const f = finde(tag, id)
+          if (f && app.ansicht.art !== 'aufgabe' && !app.dialog && !app.bearbeiten) {
+            oeffnen({ art: 'aufgabe', tag, abschnitt: f.abschnitt, id })
+          }
+        })
       }
     }
   })
