@@ -64,8 +64,9 @@
 
   function speichern() {
     const fertig: Aufgabe = { ...$state.snapshot(entwurf), titel: entwurf.titel.trim() || 'Aufgabe' }
-    for (const f of ['zusatz', 'uhrzeit', 'fuer', 'countdown', 'sternenregen', 'foto', 'fotoModus', 'wechselSek'] as const)
+    for (const f of ['zusatz', 'uhrzeit', 'bis', 'fuer', 'countdown', 'sternenregen', 'foto', 'fotoModus', 'wechselSek'] as const)
       if (fertig[f] === undefined || fertig[f] === false || fertig[f] === '') delete fertig[f]
+    if (!fertig.uhrzeit) delete fertig.bis
     if (!fertig.foto) {
       delete fertig.fotoModus
       delete fertig.wechselSek
@@ -226,9 +227,15 @@
           </div>
         </div>
         <div>
-          <span class="name">Feste Uhrzeit</span>
-          <ZeitWahl bind:wert={entwurf.uhrzeit} leerErlaubt label="Uhrzeit" />
+          <span class="name">Feste Uhrzeit (von)</span>
+          <ZeitWahl bind:wert={entwurf.uhrzeit} leerErlaubt label="Uhrzeit von" />
         </div>
+        {#if entwurf.uhrzeit}
+          <div>
+            <span class="name">bis (für den Live-Modus)</span>
+            <ZeitWahl bind:wert={entwurf.bis} leerErlaubt label="Uhrzeit bis" />
+          </div>
+        {/if}
       </div>
 
       <div class="feld">

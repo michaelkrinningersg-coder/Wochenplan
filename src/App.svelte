@@ -12,6 +12,8 @@
   import AblaeufeDialog from './dialoge/AblaeufeDialog.svelte'
   import GrosseUhr from './komponenten/GrosseUhr.svelte'
   import LaufendeTimer from './komponenten/LaufendeTimer.svelte'
+  import Ruhebild from './komponenten/Ruhebild.svelte'
+  import { ruhebilderLaden } from './lib/ruhebilder.svelte'
   import AktionDialog from './dialoge/AktionDialog.svelte'
   import AufgabeKopierenDialog from './dialoge/AufgabeKopierenDialog.svelte'
   import BearbeitenDialog from './dialoge/BearbeitenDialog.svelte'
@@ -20,7 +22,7 @@
   import Kopfzeile from './komponenten/Kopfzeile.svelte'
   import { updatePruefungStarten } from './lib/update.svelte'
   import { endeAnsagen, restAnsagen, startAnsagen } from './lib/vorlesen'
-  import { abgleich, abgleichStarten, erledigtGeaendert, lokalGeaendert } from './lib/abgleich.svelte'
+  import { ruhebilderAbgleichen, abgleich, abgleichStarten, erledigtGeaendert, lokalGeaendert } from './lib/abgleich.svelte'
   import { gelbAb, rotAb } from './lib/ampel'
   import { abschnittInfo } from './lib/konstanten'
   import { bewegeFokus, ersterFokus, fokusSetzen, richtungAusTaste } from './lib/fokus'
@@ -95,7 +97,14 @@
     void bildschirmAnlassen(app.einst.wach)
   })
   onMount(() => {
-    void zurueckTaste(() => zurueck())
+    void zurueckTaste(() => {
+      if (ruheAktiv) {
+        aufwachen()
+        return true
+      }
+      return zurueck()
+    })
+    void ruhebilderLaden().then(() => ruhebilderAbgleichen())
     // Neuer Wochenplan nach dem Update: auf dem Planer-Gerät gleich hochladen
     if (planErneuert || planUmgestellt) untrack(() => lokalGeaendert())
     return updatePruefungStarten()
@@ -252,6 +261,46 @@
     fokusSetzen(appEl.querySelector<HTMLElement>(`[data-fokus-id="aufgabe:${v.id}"]`))
   }
 
+  // ---------- Live-Modus / Ruhebild nach Inaktivität (nur Anzeige-Geräte; Vorschau überall) ----------
+  let letzteAktivitaet = $state(Date.now())
+  const timerLaeuft = $derived(
+    Object.values(app.timer).some((t) => t.gestartet !== null && t.dauerMs - (t.vergangenMs + (app.jetzt - t.gestartet)) > 0),
+  )
+  const ruheAktiv = $derived(
+    app.ruheVorschau ||
+      (abgleich.einst.rolle === 'anzeige' &&
+        (app.einst.ruhe ?? 'an') === 'an' &&
+        !timerLaeuft &&
+        !app.dialog &&
+        !app.bearbeiten &&
+        app.jetzt - letzteAktivitaet > (app.einst.ruheWarten ?? 5) * 60_000),
+  )
+  function aufwachen() {
+    const warAktiv = ruheAktiv
+    letzteAktivitaet = Date.now()
+    if (app.ruheVorschau) {
+      app.ruheVorschau = false
+      return
+    }
+    // nach dem Ruhebild wieder beim heutigen Tag starten
+    if (warAktiv && app.ansicht.art !== 'aufgabe') oeffnen({ art: 'tag', tag: heuteTag() })
+  }
+  function bedient(e: Event) {
+    if (ruheAktiv) {
+      // die Taste/der Tipp weckt nur auf und löst sonst nichts aus
+      e.preventDefault()
+      e.stopImmediatePropagation()
+      aufwachen()
+      return
+    }
+    letzteAktivitaet = Date.now()
+  }
+  // neue Fotos holen, wenn sich die Liste im Plan ändert
+  $effect(() => {
+    void app.plan.ruhebilder
+    untrack(() => void ruhebilderAbgleichen())
+  })
+
   function taste(e: KeyboardEvent) {
     tonFreischalten()
     if (app.verschieben) {
@@ -274,7 +323,14 @@
   }
 </script>
 
-<svelte:window onkeydown={taste} onpointerdown={tonFreischalten} />
+<svelte:window
+  onkeydown={taste}
+  onpointerdown={tonFreischalten}
+  onkeydowncapture={bedient}
+  onpointerdowncapture={bedient}
+  onpointermove={() => (letzteAktivitaet = Date.now())}
+  onwheel={() => (letzteAktivitaet = Date.now())}
+/>
 
 <div class="app" data-thema={thema} bind:this={appEl}>
   <Kopfzeile />
@@ -296,6 +352,9 @@
     {/key}
   </main>
   <LaufendeTimer />
+  {#if ruheAktiv}
+    <Ruhebild onwecken={aufwachen} />
+  {/if}
 
   {#if app.dialog?.art === 'bearbeiten'}
     {#key app.dialog.aufgabe.id}

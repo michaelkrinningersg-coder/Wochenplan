@@ -94,6 +94,8 @@ export const app = $state({
   /** Element, das nach einem Ansichtswechsel den Fokus bekommen soll */
   fokusZiel: null as string | null,
   hinweis: null as string | null,
+  /** Ruhebild als Vorschau zeigen (Einstellungen) */
+  ruheVorschau: false,
   /** Zeitpunkt des letzten Abhakens auf diesem Gerät (löst den Abgleich aus) */
   abgehakt: 0,
 })

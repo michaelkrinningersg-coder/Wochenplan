@@ -22,6 +22,8 @@ export interface Aufgabe {
   minuten: number
   /** feste Uhrzeit "HH:MM" (optional) – dann gibt es einen Countdown bis zum Start */
   uhrzeit?: string
+  /** Ende "HH:MM" (optional) – im Live-Modus wird die Aufgabe von uhrzeit bis bis gezeigt */
+  bis?: string
   /** für wen? leer/fehlt = beide Kinder */
   fuer?: KindId[]
   /** „noch X× schlafen bis …“ anzeigen */
@@ -79,6 +81,8 @@ export interface Plan {
   stand?: number
   /** Einstellungen, die für alle Geräte gelten */
   optionen?: GeteilteOptionen
+  /** eigene Fotos für das Ruhebild (Kennungen; die Bilder liegen einzeln verschlüsselt im Repo) */
+  ruhebilder?: string[]
 }
 
 export interface AbschnittAnpassung {
@@ -107,10 +111,18 @@ export interface Einstellungen {
   sternenregen?: 'alle' | 'auswahl' | 'aus'
   /** Uhr oben: Ziffern oder Zeiger */
   uhrArt?: 'digital' | 'analog'
+  /** Live-Modus / Ruhebild auf dem Fernseher nach Inaktivität */
+  ruhe?: 'an' | 'aus'
+  /** Minuten ohne Bedienung bis zum Ruhebild */
+  ruheWarten?: number
+  /** Jahreszeiten-Bild oder eigene Fotos */
+  ruheArt?: 'jahreszeit' | 'fotos'
+  /** Sekunden, bis das nächste Foto kommt */
+  ruheWechsel?: number
 }
 
 /** Optionen, die mit dem Plan auf alle Geräte gehen (nicht: Kind-Auswahl, Bildschirm anlassen, Stimme) */
-export const GETEILTE_OPTIONEN = ['thema', 'ton', 'timerArt', 'vorlesen', 'tempo', 'zeitAnsagen', 'sternenregen', 'uhrArt'] as const
+export const GETEILTE_OPTIONEN = ['thema', 'ton', 'timerArt', 'vorlesen', 'tempo', 'zeitAnsagen', 'sternenregen', 'uhrArt', 'ruhe', 'ruheWarten', 'ruheArt', 'ruheWechsel'] as const
 export type GeteilteOptionen = Partial<Pick<Einstellungen, (typeof GETEILTE_OPTIONEN)[number]>>
 
 export interface TimerZustand {

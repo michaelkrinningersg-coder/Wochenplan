@@ -5,15 +5,48 @@
   import { deutscheStimmen, probeSprechen, type Stimme } from '../lib/vorlesen'
   import { onMount } from 'svelte'
   import ZeitWahl from '../komponenten/ZeitWahl.svelte'
-  import { abgleich, einstSpeichern, holen, hochladen, istEingerichtet, statusHochladen } from '../lib/abgleich.svelte'
+  import { abgleich, einstSpeichern, holen, hochladen, istEingerichtet, ruhebildFernLoeschen, ruhebildHochladen, statusHochladen } from '../lib/abgleich.svelte'
+  import { ruhe, ruhebildEntfernen, ruhebildSpeichern, ruhebildVorbereiten } from '../lib/ruhebilder.svelte'
   import { dateiExportieren, istApp } from '../lib/geraet'
   import { ABSCHNITTE } from '../lib/konstanten'
   import { app, exportDaten, importDaten, zeigeHinweis } from '../lib/speicher.svelte'
-  import { KIND_FARBEN, startplan } from '../lib/startplan'
+  import { KIND_FARBEN, neueId, startplan } from '../lib/startplan'
   import { minutenVon } from '../lib/zeit'
   import { installieren, suchen, update, updateVerfuegbar } from '../lib/update.svelte'
 
   let zuruecksetzenFragen = $state(false)
+
+  // ---------- Fotos für das Ruhebild ----------
+  let fotoFeld = $state<HTMLInputElement>()
+  let ordnerFeld = $state<HTMLInputElement>()
+  let fotoLaedt = $state(false)
+  let fotoFortschritt = $state('')
+  async function fotosGewaehlt(e: Event) {
+    const dateien = [...((e.target as HTMLInputElement).files ?? [])].filter((f) => f.type.startsWith('image/')).slice(0, 40)
+    ;(e.target as HTMLInputElement).value = ''
+    if (!dateien.length) return
+    fotoLaedt = true
+    let n = 0
+    for (const d of dateien) {
+      fotoFortschritt = `${++n} von ${dateien.length}`
+      try {
+        const daten = await ruhebildVorbereiten(d)
+        const id = neueId()
+        await ruhebildSpeichern(id, daten)
+        app.plan.ruhebilder = [...(app.plan.ruhebilder ?? []), id].slice(-60)
+        void ruhebildHochladen(id, daten)
+      } catch {
+        zeigeHinweis(`${d.name} konnte nicht geladen werden.`)
+      }
+    }
+    fotoLaedt = false
+    zeigeHinweis(`${dateien.length} Foto${dateien.length === 1 ? '' : 's'} hinzugefügt`)
+  }
+  function fotoLoeschen(id: string) {
+    app.plan.ruhebilder = (app.plan.ruhebilder ?? []).filter((x) => x !== id)
+    void ruhebildEntfernen(id)
+    void ruhebildFernLoeschen(id)
+  }
 
   // Stimmen für die Sprachausgabe
   const TEMPI = [
@@ -299,6 +332,53 @@
     </section>
 
     <section>
+      <h3>Ruhebild und Live-Modus</h3>
+      <p class="hilfe">
+        Auf dem Fernseher erscheint nach einer Weile ohne Bedienung ein Ruhebild, wenn gerade kein Timer läuft. Hat eine Aufgabe eine feste Zeit
+        (von–bis), wird sie in dieser Zeit groß gezeigt. Eine Taste auf der Fernbedienung oder Antippen führt zurück.
+      </p>
+      <div class="reihe">
+        <button class="knopf klein" aria-pressed={(app.einst.ruhe ?? 'an') === 'an'} onclick={() => (app.einst.ruhe = 'an')}>An</button>
+        <button class="knopf klein" aria-pressed={app.einst.ruhe === 'aus'} onclick={() => (app.einst.ruhe = 'aus')}>Aus</button>
+        <span class="name zeile">nach</span>
+        {#each [2, 5, 10, 15, 30] as m (m)}
+          <button class="knopf klein" aria-pressed={(app.einst.ruheWarten ?? 5) === m} onclick={() => (app.einst.ruheWarten = m)}>{m} Min</button>
+        {/each}
+      </div>
+      <div class="reihe">
+        <span class="name zeile">Bild</span>
+        <button class="knopf klein" aria-pressed={(app.einst.ruheArt ?? 'jahreszeit') === 'jahreszeit'} onclick={() => (app.einst.ruheArt = 'jahreszeit')}>Jahreszeit</button>
+        <button class="knopf klein" aria-pressed={app.einst.ruheArt === 'fotos'} onclick={() => (app.einst.ruheArt = 'fotos')}>Eigene Fotos</button>
+        <button class="knopf klein" onclick={() => ((app.dialog = null), (app.ruheVorschau = true))}>Vorschau zeigen</button>
+      </div>
+      {#if app.einst.ruheArt === 'fotos'}
+        <div class="reihe">
+          <button class="knopf" onclick={() => fotoFeld?.click()} disabled={fotoLaedt}><Symbol name="bild" />Fotos hinzufügen</button>
+          {#if !istApp}<button class="knopf" onclick={() => ordnerFeld?.click()} disabled={fotoLaedt}>Ganzen Ordner</button>{/if}
+          <span class="name zeile">Wechsel alle</span>
+          {#each [10, 20, 60] as sek (sek)}
+            <button class="knopf klein" aria-pressed={(app.einst.ruheWechsel ?? 20) === sek} onclick={() => (app.einst.ruheWechsel = sek)}>{sek} s</button>
+          {/each}
+        </div>
+        <input bind:this={fotoFeld} type="file" accept="image/*" multiple hidden onchange={fotosGewaehlt} />
+        <input bind:this={ordnerFeld} type="file" accept="image/*" multiple hidden webkitdirectory onchange={fotosGewaehlt} />
+        {#if fotoLaedt}<p class="hilfe">Fotos werden vorbereitet … {fotoFortschritt}</p>{/if}
+        {#if (app.plan.ruhebilder ?? []).length}
+          <div class="ruhefotos">
+            {#each app.plan.ruhebilder ?? [] as id (id)}
+              <div class="ruhefoto">
+                {#if ruhe.bilder[id]}<img src={ruhe.bilder[id]} alt="" />{:else}<span class="laedt">…</span>{/if}
+                <button class="knopf klein gefahr" onclick={() => fotoLoeschen(id)} aria-label="Foto entfernen"><Symbol name="muell" /></button>
+              </div>
+            {/each}
+          </div>
+        {:else}
+          <p class="hilfe">Noch keine Fotos. Ohne Fotos wird das Jahreszeiten-Bild gezeigt.</p>
+        {/if}
+      {/if}
+    </section>
+
+    <section>
       <h3>Sichern</h3>
       <div class="reihe">
         <button class="knopf" onclick={exportieren}>Plan als Datei sichern</button>
@@ -344,6 +424,37 @@
 </Fenster>
 
 <style>
+  .ruhefotos {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 8px;
+  }
+  .ruhefoto {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--himmel);
+  }
+  .ruhefoto img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .ruhefoto .knopf {
+    position: absolute;
+    right: 4px;
+    bottom: 4px;
+    min-height: 0;
+    padding: 5px;
+    font-size: 14px;
+    border-radius: 50%;
+  }
+  .laedt {
+    display: grid;
+    place-items: center;
+    height: 100%;
+  }
   .stimme {
     display: flex;
     flex-direction: column;

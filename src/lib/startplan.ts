@@ -115,6 +115,7 @@ function aufgabeNormalisieren(x: Record<string, unknown>): Aufgabe | null {
     minuten: Number.isFinite(x.minuten) ? Math.max(0, Math.min(600, Math.round(x.minuten as number))) : 0,
     ...(typeof x.zusatz === 'string' && x.zusatz ? { zusatz: x.zusatz } : {}),
     ...(typeof x.uhrzeit === 'string' && UHR.test(x.uhrzeit) ? { uhrzeit: x.uhrzeit } : {}),
+    ...(typeof x.bis === 'string' && UHR.test(x.bis) ? { bis: x.bis } : {}),
     ...(fuer.length === 1 ? { fuer } : {}),
     ...(x.countdown === true ? { countdown: true } : {}),
     ...(x.sternenregen === true ? { sternenregen: true } : {}),
@@ -197,6 +198,7 @@ export function planNormalisieren(roh: unknown): Plan {
     datumVorlage,
     abschnitte,
     ...(optionen ? { optionen } : {}),
+    ...(Array.isArray(p.ruhebilder) ? { ruhebilder: p.ruhebilder.filter((x): x is string => typeof x === 'string' && /^[a-z0-9-]{4,40}$/i.test(x)).slice(0, 60) } : {}),
   }
   const vonStand = typeof p.stand === 'number' ? p.stand : 1
   if (vonStand < STAND) umstellen(plan, vonStand)
@@ -215,6 +217,10 @@ function optionenNormalisieren(roh: unknown): GeteilteOptionen | undefined {
   if (typeof o.zeitAnsagen === 'boolean') r.zeitAnsagen = o.zeitAnsagen
   if (o.sternenregen === 'alle' || o.sternenregen === 'auswahl' || o.sternenregen === 'aus') r.sternenregen = o.sternenregen
   if (o.uhrArt === 'digital' || o.uhrArt === 'analog') r.uhrArt = o.uhrArt
+  if (o.ruhe === 'an' || o.ruhe === 'aus') r.ruhe = o.ruhe
+  if (typeof o.ruheWarten === 'number' && o.ruheWarten >= 1 && o.ruheWarten <= 60) r.ruheWarten = o.ruheWarten
+  if (o.ruheArt === 'jahreszeit' || o.ruheArt === 'fotos') r.ruheArt = o.ruheArt
+  if (typeof o.ruheWechsel === 'number' && o.ruheWechsel >= 5 && o.ruheWechsel <= 600) r.ruheWechsel = o.ruheWechsel
   return Object.keys(r).length ? r : undefined
 }
 

@@ -1,6 +1,7 @@
 // Abgleich über GitHub: Der Planer (Handy/PC) lädt den Plan verschlüsselt hoch,
 // der Fernseher holt ihn regelmäßig ab. Ohne Familien-Passwort ist die Datei nicht lesbar.
 import { istApp } from './geraet'
+import { ruhe, ruhebildEntfernen, ruhebildSpeichern } from './ruhebilder.svelte'
 import { app, erledigtKuerzen, exportDaten, importDaten, zeigeHinweis, type ErledigtStand } from './speicher.svelte'
 
 export interface AbgleichEinst {
@@ -332,6 +333,71 @@ function gleich(a: ErledigtStand, b: ErledigtStand): boolean {
   return JSON.stringify(a) === JSON.stringify(b)
 }
 
+// ---------- Eigene Fotos für das Ruhebild (je Foto eine verschlüsselte Datei) ----------
+
+function ruhebildDatei(id: string): string {
+  const teile = abgleich.einst.datei.split('/')
+  teile[teile.length - 1] = `ruhebilder/${id}.json`
+  return teile.join('/')
+}
+
+export async function ruhebildHochladen(id: string, daten: string): Promise<boolean> {
+  if (!istEingerichtet() || !abgleich.einst.token) return false
+  try {
+    const paket = await verschluesseln(JSON.stringify({ daten }), abgleich.einst.passwort, Date.now())
+    const r = await fetch(apiUrl(ruhebildDatei(id)), {
+      method: 'PUT',
+      headers: kopf({ Accept: 'application/vnd.github+json', 'Content-Type': 'application/json' }),
+      body: JSON.stringify({ message: 'Ruhebild', content: zuB64(enc.encode(JSON.stringify(paket))), branch: abgleich.einst.zweig }),
+    })
+    return r.ok || r.status === 422 // 422: gibt es schon
+  } catch (e) {
+    console.warn('Ruhebild hochladen', e)
+    return false
+  }
+}
+
+export async function ruhebildFernLoeschen(id: string) {
+  if (!istEingerichtet() || !abgleich.einst.token) return
+  try {
+    const ref = encodeURIComponent(abgleich.einst.zweig)
+    const meta = await fetch(`${apiUrl(ruhebildDatei(id))}?ref=${ref}`, { headers: kopf({ Accept: 'application/vnd.github+json' }), cache: 'no-store' })
+    if (!meta.ok) return
+    const { sha } = (await meta.json()) as { sha: string }
+    await fetch(apiUrl(ruhebildDatei(id)), {
+      method: 'DELETE',
+      headers: kopf({ Accept: 'application/vnd.github+json', 'Content-Type': 'application/json' }),
+      body: JSON.stringify({ message: 'Ruhebild entfernt', sha, branch: abgleich.einst.zweig }),
+    })
+  } catch (e) {
+    console.warn('Ruhebild löschen', e)
+  }
+}
+
+let ruheLaeuft = false
+/** Fehlende Fotos holen, entfernte Fotos lokal löschen */
+export async function ruhebilderAbgleichen() {
+  if (ruheLaeuft || !ruhe.geladen) return
+  ruheLaeuft = true
+  try {
+    const liste = app.plan.ruhebilder ?? []
+    for (const id of Object.keys(ruhe.bilder)) if (!liste.includes(id)) await ruhebildEntfernen(id)
+    if (!istEingerichtet()) return
+    const ref = encodeURIComponent(abgleich.einst.zweig)
+    for (const id of liste) {
+      if (ruhe.bilder[id]) continue
+      const r = await fetch(`${apiUrl(ruhebildDatei(id))}?ref=${ref}`, { headers: kopf({ Accept: 'application/vnd.github.raw+json' }), cache: 'no-store' })
+      if (!r.ok) continue
+      const daten = (JSON.parse(await entschluesseln((await r.json()) as Paket, abgleich.einst.passwort)) as { daten?: string }).daten
+      if (typeof daten === 'string' && daten.startsWith('data:image/')) await ruhebildSpeichern(id, daten)
+    }
+  } catch (e) {
+    console.warn('Ruhebilder abgleichen', e)
+  } finally {
+    ruheLaeuft = false
+  }
+}
+
 let statusEtag = ''
 let statusLaeuft = false
 
@@ -456,6 +522,7 @@ export function abgleichStarten(): () => void {
     if (abgleich.einst.rolle === 'planer' && abgleich.stand.lokal > abgleich.stand.synchron) void hochladen()
     else void holen()
     void statusHolen()
+    void ruhebilderAbgleichen()
   }
   takt()
   // Planer schauen öfter nach (zweites Handy), solange die App sichtbar ist
