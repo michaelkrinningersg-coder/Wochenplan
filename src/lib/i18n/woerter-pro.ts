@@ -1,5 +1,6 @@
 export const W = {
   en: {
+    "Davor": "Before",
     "Morgenroutine": "Morning routine",
     "bis zu {n} Kacheln": "up to {n} tiles",
     "Plan sichern und teilen": "Back up and share the plan",
@@ -27,6 +28,7 @@ export const W = {
     "Du nutzt die kostenlose Version: Morgenroutine mit bis zu {n} Kacheln.": "You are using the free version: morning routine with up to {n} tiles.",
   },
   es: {
+    "Davor": "Antes",
     "Morgenroutine": "Rutina de la mañana",
     "bis zu {n} Kacheln": "hasta {n} tarjetas",
     "Plan sichern und teilen": "Guardar y compartir el plan",
@@ -54,6 +56,7 @@ export const W = {
     "Du nutzt die kostenlose Version: Morgenroutine mit bis zu {n} Kacheln.": "Usas la versión gratuita: rutina de la mañana con hasta {n} tarjetas.",
   },
   fr: {
+    "Davor": "Avant",
     "Morgenroutine": "Routine du matin",
     "bis zu {n} Kacheln": "jusqu'à {n} cartes",
     "Plan sichern und teilen": "Sauvegarder et partager le plan",

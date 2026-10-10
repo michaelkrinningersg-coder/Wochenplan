@@ -19,6 +19,7 @@
     istHeute,
     minutenBisStart,
     naechsteNach,
+    vorigeVor,
     oeffnen,
     setzeErledigt,
     timerAendern,
@@ -52,6 +53,7 @@
   const tm = $derived(timerRest(id, dauerMs))
   const bisStart = $derived(aufgabe ? minutenBisStart(tag, aufgabe) : null)
   const danach = $derived(naechsteNach(tag, id))
+  const davor = $derived(vorigeVor(tag, id))
 
   const ampel = $derived.by((): 'rot' | 'gelb' | 'gruen' | 'aus' => {
     if (!mitTimer) return 'aus'
@@ -206,6 +208,21 @@
         </div>
       {/if}
 
+      {#if danach || davor}
+      <div class="folge">
+      {#if davor}
+        <button
+          class="danach davor"
+          data-seg={segVon(davor.abschnitt)}
+          data-fokus-id="davor"
+          onclick={() => oeffnen({ art: 'aufgabe', tag, abschnitt: davor.abschnitt, id: davor.aufgabe.id })}
+        >
+          <Symbol name="weiter" />
+          <span class="danach-bild"><Bild id={davor.aufgabe.bild} zusatz={davor.aufgabe.zusatz} /></span>
+          <span class="danach-name">{davor.aufgabe.titel}</span>
+          <span class="danach-text">{t('Davor')}</span>
+        </button>
+      {/if}
       {#if danach}
         <button
           class="danach"
@@ -218,6 +235,8 @@
           <span class="danach-name">{danach.aufgabe.titel}</span>
           <Symbol name="weiter" />
         </button>
+      {/if}
+      </div>
       {/if}
     </div>
 
@@ -369,6 +388,15 @@
     background: var(--seg-hell);
     box-shadow: inset 0 0 0 3px var(--seg);
     font-size: var(--t-text);
+  }
+  .folge {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+  }
+  .davor :global(svg) {
+    transform: scaleX(-1);
   }
   .danach-text {
     color: var(--tinte-leise);

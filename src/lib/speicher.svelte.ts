@@ -304,6 +304,13 @@ export function naechsteNach(tag: TagId, id: string): { abschnitt: AbschnittId; 
   return rest.find((x) => !istErledigt(x.aufgabe)) ?? rest[0] ?? null
 }
 
+/** Die Aufgabe direkt vor `id` in der Tagesreihenfolge (zum Zurückschalten nach versehentlichem Weiter) */
+export function vorigeVor(tag: TagId, id: string): { abschnitt: AbschnittId; aufgabe: Aufgabe } | null {
+  const liste = tagesListe(tag)
+  const i = liste.findIndex((x) => x.aufgabe.id === id)
+  return i > 0 ? liste[i - 1] : null
+}
+
 /** Minuten bis zur festen Uhrzeit einer Aufgabe (nur heute, nur Zukunft) */
 export function minutenBisStart(tag: TagId, aufgabe: Aufgabe): number | null {
   if (!aufgabe.uhrzeit || !istHeute(tag)) return null
