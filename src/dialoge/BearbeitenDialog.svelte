@@ -1,5 +1,7 @@
 <script lang="ts">
+  import AufgabenBild from '../komponenten/AufgabenBild.svelte'
   import Bild from '../komponenten/Bild.svelte'
+  import BildZuschnitt from '../komponenten/BildZuschnitt.svelte'
   import Fenster from '../komponenten/Fenster.svelte'
   import Symbol from '../komponenten/Symbol.svelte'
   import ZeitWahl from '../komponenten/ZeitWahl.svelte'
@@ -7,13 +9,15 @@
   import { ICON_GROUPS, ICON_LIST } from '../lib/iconliste'
   import { ABSCHNITTE, ZUSAETZE, tagName } from '../lib/konstanten'
   import { app, aufgabeLoeschen, aufgabeSpeichern, fotoHinzufuegen, zeigeHinweis } from '../lib/speicher.svelte'
-  import type { AbschnittId, Aufgabe, TagId } from '../lib/typen'
+  import type { AbschnittId, Aufgabe, KindId, TagId, Termin } from '../lib/typen'
+  import { ausKey } from '../lib/zeit'
   import { VORLAGEN, type Vorlage } from '../lib/vorlagen'
 
-  let props: { tag: TagId; abschnitt: AbschnittId; aufgabe: Aufgabe; neu: boolean } = $props()
+  let props: { tag: TagId; abschnitt: AbschnittId; aufgabe: Aufgabe; neu: boolean; datum?: string } = $props()
   // Werte festhalten: Nach dem Schließen (app.dialog = null) sind die Props nicht mehr lesbar
   // svelte-ignore state_referenced_locally
-  const { tag, abschnitt: startAbschnitt, aufgabe: start, neu } = props
+  const { tag, abschnitt: startAbschnitt, aufgabe: start, neu, datum } = props
+  const istTerminModus = !!datum
 
   // Arbeitskopie (die Props sind die Ausgangswerte; Änderungen gelten erst beim Speichern)
   // svelte-ignore state_referenced_locally
@@ -33,29 +37,56 @@
     entwurf.bild = id
   }
 
+  /** Foto aus der Galerie: erst groß laden, dann zuschneiden */
+  let zuschnittQuelle = $state<string | null>(null)
   async function fotoGewaehlt(e: Event) {
     const datei = (e.target as HTMLInputElement).files?.[0]
     if (!datei) return
     try {
-      const daten = await fotoVerkleinern(datei)
-      fotoAlt = daten
-      entwurf.bild = fotoHinzufuegen(daten)
+      zuschnittQuelle = await fotoVerkleinern(datei, 1400)
     } catch {
       zeigeHinweis('Das Foto konnte nicht geladen werden.')
     } finally {
       ;(e.target as HTMLInputElement).value = ''
     }
   }
+  function zuschnittFertig(daten: string) {
+    fotoAlt = daten
+    entwurf.foto = fotoHinzufuegen(daten)
+    if (!entwurf.fotoModus) entwurf.fotoModus = 'wechsel'
+    zuschnittQuelle = null
+  }
+
+  function fuerSetzen(k: 'alle' | KindId) {
+    entwurf.fuer = k === 'alle' ? undefined : [k]
+  }
 
   function speichern() {
-    const fertig: Aufgabe = { ...entwurf, titel: entwurf.titel.trim() || 'Aufgabe' }
-    if (!fertig.zusatz) delete fertig.zusatz
-    if (!fertig.uhrzeit) delete fertig.uhrzeit
+    const fertig: Aufgabe = { ...$state.snapshot(entwurf), titel: entwurf.titel.trim() || 'Aufgabe' }
+    for (const f of ['zusatz', 'uhrzeit', 'fuer', 'countdown', 'foto', 'fotoModus', 'wechselSek'] as const)
+      if (fertig[f] === undefined || fertig[f] === false || fertig[f] === '') delete fertig[f]
+    if (!fertig.foto) {
+      delete fertig.fotoModus
+      delete fertig.wechselSek
+    }
+    if (istTerminModus) {
+      const termin: Termin = { ...fertig, datum: datum!, abschnitt }
+      const i = app.plan.termine.findIndex((t) => t.id === termin.id)
+      if (i >= 0) app.plan.termine[i] = termin
+      else app.plan.termine.push(termin)
+      app.dialog = { art: 'datum', datum: datum! }
+      return
+    }
     aufgabeSpeichern(tag, abschnitt, fertig)
     app.dialog = null
   }
 
   function loeschen() {
+    if (istTerminModus) {
+      app.plan.termine = app.plan.termine.filter((t) => t.id !== entwurf.id)
+      app.dialog = { art: 'datum', datum: datum! }
+      return
+    }
     aufgabeLoeschen(tag, entwurf.id)
     app.dialog = null
   }
@@ -78,7 +109,14 @@
   const gruppenIcons = $derived(ICON_LIST.filter((i) => i.group === gruppe))
 </script>
 
-<Fenster titel={neu ? `Neue Aufgabe am ${tagName(tag)}` : 'Aufgabe ändern'} breit>
+<Fenster
+  titel={istTerminModus
+    ? `Termin am ${ausKey(datum!).toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' })}`
+    : neu
+      ? `Neue Aufgabe am ${tagName(tag)}`
+      : 'Aufgabe ändern'}
+  breit
+>
   <form
     class="formular"
     onsubmit={(e) => {
@@ -87,7 +125,7 @@
     }}
   >
     <div class="vorschau" data-seg={abschnitt}>
-      <div class="vorschau-bild"><Bild id={entwurf.bild} zusatz={entwurf.zusatz} /></div>
+      <div class="vorschau-bild"><AufgabenBild aufgabe={entwurf} /></div>
       <span class="vorschau-titel">{entwurf.titel || 'Neue Aufgabe'}</span>
     </div>
 
@@ -142,6 +180,28 @@
 
       <div class="feld zwei">
         <div>
+          <span class="name">Für</span>
+          <div class="reihe">
+            <button type="button" class="knopf klein" aria-pressed={!entwurf.fuer?.length} onclick={() => fuerSetzen('alle')}>Beide</button>
+            {#each app.plan.kinder as k (k.id)}
+              <button type="button" class="knopf klein kind" style="--kind: {k.farbe}" aria-pressed={entwurf.fuer?.length === 1 && entwurf.fuer[0] === k.id} onclick={() => fuerSetzen(k.id)}>
+                <span class="punkt"></span>{k.name}
+              </button>
+            {/each}
+          </div>
+        </div>
+        <div>
+          <span class="name">Countdown</span>
+          <div class="reihe">
+            <button type="button" class="knopf klein" aria-pressed={!!entwurf.countdown} onclick={() => (entwurf.countdown = !entwurf.countdown)}>
+              {entwurf.countdown ? 'Ja: „noch X× schlafen“' : 'Nein'}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="feld zwei">
+        <div>
           <span class="name">Timer</span>
           <div class="reihe">
             <button type="button" class="knopf rund" onclick={() => (entwurf.minuten = Math.max(0, entwurf.minuten - (entwurf.minuten > 10 ? 5 : 1)))} aria-label="Weniger Minuten">−</button>
@@ -161,20 +221,8 @@
           {#each ICON_GROUPS as g (g)}
             <button type="button" class="knopf klein" aria-pressed={gruppe === g} onclick={() => (gruppe = g)}>{g}</button>
           {/each}
-          <button type="button" class="knopf klein" aria-pressed={gruppe === 'Foto'} onclick={() => (gruppe = 'Foto')}>
-            <Symbol name="bild" />Eigenes Foto
-          </button>
         </div>
-        {#if gruppe === 'Foto'}
-          <div class="foto-bereich">
-            <p>Ein Foto vom Handy oder PC wählen, z. B. von der Kita, der Oma oder dem eigenen Zahnputzbecher. Es wird verkleinert und im Plan gespeichert.</p>
-            <button type="button" class="knopf haupt" onclick={() => dateiFeld?.click()}><Symbol name="bild" />Foto auswählen</button>
-            <input bind:this={dateiFeld} id="foto-datei" type="file" accept="image/*" hidden onchange={fotoGewaehlt} />
-            {#if entwurf.bild.startsWith('foto:') || fotoAlt}
-              <img class="foto-vorschau" src={bildUrl(entwurf.bild, app.fotos)} alt="Gewähltes Foto" />
-            {/if}
-          </div>
-        {:else}
+        {#if true}
           <div class="bildwahl">
             {#each gruppenIcons as ic (ic.id)}
               <button
@@ -188,6 +236,39 @@
                 <img src={bildUrl(ic.id, app.fotos)} alt="" draggable="false" />
               </button>
             {/each}
+          </div>
+        {/if}
+      </div>
+
+      <div class="feld">
+        <span class="name">Eigenes Foto</span>
+        {#if zuschnittQuelle}
+          <BildZuschnitt quelle={zuschnittQuelle} onfertig={zuschnittFertig} onabbrechen={() => (zuschnittQuelle = null)} />
+        {:else}
+          <div class="foto-bereich">
+            <div class="reihe">
+              <button type="button" class="knopf" onclick={() => dateiFeld?.click()}><Symbol name="bild" />{entwurf.foto ? 'Anderes Foto' : 'Foto aus der Galerie'}</button>
+              {#if entwurf.foto}
+                <img class="foto-vorschau" src={bildUrl(entwurf.foto, app.fotos)} alt="Gewähltes Foto" />
+                <button type="button" class="knopf klein gefahr" onclick={() => (entwurf.foto = undefined)}>Foto entfernen</button>
+              {/if}
+            </div>
+            <input bind:this={dateiFeld} id="foto-datei" type="file" accept="image/*" hidden onchange={fotoGewaehlt} />
+            {#if entwurf.foto}
+              <div class="reihe">
+                <span class="name zeile">Kachel zeigt</span>
+                <button type="button" class="knopf klein" aria-pressed={entwurf.fotoModus === 'bild'} onclick={() => (entwurf.fotoModus = 'bild')}>Bild</button>
+                <button type="button" class="knopf klein" aria-pressed={entwurf.fotoModus === 'foto'} onclick={() => (entwurf.fotoModus = 'foto')}>Foto</button>
+                <button type="button" class="knopf klein" aria-pressed={(entwurf.fotoModus ?? 'wechsel') === 'wechsel'} onclick={() => (entwurf.fotoModus = 'wechsel')}>Abwechselnd</button>
+                {#if (entwurf.fotoModus ?? 'wechsel') === 'wechsel'}
+                  <button type="button" class="knopf rund" onclick={() => (entwurf.wechselSek = Math.max(2, (entwurf.wechselSek ?? 5) - 1))} aria-label="Schneller wechseln">−</button>
+                  <span class="wert">alle {entwurf.wechselSek ?? 5} s</span>
+                  <button type="button" class="knopf rund" onclick={() => (entwurf.wechselSek = Math.min(60, (entwurf.wechselSek ?? 5) + 1))} aria-label="Langsamer wechseln">+</button>
+                {/if}
+              </div>
+            {:else}
+              <p>Zum Beispiel die Kita, Oma oder der eigene Zahnputzbecher. Das Foto wird quadratisch zugeschnitten und kann mit dem Bild abwechseln.</p>
+            {/if}
           </div>
         {/if}
       </div>
@@ -207,7 +288,7 @@
       <div class="aktionen">
         <button type="submit" class="knopf haupt" data-autofokus={neu ? true : undefined}><Symbol name="haken" />Speichern</button>
         <button type="button" class="knopf" onclick={() => (app.dialog = null)}>Abbrechen</button>
-        {#if !neu}
+        {#if !neu && !istTerminModus}
           <button
             type="button"
             class="knopf"
@@ -216,6 +297,8 @@
               app.dialog = { art: 'aufgabeKopieren', tag, id: entwurf.id }
             }}><Symbol name="kopie" />Kopieren nach …</button
           >
+        {/if}
+        {#if !neu}
           {#if loeschenFragen}
             <button type="button" class="knopf gefahr" onclick={loeschen}><Symbol name="muell" />Wirklich löschen</button>
           {:else}
@@ -308,7 +391,7 @@
   .abschnitt-wahl[aria-pressed='true'] {
     background: var(--seg);
     border-color: var(--seg-tief);
-    color: var(--tinte-auf-farbe);
+    color: var(--seg-text, var(--tinte-auf-farbe));
   }
   .zusatz img {
     width: 1.3em;
@@ -375,9 +458,19 @@
     color: var(--tinte-leise);
     font-size: var(--t-klein);
   }
+  .kind .punkt {
+    width: 0.8em;
+    height: 0.8em;
+    border-radius: 50%;
+    background: var(--kind);
+  }
+  .name.zeile {
+    align-self: center;
+    margin: 0 4px 0 0;
+  }
   .foto-vorschau {
-    width: 160px;
-    height: 160px;
+    width: 64px;
+    height: 64px;
     object-fit: cover;
     border-radius: 20px;
   }

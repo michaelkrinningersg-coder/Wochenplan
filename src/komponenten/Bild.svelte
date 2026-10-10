@@ -1,15 +1,16 @@
 <script lang="ts">
-  import { bildUrl } from '../lib/bilder'
+  import { bildUrl, IST_KARTE } from '../lib/bilder'
   import { ZUSAETZE } from '../lib/konstanten'
   import { app } from '../lib/speicher.svelte'
 
   let { id, zusatz }: { id: string; zusatz?: string } = $props()
 
   const istFoto = $derived(id.startsWith('foto:'))
+  const istKarte = $derived(IST_KARTE.has(id))
   const zusatzBild = $derived(zusatz ? ZUSAETZE.find((z) => z.id === zusatz)?.bild : undefined)
 </script>
 
-<span class="bild" class:foto={istFoto}>
+<span class="bild" class:foto={istFoto} class:karte={istKarte}>
   <img src={bildUrl(id, app.fotos)} alt="" draggable="false" />
   {#if zusatzBild}
     <span class="zusatz"><img src={bildUrl(zusatzBild, app.fotos)} alt="" draggable="false" /></span>
@@ -32,6 +33,11 @@
   .foto > img {
     object-fit: cover;
     border-radius: 16%;
+  }
+  /* gemalte Karten: weißer Grund, abgerundet */
+  .karte > img {
+    border-radius: 14%;
+    background: #ffffff;
   }
   .zusatz {
     position: absolute;

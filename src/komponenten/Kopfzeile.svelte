@@ -15,6 +15,10 @@
     switch (a.art) {
       case 'woche':
         return 'Woche'
+      case 'monat':
+        return 'Kalender'
+      case 'jahr':
+        return 'Jahresplan'
       case 'tag':
         return tagName(a.tag)
       case 'abschnitt':
@@ -26,6 +30,9 @@
     switch (a.art) {
       case 'woche':
         return 'jede Woche gleich'
+      case 'monat':
+      case 'jahr':
+        return 'Termine und Geburtstage'
       case 'tag':
         return istHeute(a.tag) ? `heute, ${datumLang(jetzt)}` : 'jede Woche'
       case 'abschnitt':
@@ -63,6 +70,13 @@
       </button>
       <button class="knopf" aria-pressed={a.art === 'woche'} onclick={() => oeffnen({ art: 'woche' })}>
         <Symbol name="woche" /><span class="wort">Woche</span>
+      </button>
+      <button
+        class="knopf"
+        aria-pressed={a.art === 'monat' || a.art === 'jahr'}
+        onclick={() => oeffnen({ art: 'monat', jahr: jetzt.getFullYear(), monat: jetzt.getMonth() })}
+      >
+        <Symbol name="kalender" /><span class="wort">Kalender</span>
       </button>
     </nav>
 

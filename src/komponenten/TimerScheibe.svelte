@@ -44,7 +44,7 @@
         class="strich"
       />
     {/each}
-    <circle cx={M} cy={M} r={R * 0.68} class="teller" />
+    <circle cx={M} cy={M} r={R * 0.7} class="teller" />
   </svg>
   <div class="mitte">
     {@render children()}
@@ -82,8 +82,9 @@
     position: absolute;
     left: 50%;
     top: 50%;
-    width: 50%;
-    height: 50%;
+    /* Bild passt ganz in den weißen Teller: Diagonale 0,46 × √2 ≈ 0,65 < 0,67 */
+    width: 46%;
+    height: 46%;
     transform: translate(-50%, -50%);
   }
 </style>

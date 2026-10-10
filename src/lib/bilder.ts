@@ -4,10 +4,22 @@ const dateien = import.meta.glob('../assets/icons/*.svg', {
   import: 'default',
 }) as Record<string, string>
 
+// Gemalte Bildkarten (WebP) ersetzen gleichnamige Symbole
+const karten = import.meta.glob('../assets/karten/*.webp', {
+  eager: true,
+  query: '?url',
+  import: 'default',
+}) as Record<string, string>
+
 export const ICON_URL: Record<string, string> = {}
+export const IST_KARTE = new Set<string>()
 for (const [pfad, url] of Object.entries(dateien)) {
-  const name = pfad.split('/').pop()!.replace(/\.svg$/, '')
+  ICON_URL[pfad.split('/').pop()!.replace(/\.svg$/, '')] = url
+}
+for (const [pfad, url] of Object.entries(karten)) {
+  const name = pfad.split('/').pop()!.replace(/\.webp$/, '')
   ICON_URL[name] = url
+  IST_KARTE.add(name)
 }
 
 export function bildUrl(id: string, fotos: Record<string, string>): string {

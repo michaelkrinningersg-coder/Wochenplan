@@ -9,6 +9,7 @@
   import {
     allesErledigt,
     app,
+    aufgabenIn,
     istErledigt,
     istHeute,
     jetztUndDanach,
@@ -48,20 +49,23 @@
   const phase = $derived(tagesPhase(app.plan, new Date(app.jetzt)))
   const jd = $derived(jetztUndDanach(tag))
   const schmal = $derived(breite > 0 && breite < 640)
-  const tagLeer = $derived(ABSCHNITTE.every((a) => app.plan.woche[tag][a.id].length === 0))
+  const tagLeer = $derived(ABSCHNITTE.every((a) => aufgabenIn(tag, a.id).length === 0))
 
   // Platz für Kacheln: Gesamthöhe minus Spaltenkopf und Innenabstände
   const KOPF = 84
   const INNEN = 10
+  const anzahlen = $derived(ABSCHNITTE.map((a) => aufgabenIn(tag, a.id).length + (app.bearbeiten ? 1 : 0)))
+  // Leere Abschnitte werden schmal, damit auf dem Fernseher alles passt
+  const LEER = 54
   const raster = $derived(
     tagesRaster(
-      ABSCHNITTE.map((a) => app.plan.woche[tag][a.id].length + (app.bearbeiten ? 1 : 0)),
+      anzahlen,
       breite,
       Math.max(80, hoehe - KOPF - 2 * INNEN),
       12,
       10,
       INNEN,
-      118,
+      anzahlen.map((n) => (n === 0 ? LEER : 80)),
     ),
   )
   const s = $derived(schmal ? 92 : raster.s)
@@ -84,12 +88,13 @@
   {:else}
     <div class="spalten" bind:this={spaltenEl} bind:clientWidth={breite} bind:clientHeight={hoehe}>
       {#each ABSCHNITTE as ab, i (ab.id)}
-        {@const liste = app.plan.woche[tag][ab.id]}
+        {@const liste = aufgabenIn(tag, ab.id)}
         <section
           class="spalte"
           class:aktiv={aktiverAbschnitt(ab.id)}
+          class:leer={anzahlen[i] === 0}
           data-seg={ab.id}
-          style={schmal ? '' : `flex: 1 1 ${raster.breiten[i]}px`}
+          style={schmal ? '' : anzahlen[i] === 0 ? `flex: 0 0 ${LEER}px` : `flex: 1 1 ${raster.breiten[i]}px`}
         >
           <button
             class="kopf"
@@ -105,6 +110,9 @@
               <span class="kopf-zeit">{spanneText(app.plan, ab.id)}</span>
             </span>
           </button>
+          {#if anzahlen[i] === 0 && !schmal}
+            <span class="senkrecht" aria-hidden="true">{ab.name}</span>
+          {/if}
           <div
             class="kacheln"
             data-zone
@@ -119,7 +127,7 @@
                 groesse={s}
                 status={jd.jetzt === aufgabe.id ? 'jetzt' : jd.danach === aufgabe.id ? 'danach' : ''}
                 autofokus={jd.jetzt === aufgabe.id}
-                erledigt={heute && istErledigt(aufgabe.id)}
+                erledigt={heute && istErledigt(aufgabe)}
                 bisStart={minutenBisStart(tag, aufgabe)}
                 onwahl={(e) => aufgabeGewaehlt(e, tag, ab.id, aufgabe)}
               />
@@ -171,7 +179,7 @@
     border: none;
     border-radius: 26px 26px 0 0;
     background: var(--seg);
-    color: var(--tinte-auf-farbe);
+    color: var(--seg-text, var(--tinte-auf-farbe));
     text-align: center;
     flex: none;
   }
@@ -214,9 +222,36 @@
   .kopf-name {
     font-family: var(--schrift-titel);
     font-weight: 600;
-    font-size: var(--t-text);
+    font-size: clamp(12px, 1.55vw, 22px);
     line-height: 1.05;
-    white-space: nowrap;
+    text-align: center;
+  }
+  /* Leerer Abschnitt: nur Symbol oben, Name senkrecht */
+  .spalte.leer .kopf {
+    padding: 6px 2px;
+  }
+  .spalte.leer .kopf-name {
+    display: none;
+  }
+  .spalte.leer .kopf-zeit {
+    font-size: 11px;
+    white-space: normal;
+    text-align: center;
+  }
+  .senkrecht {
+    flex: 1;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    text-align: center;
+    padding: 10px 0;
+    font-family: var(--schrift-titel);
+    font-weight: 600;
+    font-size: var(--t-klein);
+    color: var(--seg-tief);
+    opacity: 0.8;
+  }
+  .spalte.leer .kacheln {
+    display: none;
   }
   .kopf-zeit {
     font-size: var(--t-klein);

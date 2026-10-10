@@ -2,6 +2,9 @@
   import { onMount, tick, untrack } from 'svelte'
   import AbschnittAnsicht from './ansichten/AbschnittAnsicht.svelte'
   import AufgabeAnsicht from './ansichten/AufgabeAnsicht.svelte'
+  import JahresAnsicht from './ansichten/JahresAnsicht.svelte'
+  import MonatsAnsicht from './ansichten/MonatsAnsicht.svelte'
+  import DatumDialog from './dialoge/DatumDialog.svelte'
   import TagesAnsicht from './ansichten/TagesAnsicht.svelte'
   import WochenAnsicht from './ansichten/WochenAnsicht.svelte'
   import AktionDialog from './dialoge/AktionDialog.svelte'
@@ -12,6 +15,7 @@
   import Kopfzeile from './komponenten/Kopfzeile.svelte'
   import { abgleich, abgleichStarten, lokalGeaendert } from './lib/abgleich.svelte'
   import { gelbAb, rotAb } from './lib/ampel'
+  import { abschnittInfo } from './lib/konstanten'
   import { bewegeFokus, ersterFokus, fokusSetzen, richtungAusTaste } from './lib/fokus'
   import { bildschirmAnlassen, zurueckTaste } from './lib/geraet'
   import { app, finde, planErneuert, oeffnen, schrittVerschieben, speichern, tagVerschieben, zurueck } from './lib/speicher.svelte'
@@ -75,7 +79,7 @@
   const thema = $derived.by(() => {
     if (app.einst.thema !== 'auto') return app.einst.thema
     const p = tagesPhase(app.plan, new Date(app.jetzt))
-    return p.art === 'abschnitt' && p.id !== 'abend' && p.id !== 'bett' ? 'tag' : 'nacht'
+    return p.art === 'abschnitt' && !abschnittInfo(p.id).nacht ? 'tag' : 'nacht'
   })
 
   // Bearbeiten nur auf dem Planer-Gerät
@@ -205,6 +209,10 @@
         <TagesAnsicht tag={app.ansicht.tag} />
       {:else if app.ansicht.art === 'abschnitt'}
         <AbschnittAnsicht tag={app.ansicht.tag} abschnitt={app.ansicht.abschnitt} />
+      {:else if app.ansicht.art === 'monat'}
+        <MonatsAnsicht jahr={app.ansicht.jahr} monat={app.ansicht.monat} />
+      {:else if app.ansicht.art === 'jahr'}
+        <JahresAnsicht jahr={app.ansicht.jahr} />
       {:else}
         <AufgabeAnsicht tag={app.ansicht.tag} abschnitt={app.ansicht.abschnitt} id={app.ansicht.id} />
       {/if}
@@ -217,6 +225,20 @@
     {/key}
   {:else if app.dialog?.art === 'aktion'}
     <AktionDialog tag={app.dialog.tag} id={app.dialog.id} />
+  {:else if app.dialog?.art === 'datum'}
+    {#key app.dialog.datum}
+      <DatumDialog datum={app.dialog.datum} />
+    {/key}
+  {:else if app.dialog?.art === 'termin'}
+    {#key app.dialog.termin.id}
+      <BearbeitenDialog
+        tag={heuteTag()}
+        abschnitt={app.dialog.termin.abschnitt}
+        aufgabe={app.dialog.termin}
+        neu={app.dialog.neu}
+        datum={app.dialog.termin.datum}
+      />
+    {/key}
   {:else if app.dialog?.art === 'aufgabeKopieren'}
     <AufgabeKopierenDialog tag={app.dialog.tag} id={app.dialog.id} />
   {:else if app.dialog?.art === 'kopieren'}

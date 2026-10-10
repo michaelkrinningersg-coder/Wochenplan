@@ -1,5 +1,6 @@
 <script lang="ts">
   import Ampel from '../komponenten/Ampel.svelte'
+  import AufgabenBild from '../komponenten/AufgabenBild.svelte'
   import Bild from '../komponenten/Bild.svelte'
   import Symbol from '../komponenten/Symbol.svelte'
   import Konfetti from '../komponenten/Konfetti.svelte'
@@ -39,7 +40,7 @@
   const aufgabe = $derived(fund?.aufgabe)
   const seg = $derived(fund?.abschnitt ?? abschnitt)
   const heute = $derived(istHeute(tag))
-  const erledigt = $derived(heute && istErledigt(id))
+  const erledigt = $derived(heute && !!aufgabe && istErledigt(aufgabe))
   const mitTimer = $derived((aufgabe?.minuten ?? 0) > 0 || app.timer[id] !== undefined)
   const dauerMs = $derived(app.timer[id]?.dauerMs ?? (aufgabe?.minuten ?? 0) * 60_000)
   const t = $derived(timerRest(id, dauerMs))
@@ -68,7 +69,7 @@
 
   function fertig() {
     if (!aufgabe) return
-    setzeErledigt(id, true)
+    setzeErledigt(aufgabe, true)
     timerPause(id)
     const alles = allesErledigt(tag)
     if (app.einst.ton) spieleTon(alles ? 'alles' : 'fertig')
@@ -83,7 +84,7 @@
   }
 
   function nochmal() {
-    setzeErledigt(id, false)
+    if (aufgabe) setzeErledigt(aufgabe, false)
     timerZuruecksetzen(id)
   }
 
@@ -103,7 +104,7 @@
         groesse={scheibe}
       >
         <div class="bild" class:erledigt>
-          <Bild id={aufgabe.bild} zusatz={aufgabe.zusatz} />
+          <AufgabenBild {aufgabe} />
         </div>
       </TimerScheibe>
       {#if mitTimer && !erledigt}

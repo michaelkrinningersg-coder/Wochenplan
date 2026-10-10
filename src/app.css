@@ -54,6 +54,15 @@
   --bett: #7b93e3;
   --bett-tief: #3a4fa8;
   --bett-hell: #e1e7fb;
+  --aufstehen: #ffd2b8;
+  --aufstehen-tief: #cf6f45;
+  --aufstehen-hell: #fff1e8;
+  --frueh: #f7a072;
+  --frueh-tief: #b8542a;
+  --frueh-hell: #fde3d4;
+  --schlafen: #4a57a3;
+  --schlafen-tief: #232c66;
+  --schlafen-hell: #dcdff2;
 
   --gruen: #2fae66;
   --gruen-tief: #1f7a47;
@@ -95,7 +104,16 @@
     --nachmittag-hell: #223a31;
     --abend-hell: #302b62;
   --bett-hell: #232c5e;
+  --aufstehen-hell: #43333a;
+  --frueh-hell: #46302e;
+  --schlafen-hell: #1f2552;
     --bett-hell: #232c5e;
+  --aufstehen-hell: #43333a;
+  --frueh-hell: #46302e;
+  --schlafen-hell: #1f2552;
+    --aufstehen-hell: #43333a;
+    --frueh-hell: #46302e;
+    --schlafen-hell: #1f2552;
     --gehaeuse: #0e1228;
   --gruen-hell: #1d4636;
   --gruen-tief: #8fe0b2;
@@ -117,6 +135,9 @@
   --nachmittag-hell: #223a31;
   --abend-hell: #302b62;
   --bett-hell: #232c5e;
+  --aufstehen-hell: #43333a;
+  --frueh-hell: #46302e;
+  --schlafen-hell: #1f2552;
   --gehaeuse: #0e1228;
   --gruen-hell: #1d4636;
   --gruen-tief: #8fe0b2;
@@ -139,6 +160,9 @@
   --nachmittag-hell: #e2f5dc;
   --abend-hell: #e6e3fa;
   --bett-hell: #e1e7fb;
+  --aufstehen-hell: #fff1e8;
+  --frueh-hell: #fde3d4;
+  --schlafen-hell: #dcdff2;
   --gehaeuse: #22304f;
   --gruen-hell: #dcf5e6;
   --gruen-tief: #1f7a47;
@@ -159,6 +183,9 @@
   --nachmittag-hell: #223a31;
   --abend-hell: #302b62;
   --bett-hell: #232c5e;
+  --aufstehen-hell: #43333a;
+  --frueh-hell: #46302e;
+  --schlafen-hell: #1f2552;
   --gehaeuse: #0e1228;
   --gruen-hell: #1d4636;
   --gruen-tief: #8fe0b2;
@@ -172,6 +199,9 @@
 [data-seg='nachmittag'] { --seg: var(--nachmittag); --seg-tief: var(--nachmittag-tief); --seg-hell: var(--nachmittag-hell); }
 [data-seg='abend'] { --seg: var(--abend); --seg-tief: var(--abend-tief); --seg-hell: var(--abend-hell); }
 [data-seg='bett'] { --seg: var(--bett); --seg-tief: var(--bett-tief); --seg-hell: var(--bett-hell); }
+[data-seg='aufstehen'] { --seg: var(--aufstehen); --seg-tief: var(--aufstehen-tief); --seg-hell: var(--aufstehen-hell); }
+[data-seg='frueh'] { --seg: var(--frueh); --seg-tief: var(--frueh-tief); --seg-hell: var(--frueh-hell); }
+[data-seg='schlafen'] { --seg: var(--schlafen); --seg-tief: var(--schlafen-tief); --seg-hell: var(--schlafen-hell); --seg-text: #ffffff; }
 
 *,
 *::before,

@@ -4,7 +4,7 @@
   import { aufgabeGewaehlt } from '../lib/aktionen'
   import { ABSCHNITTE, TAGE } from '../lib/konstanten'
   import { wochenRaster } from '../lib/raster'
-  import { app, istErledigt, istHeute, neueAufgabe, oeffnen } from '../lib/speicher.svelte'
+  import { app, aufgabenIn, istErledigt, istHeute, neueAufgabe, oeffnen, vorlageFuer } from '../lib/speicher.svelte'
 
   let breite = $state(0)
   let hoehe = $state(0)
@@ -20,7 +20,7 @@
         ? 48
         : 40
       : wochenRaster(
-          TAGE.map((t) => ABSCHNITTE.map((a) => app.plan.woche[t.id][a.id].length + (app.bearbeiten ? 1 : 0))),
+          TAGE.map((t) => ABSCHNITTE.map((a) => aufgabenIn(t.id, a.id).length + (app.bearbeiten ? 1 : 0))),
           spaltenBreite,
           hoehe,
           KOPF,
@@ -53,13 +53,13 @@
       <div class="baender">
         {#each ABSCHNITTE as ab (ab.id)}
           <div class="band" data-seg={ab.id} data-zone data-tag={t.id} data-abschnitt={ab.id} style="--luecke: {LUECKE}px">
-            {#each app.plan.woche[t.id][ab.id] as aufgabe (aufgabe.id)}
+            {#each aufgabenIn(t.id, ab.id) as aufgabe (aufgabe.id)}
               <Kachel
                 {aufgabe}
                 tag={t.id}
                 groesse={s}
                 mini
-                erledigt={heute && istErledigt(aufgabe.id)}
+                erledigt={heute && istErledigt(aufgabe)}
                 onwahl={(e) => aufgabeGewaehlt(e, t.id, ab.id, aufgabe)}
               />
             {/each}

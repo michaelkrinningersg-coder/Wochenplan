@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { app, verschiebeAufgabe } from '../lib/speicher.svelte'
+  import { app, istTermin, verschiebeAufgabe } from '../lib/speicher.svelte'
   import type { Aufgabe, TagId } from '../lib/typen'
   import { inText } from '../lib/zeit'
   import { ziehbar } from '../lib/ziehen'
-  import Bild from './Bild.svelte'
+  import AufgabenBild from './AufgabenBild.svelte'
   import Symbol from './Symbol.svelte'
 
   let {
@@ -30,6 +30,8 @@
 
   const verschoben = $derived(app.verschieben?.id === aufgabe.id)
   const bearbeiten = $derived(app.bearbeiten)
+  const termin = $derived(istTermin(aufgabe.id))
+  const kind = $derived(aufgabe.fuer?.length === 1 ? app.plan.kinder.find((k) => k.id === aufgabe.fuer![0]) : undefined)
 </script>
 
 <button
@@ -40,6 +42,7 @@
   class:erledigt
   class:bearbeiten
   class:verschoben
+  class:termin
   style="--s: {groesse}px"
   data-aufgabe-id={aufgabe.id}
   data-fokus-id={'aufgabe:' + aufgabe.id}
@@ -50,12 +53,15 @@
   use:ziehbar={{
     id: aufgabe.id,
     tag,
-    aktiv: bearbeiten,
+    aktiv: bearbeiten && !termin,
     ablegen: (zielTag, zielAbschnitt, index) => verschiebeAufgabe(tag, aufgabe.id, zielTag, zielAbschnitt, index),
   }}
 >
   <span class="flaeche">
-    <Bild id={aufgabe.bild} zusatz={aufgabe.zusatz} />
+    <AufgabenBild {aufgabe} />
+    {#if kind && app.einst.kind === 'alle'}
+      <span class="kind" style="--kind: {kind.farbe}" title="nur {kind.name}">{kind.name.slice(0, 1)}</span>
+    {/if}
     {#if erledigt}
       <span class="haken"><Symbol name="haken" /></span>
     {/if}
@@ -104,10 +110,10 @@
     max-width: 100%;
     font-family: var(--schrift-text);
     font-weight: 700;
-    font-size: clamp(12px, calc(var(--s) * 0.13), 26px);
+    font-size: clamp(10px, calc(var(--s) * 0.15), 26px);
     line-height: 1.1;
     text-align: center;
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
     hyphens: auto;
   }
   .uhrzeit {
@@ -167,6 +173,26 @@
     stroke-width: 3.4;
   }
 
+  .kind {
+    position: absolute;
+    left: -10%;
+    top: -10%;
+    display: grid;
+    place-items: center;
+    width: 36%;
+    height: 36%;
+    border-radius: 50%;
+    background: var(--kind);
+    color: #ffffff;
+    font-family: var(--schrift-titel);
+    font-weight: 600;
+    font-size: calc(var(--s) * 0.17);
+    box-shadow: 0 0 0 2px var(--tafel);
+  }
+  .termin {
+    outline: 3px dotted var(--seg-tief, var(--linie));
+    outline-offset: -6px;
+  }
   .verschoben {
     transform: scale(1.1) rotate(-3deg);
     box-shadow: 0 10px 22px var(--schatten);

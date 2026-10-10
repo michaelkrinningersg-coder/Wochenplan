@@ -19,20 +19,23 @@ export function tagesRaster(
   luecke: number,
   spaltenLuecke: number,
   innen: number,
-  minSpalte: number,
+  minSpalte: number | number[],
 ): TagesRaster {
+  const minimum = (i: number) => (Array.isArray(minSpalte) ? minSpalte[i] : minSpalte)
   const k = anzahlen.length
   for (let s = 170; s >= 44; s -= 2) {
     const zeilen = Math.max(1, Math.floor((hoehe + luecke) / (s * KACHEL_HOEHE + luecke)))
     const spalten = anzahlen.map((n) => Math.max(1, Math.ceil(n / zeilen)))
-    const breiten = spalten.map((c) => Math.max(c * s * KACHEL_BREITE + (c - 1) * luecke + 2 * innen, minSpalte))
+    const breiten = spalten.map((c, i) =>
+      anzahlen[i] === 0 ? minimum(i) : Math.max(c * s * KACHEL_BREITE + (c - 1) * luecke + 2 * innen, minimum(i)),
+    )
     const summe = breiten.reduce((a, b) => a + b, 0) + (k - 1) * spaltenLuecke
     if (summe <= breite) return { s, spalten, breiten }
   }
   const s = 44
   const zeilen = Math.max(1, Math.floor((hoehe + luecke) / (s * KACHEL_HOEHE + luecke)))
   const spalten = anzahlen.map((n) => Math.max(1, Math.ceil(n / zeilen)))
-  return { s, spalten, breiten: spalten.map(() => minSpalte) }
+  return { s, spalten, breiten: spalten.map((_, i) => minimum(i)) }
 }
 
 /** Größte Kachel für n Kacheln in einer Fläche (Abschnittsansicht) */

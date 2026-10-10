@@ -7,6 +7,7 @@
   import { flaechenRaster } from '../lib/raster'
   import {
     app,
+    aufgabenIn,
     istErledigt,
     istHeute,
     jetztUndDanach,
@@ -24,7 +25,7 @@
   const index = $derived(ABSCHNITTE.findIndex((a) => a.id === abschnitt))
   const vorher = $derived(ABSCHNITTE[index - 1])
   const nachher = $derived(ABSCHNITTE[index + 1])
-  const liste = $derived(app.plan.woche[tag][abschnitt])
+  const liste = $derived(aufgabenIn(tag, abschnitt))
   const heute = $derived(istHeute(tag))
   const jd = $derived(jetztUndDanach(tag))
   const anzahl = $derived(liste.length + (app.bearbeiten ? 1 : 0))
@@ -32,7 +33,7 @@
   /** Fokus beim Öffnen: die Jetzt-Aufgabe, sonst die erste offene, sonst die erste */
   const fokusId = $derived(
     liste.find((x) => x.id === jd.jetzt)?.id ??
-      liste.find((x) => !(heute && istErledigt(x.id)))?.id ??
+      liste.find((x) => !(heute && istErledigt(x)))?.id ??
       liste[0]?.id,
   )
 </script>
@@ -70,7 +71,7 @@
             groesse={raster.s}
             status={jd.jetzt === aufgabe.id ? 'jetzt' : jd.danach === aufgabe.id ? 'danach' : ''}
             autofokus={fokusId === aufgabe.id}
-            erledigt={heute && istErledigt(aufgabe.id)}
+            erledigt={heute && istErledigt(aufgabe)}
             bisStart={minutenBisStart(tag, aufgabe)}
             onwahl={(e) => aufgabeGewaehlt(e, tag, abschnitt, aufgabe)}
           />

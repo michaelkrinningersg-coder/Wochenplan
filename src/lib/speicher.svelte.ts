@@ -8,11 +8,14 @@ import type {
   Dialog,
   Einstellungen,
   Fundstelle,
+  KindId,
   Plan,
+  Tagesplan,
+  Termin,
   TagId,
   TimerZustand,
 } from './typen'
-import { datumKey, heuteTag, minutenJetzt, minutenVon, tagesPhase } from './zeit'
+import { datumFuerTag, datumKey, heuteTag, minutenJetzt, minutenVon, tagesPhase } from './zeit'
 
 const SCHLUESSEL = {
   plan: 'wochenplan.plan.v1',
@@ -41,7 +44,7 @@ export function speichern(key: keyof typeof SCHLUESSEL, wert: unknown): boolean 
   }
 }
 
-const STANDARD_EINST: Einstellungen = { thema: 'auto', ton: true, wach: true, timerArt: 'ampel' }
+const STANDARD_EINST: Einstellungen = { thema: 'auto', ton: true, wach: true, timerArt: 'ampel', kind: 'alle', vorlesen: true }
 
 function timerLaden(): Record<string, TimerZustand> {
   const roh = laden<Record<string, TimerZustand>>(SCHLUESSEL.timer, {})
@@ -51,18 +54,27 @@ function timerLaden(): Record<string, TimerZustand> {
   return sauber
 }
 
-function erledigtLaden(): Record<string, string[]> {
-  const roh = laden<Record<string, string[]>>(SCHLUESSEL.erledigt, {})
-  // nur die letzten 7 Tage behalten
-  const tage = Object.keys(roh).sort().slice(-7)
-  const sauber: Record<string, string[]> = {}
-  for (const t of tage) if (Array.isArray(roh[t])) sauber[t] = roh[t]
+/**
+ * Erledigt-Stand: Datum → Schlüssel "k1:<aufgabe>" → Zeitstempel.
+ * Positiv = erledigt, negativ = wieder offen. So lassen sich Stände von mehreren Geräten zusammenführen.
+ */
+export type ErledigtStand = Record<string, Record<string, number>>
+
+export function erledigtKuerzen(roh: ErledigtStand): ErledigtStand {
+  // 14 Tage behalten (für die Sterne der Woche)
+  const tage = Object.keys(roh).sort().slice(-14)
+  const sauber: ErledigtStand = {}
+  for (const t of tage) if (roh[t] && typeof roh[t] === 'object' && !Array.isArray(roh[t])) sauber[t] = roh[t]
   return sauber
 }
 
-// Pläne der ersten Version (ohne Bettzeit) werden einmalig durch den vorbereiteten Wochenplan ersetzt
+function erledigtLaden(): ErledigtStand {
+  return erledigtKuerzen(laden<ErledigtStand>(SCHLUESSEL.erledigt, {}))
+}
+
+// Pläne älterer Versionen (andere Tagesgliederung) werden einmalig durch den vorbereiteten Wochenplan ersetzt
 const gespeicherterPlan = laden<{ version?: number } | null>(SCHLUESSEL.plan, null)
-export const planErneuert = !!gespeicherterPlan && gespeicherterPlan.version !== 2
+export const planErneuert = !!gespeicherterPlan && gespeicherterPlan.version !== 3
 
 export const app = $state({
   plan: (gespeicherterPlan && !planErneuert ? planNormalisieren(gespeicherterPlan) : startplan()) as Plan,
@@ -116,9 +128,14 @@ export function zurueck(): boolean {
       oeffnen({ art: 'woche' }, 'tag:' + a.tag)
       return true
     case 'woche':
+    case 'jahr':
       oeffnen({ art: 'tag', tag: heuteTag() })
       return true
+    case 'monat':
+      oeffnen({ art: 'jahr', jahr: a.jahr })
+      return true
   }
+  return false
 }
 
 export function zeigeHinweis(text: string) {
@@ -130,32 +147,114 @@ export function zeigeHinweis(text: string) {
 
 // ---------- Plan lesen ----------
 
+/** Datum (Schlüssel) des Wochentags in der laufenden Woche */
+export function datumVon(tag: TagId): string {
+  return datumKey(datumFuerTag(tag, new Date(app.jetzt)))
+}
+
+/** Der Tagesplan, der an diesem Wochentag gilt: Tagesvorlage für das Datum oder der normale Wochentag */
+export function planFuer(tag: TagId): Tagesplan {
+  const vorlageId = app.plan.datumVorlage[datumVon(tag)]
+  const vorlage = vorlageId ? app.plan.vorlagen.find((v) => v.id === vorlageId) : undefined
+  return vorlage ? vorlage.tag : app.plan.woche[tag]
+}
+
+export function vorlageFuer(tag: TagId): string | null {
+  const id = app.plan.datumVorlage[datumVon(tag)]
+  return id ? (app.plan.vorlagen.find((v) => v.id === id)?.name ?? null) : null
+}
+
+/** Ist die Aufgabe für das gewählte Kind sichtbar? */
+export function sichtbar(a: Aufgabe): boolean {
+  const k = app.einst.kind
+  return k === 'alle' || !a.fuer || a.fuer.length === 0 || a.fuer.includes(k)
+}
+
+export function termineAm(datum: string): Termin[] {
+  return app.plan.termine.filter((t) => t.datum === datum)
+}
+
+/** Alle Aufgaben eines Abschnitts, die angezeigt werden (Plan + Termine des Datums, gefiltert nach Kind) */
+export function aufgabenIn(tag: TagId, abschnitt: AbschnittId): Aufgabe[] {
+  const datum = datumVon(tag)
+  return [
+    ...planFuer(tag)[abschnitt].filter(sichtbar),
+    ...app.plan.termine.filter((t) => t.datum === datum && t.abschnitt === abschnitt && sichtbar(t)),
+  ]
+}
+
+export function istTermin(id: string): boolean {
+  return app.plan.termine.some((t) => t.id === id)
+}
+
 export function finde(tag: TagId, id: string): Fundstelle | null {
-  const tp = app.plan.woche[tag]
+  const tp = planFuer(tag)
   for (const ab of ABSCHNITTE) {
     const i = tp[ab.id].findIndex((x) => x.id === id)
     if (i >= 0) return { abschnitt: ab.id, index: i, aufgabe: tp[ab.id][i] }
   }
+  const t = app.plan.termine.find((x) => x.id === id)
+  if (t) return { abschnitt: t.abschnitt, index: 0, aufgabe: t, termin: true }
   return null
 }
 
-/** Alle Aufgaben eines Tages in Reihenfolge */
+/** Alle sichtbaren Aufgaben eines Tages in Reihenfolge */
 export function tagesListe(tag: TagId): { abschnitt: AbschnittId; aufgabe: Aufgabe }[] {
-  const tp = app.plan.woche[tag]
-  return ABSCHNITTE.flatMap((ab) => tp[ab.id].map((aufgabe) => ({ abschnitt: ab.id, aufgabe })))
+  return ABSCHNITTE.flatMap((ab) => aufgabenIn(tag, ab.id).map((aufgabe) => ({ abschnitt: ab.id, aufgabe })))
+}
+
+// ---------- Kinder ----------
+
+export function kindName(id: KindId): string {
+  return app.plan.kinder.find((k) => k.id === id)?.name ?? id
+}
+
+/** Für welche Kinder gilt die Aufgabe? */
+export function kinderVon(a: Aufgabe): KindId[] {
+  return a.fuer && a.fuer.length ? a.fuer : app.plan.kinder.map((k) => k.id)
 }
 
 // ---------- Erledigt ----------
 
-export function istErledigt(id: string): boolean {
-  return app.erledigt[datumKey(new Date(app.jetzt))]?.includes(id) ?? false
+function erledigtFuer(kind: KindId, id: string, datum = datumKey(new Date(app.jetzt))): boolean {
+  return (app.erledigt[datum]?.[kind + ':' + id] ?? 0) > 0
 }
 
-export function setzeErledigt(id: string, wert: boolean) {
-  const k = datumKey()
-  const liste = app.erledigt[k] ?? []
-  const ohne = liste.filter((x) => x !== id)
-  app.erledigt[k] = wert ? [...ohne, id] : ohne
+/** Erledigt? In der Ansicht „Beide“: erst, wenn alle zugeordneten Kinder fertig sind. */
+export function istErledigt(a: Aufgabe): boolean {
+  const k = app.einst.kind
+  if (k !== 'alle') return erledigtFuer(k, a.id)
+  return kinderVon(a).every((kind) => erledigtFuer(kind, a.id))
+}
+
+export function setzeErledigt(a: Aufgabe, wert: boolean) {
+  const datum = datumKey()
+  const k = app.einst.kind
+  const kinder = k === 'alle' ? kinderVon(a) : [k]
+  const tag = app.erledigt[datum] ?? {}
+  const t = Date.now()
+  for (const kind of kinder) tag[kind + ':' + a.id] = wert ? t : -t
+  app.erledigt[datum] = tag
+}
+
+/** Sterne eines Kindes: erledigte Aufgaben heute und in den letzten 7 Tagen */
+export function sterne(kind: KindId): { heute: number; woche: number } {
+  const heute = datumKey(new Date(app.jetzt))
+  const grenze = new Date(app.jetzt)
+  grenze.setDate(grenze.getDate() - 6)
+  const ab = datumKey(grenze)
+  let h = 0
+  let w = 0
+  for (const [datum, eintraege] of Object.entries(app.erledigt)) {
+    if (datum < ab) continue
+    for (const [schluessel, wert] of Object.entries(eintraege)) {
+      if (wert > 0 && schluessel.startsWith(kind + ':')) {
+        w++
+        if (datum === heute) h++
+      }
+    }
+  }
+  return { heute: h, woche: w }
 }
 
 /**
@@ -167,16 +266,13 @@ export function jetztUndDanach(tag: TagId): { jetzt: string | null; danach: stri
   const d = new Date(app.jetzt)
   const phase = tagesPhase(app.plan, d)
   const liste = tagesListe(tag)
-  const offen = liste.filter((x) => !istErledigt(x.aufgabe.id))
+  const offen = liste.filter((x) => !istErledigt(x.aufgabe))
   if (offen.length === 0 || phase.art === 'nachher') return { jetzt: null, danach: null }
   let startIndex = 0
   if (phase.art === 'abschnitt') {
     const abIndex = ABSCHNITTE.findIndex((a) => a.id === phase.id)
     startIndex = offen.findIndex((x) => ABSCHNITTE.findIndex((a) => a.id === x.abschnitt) >= abIndex)
-    if (startIndex < 0) {
-      // alles Spätere erledigt – die älteste offene Aufgabe ist noch dran
-      startIndex = 0
-    }
+    if (startIndex < 0) startIndex = 0
   }
   if (phase.art === 'vorher') return { jetzt: null, danach: offen[0]?.aufgabe.id ?? null }
   return { jetzt: offen[startIndex]?.aufgabe.id ?? null, danach: offen[startIndex + 1]?.aufgabe.id ?? null }
@@ -188,7 +284,7 @@ export function naechsteNach(tag: TagId, id: string): { abschnitt: AbschnittId; 
   const i = liste.findIndex((x) => x.aufgabe.id === id)
   if (i < 0) return null
   const rest = liste.slice(i + 1)
-  return rest.find((x) => !istErledigt(x.aufgabe.id)) ?? rest[0] ?? null
+  return rest.find((x) => !istErledigt(x.aufgabe)) ?? rest[0] ?? null
 }
 
 /** Minuten bis zur festen Uhrzeit einer Aufgabe (nur heute, nur Zukunft) */
@@ -203,9 +299,10 @@ export function minutenBisStart(tag: TagId, aufgabe: Aufgabe): number | null {
 export function verschiebeAufgabe(vonTag: TagId, id: string, nachTag: TagId, nachAbschnitt: AbschnittId, index: number) {
   const f = finde(vonTag, id)
   if (!f) return
-  const quelle = app.plan.woche[vonTag][f.abschnitt]
+  if (f.termin) return
+  const quelle = planFuer(vonTag)[f.abschnitt]
   const [teil] = quelle.splice(f.index, 1)
-  const ziel = app.plan.woche[nachTag][nachAbschnitt]
+  const ziel = planFuer(nachTag)[nachAbschnitt]
   const i = Math.max(0, Math.min(index, ziel.length))
   ziel.splice(i, 0, teil)
 }
@@ -213,9 +310,9 @@ export function verschiebeAufgabe(vonTag: TagId, id: string, nachTag: TagId, nac
 /** Verschieben mit Pfeiltasten: einen Platz früher/später in der Tagesreihenfolge */
 export function schrittVerschieben(tag: TagId, id: string, richtung: -1 | 1) {
   const f = finde(tag, id)
-  if (!f) return
+  if (!f || f.termin) return
   const abIndex = ABSCHNITTE.findIndex((a) => a.id === f.abschnitt)
-  const liste = app.plan.woche[tag][f.abschnitt]
+  const liste = planFuer(tag)[f.abschnitt]
   const neu = f.index + richtung
   if (neu >= 0 && neu < liste.length) {
     verschiebeAufgabe(tag, id, tag, f.abschnitt, neu)
@@ -223,7 +320,7 @@ export function schrittVerschieben(tag: TagId, id: string, richtung: -1 | 1) {
   }
   const nachbar = ABSCHNITTE[abIndex + richtung]
   if (!nachbar) return
-  const zielListe = app.plan.woche[tag][nachbar.id]
+  const zielListe = planFuer(tag)[nachbar.id]
   verschiebeAufgabe(tag, id, tag, nachbar.id, richtung === 1 ? 0 : zielListe.length)
 }
 
@@ -232,8 +329,8 @@ export function tagVerschieben(tag: TagId, id: string, richtung: -1 | 1): TagId 
   const i = TAGE.findIndex((t) => t.id === tag)
   const ziel = TAGE[i + richtung]
   const f = finde(tag, id)
-  if (!ziel || !f) return tag
-  verschiebeAufgabe(tag, id, ziel.id, f.abschnitt, app.plan.woche[ziel.id][f.abschnitt].length)
+  if (!ziel || !f || f.termin) return tag
+  verschiebeAufgabe(tag, id, ziel.id, f.abschnitt, planFuer(ziel.id)[f.abschnitt].length)
   return ziel.id
 }
 
@@ -249,13 +346,13 @@ export function neueAufgabe(tag: TagId, abschnitt: AbschnittId) {
 
 export function aufgabeSpeichern(tag: TagId, abschnitt: AbschnittId, aufgabe: Aufgabe) {
   const f = finde(tag, aufgabe.id)
-  if (f) {
-    app.plan.woche[tag][f.abschnitt][f.index] = aufgabe
+  if (f && !f.termin) {
+    planFuer(tag)[f.abschnitt][f.index] = aufgabe
     if (f.abschnitt !== abschnitt) {
-      verschiebeAufgabe(tag, aufgabe.id, tag, abschnitt, app.plan.woche[tag][abschnitt].length)
+      verschiebeAufgabe(tag, aufgabe.id, tag, abschnitt, planFuer(tag)[abschnitt].length)
     }
-  } else {
-    app.plan.woche[tag][abschnitt].push(aufgabe)
+  } else if (!f) {
+    planFuer(tag)[abschnitt].push(aufgabe)
   }
   fotosAufraeumen()
 }
@@ -263,18 +360,20 @@ export function aufgabeSpeichern(tag: TagId, abschnitt: AbschnittId, aufgabe: Au
 export function aufgabeLoeschen(tag: TagId, id: string) {
   const f = finde(tag, id)
   if (!f) return
-  app.plan.woche[tag][f.abschnitt].splice(f.index, 1)
+  if (f.termin) app.plan.termine = app.plan.termine.filter((t) => t.id !== id)
+  else planFuer(tag)[f.abschnitt].splice(f.index, 1)
   delete app.timer[id]
   fotosAufraeumen()
 }
 
 export function tagKopieren(von: TagId, nach: TagId[], ersetzen: boolean) {
-  const quelle = app.plan.woche[von]
+  const quelle = $state.snapshot(planFuer(von))
   for (const z of nach) {
     if (z === von) continue
+    const ziel = planFuer(z)
     for (const ab of ABSCHNITTE) {
       const kopie = quelle[ab.id].map((x) => ({ ...x, id: neueId() }))
-      app.plan.woche[z][ab.id] = ersetzen ? kopie : [...app.plan.woche[z][ab.id], ...kopie]
+      ziel[ab.id] = ersetzen ? kopie : [...ziel[ab.id], ...kopie]
     }
   }
 }
@@ -283,20 +382,24 @@ export function tagKopieren(von: TagId, nach: TagId[], ersetzen: boolean) {
 export function aufgabeKopieren(tag: TagId, id: string, ziele: TagId[]) {
   const f = finde(tag, id)
   if (!f) return
-  for (const z of ziele) app.plan.woche[z][f.abschnitt].push({ ...$state.snapshot(f.aufgabe), id: neueId() })
+  for (const z of ziele) planFuer(z)[f.abschnitt].push({ ...$state.snapshot(f.aufgabe), id: neueId() })
 }
 
 export function tagLeeren(tag: TagId) {
-  for (const ab of ABSCHNITTE) app.plan.woche[tag][ab.id] = []
+  const ziel = planFuer(tag)
+  for (const ab of ABSCHNITTE) ziel[ab.id] = []
   fotosAufraeumen()
 }
 
 /** Fotos löschen, die keine Aufgabe mehr benutzt */
 export function fotosAufraeumen() {
   const benutzt = new Set<string>()
-  for (const t of TAGE)
-    for (const ab of ABSCHNITTE)
-      for (const x of app.plan.woche[t.id][ab.id]) if (x.bild.startsWith('foto:')) benutzt.add(x.bild.slice(5))
+  const merken = (x: Aufgabe) => {
+    for (const b of [x.bild, x.foto]) if (b && b.startsWith('foto:')) benutzt.add(b.slice(5))
+  }
+  const tage = [...TAGE.map((t) => app.plan.woche[t.id]), ...app.plan.vorlagen.map((v) => v.tag)]
+  for (const tp of tage) for (const ab of ABSCHNITTE) tp[ab.id].forEach(merken)
+  app.plan.termine.forEach(merken)
   for (const id of Object.keys(app.fotos)) if (!benutzt.has(id)) delete app.fotos[id]
 }
 
@@ -331,8 +434,8 @@ export function timerSetzen(id: string, minuten: number) {
 
 /** Sind heute alle Aufgaben erledigt (bzw. alle eines Abschnitts)? */
 export function allesErledigt(tag: TagId, abschnitt?: AbschnittId): boolean {
-  const liste = abschnitt ? app.plan.woche[tag][abschnitt] : tagesListe(tag).map((x) => x.aufgabe)
-  return istHeute(tag) && liste.length > 0 && liste.every((a) => istErledigt(a.id))
+  const liste = abschnitt ? aufgabenIn(tag, abschnitt) : tagesListe(tag).map((x) => x.aufgabe)
+  return istHeute(tag) && liste.length > 0 && liste.every((a) => istErledigt(a))
 }
 
 export function timerPause(id: string) {

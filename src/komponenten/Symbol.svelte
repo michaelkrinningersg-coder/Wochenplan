@@ -27,6 +27,8 @@
     <path d="M5 12.5l4.5 4.5L19 7.5" />
   {:else if name === 'woche'}
     <rect x="3.5" y="5" width="17" height="15" rx="3" /><path d="M3.5 10h17M8 3v4M16 3v4" />
+  {:else if name === 'kalender'}
+    <rect x="3.5" y="5" width="17" height="15" rx="3" /><path d="M3.5 10h17M8 3v4M16 3v4" /><path d="M8 14h2M12 14h2M16 14h0.5M8 17h2M12 17h2" />
   {:else if name === 'heute'}
     <circle cx="12" cy="12" r="4" /><path d="M12 2.5v2M12 19.5v2M21.5 12h-2M4.5 12h-2M18.7 5.3l-1.4 1.4M6.7 17.3l-1.4 1.4M18.7 18.7l-1.4-1.4M6.7 6.7L5.3 5.3" />
   {:else if name === 'pfeile'}

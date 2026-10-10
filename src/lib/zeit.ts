@@ -45,7 +45,7 @@ export type TagesPhase =
 export function tagesPhase(plan: Plan, d = new Date()): TagesPhase {
   const jetzt = minutenJetzt(d)
   const [ersterStart] = abschnittSpanne(plan, 'morgen')
-  const [, letztesEnde] = abschnittSpanne(plan, 'bett')
+  const [, letztesEnde] = abschnittSpanne(plan, 'schlafen')
   if (jetzt < ersterStart) return { art: 'vorher' }
   if (jetzt >= letztesEnde) return { art: 'nachher' }
   for (const a of ABSCHNITTE) {
@@ -90,3 +90,42 @@ export function inText(min: number): string {
 export function datumLang(d = new Date()): string {
   return d.toLocaleDateString('de-DE', { day: 'numeric', month: 'long' })
 }
+
+const TAG_INDEX: Record<TagId, number> = { mo: 0, di: 1, mi: 2, do: 3, fr: 4, sa: 5, so: 6 }
+
+/** Datum des Wochentags in der laufenden Woche (Montag bis Sonntag) */
+export function datumFuerTag(tag: TagId, bezug = new Date()): Date {
+  const d = new Date(bezug.getFullYear(), bezug.getMonth(), bezug.getDate())
+  const heute = (d.getDay() + 6) % 7
+  d.setDate(d.getDate() + TAG_INDEX[tag] - heute)
+  return d
+}
+
+export function ausKey(key: string): Date {
+  const [j, m, t] = key.split('-').map(Number)
+  return new Date(j, (m || 1) - 1, t || 1)
+}
+
+/** Ganze Tage von heute bis zum Datum (0 = heute) */
+export function tageBis(ziel: Date, bezug = new Date()): number {
+  const a = new Date(bezug.getFullYear(), bezug.getMonth(), bezug.getDate()).getTime()
+  const b = new Date(ziel.getFullYear(), ziel.getMonth(), ziel.getDate()).getTime()
+  return Math.round((b - a) / 86_400_000)
+}
+
+export function alterAm(geburtstag: string, d = new Date()): number {
+  const g = ausKey(geburtstag)
+  let alter = d.getFullYear() - g.getFullYear()
+  if (d.getMonth() < g.getMonth() || (d.getMonth() === g.getMonth() && d.getDate() < g.getDate())) alter--
+  return alter
+}
+
+/** Nächster Geburtstag (heute eingeschlossen) */
+export function naechsterGeburtstag(geburtstag: string, bezug = new Date()): Date {
+  const g = ausKey(geburtstag)
+  const d = new Date(bezug.getFullYear(), g.getMonth(), g.getDate())
+  if (tageBis(d, bezug) < 0) d.setFullYear(d.getFullYear() + 1)
+  return d
+}
+
+export const MONATE = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember']

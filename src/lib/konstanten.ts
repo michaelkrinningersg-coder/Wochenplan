@@ -10,13 +10,17 @@ export const TAGE: { id: TagId; kurz: string; lang: string }[] = [
   { id: 'so', kurz: 'So', lang: 'Sonntag' },
 ]
 
-export const ABSCHNITTE: { id: AbschnittId; name: string; bild: string }[] = [
-  { id: 'morgen', name: 'Morgen', bild: '_sonnenaufgang' },
-  { id: 'vormittag', name: 'Vormittag', bild: '_sonne' },
-  { id: 'mittag', name: 'Mittag', bild: '_sonnengesicht' },
-  { id: 'nachmittag', name: 'Nachmittag', bild: '_sonnewolke' },
-  { id: 'abend', name: 'Abend', bild: '_sonnenuntergang' },
-  { id: 'bett', name: 'Bettzeit', bild: '_nacht' },
+/** Gliederung des Tages. „nacht“ = dunkle Darstellung und Mond statt Sonne. */
+export const ABSCHNITTE: { id: AbschnittId; name: string; bild: string; nacht: boolean }[] = [
+  { id: 'aufstehen', name: 'Aufstehen', bild: 'wecker', nacht: false },
+  { id: 'morgen', name: 'Morgen', bild: '_sonnenaufgang', nacht: false },
+  { id: 'vormittag', name: 'Vormittag', bild: '_sonne', nacht: false },
+  { id: 'mittag', name: 'Mittag', bild: '_sonnengesicht', nacht: false },
+  { id: 'nachmittag', name: 'Nachmittag', bild: '_sonnewolke', nacht: false },
+  { id: 'frueh', name: 'Früher Abend', bild: '_sonnenuntergang', nacht: false },
+  { id: 'abend', name: 'Abendzeit', bild: '_daemmerung', nacht: true },
+  { id: 'bett', name: 'Bettgehzeit', bild: '_nacht', nacht: true },
+  { id: 'schlafen', name: 'Schlafen', bild: '_sternennacht', nacht: true },
 ]
 
 export const ZUSAETZE: { id: string; name: string; bild: string }[] = [
