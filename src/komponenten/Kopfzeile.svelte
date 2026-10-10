@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { abgleich } from '../lib/abgleich.svelte'
+  import { abgleich, holen } from '../lib/abgleich.svelte'
   import { abschnittInfo, tagName } from '../lib/konstanten'
   import { app, istHeute, oeffnen, zeigeHinweis, zurueck } from '../lib/speicher.svelte'
   import { datumLang, heuteTag, spanneText, uhrzeitJetzt } from '../lib/zeit'
@@ -126,7 +126,7 @@
     {:else if planer}
       <HalteKnopf
         label="Plan bearbeiten (gedrückt halten)"
-        onhalten={() => (app.bearbeiten = true)}
+        onhalten={() => ((app.bearbeiten = true), void holen())}
         onkurz={() => zeigeHinweis('Zum Bearbeiten den Stift gedrückt halten')}
       >
         <Symbol name="stift" />

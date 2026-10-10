@@ -34,8 +34,8 @@ function werktag(): Tagesplan {
     vormittag: [a('Kita', 'kita', 0)],
     mittag: [],
     nachmittag: [a('Spielzeit', 'spielen', 0)],
-    frueh: [a('Hände waschen', 'waschen', 0), a('Abendessen', 'abendbrot', 0), a('Spielzeit', 'spielen', 0), a('Aufräumen', 'aufraeumen', 0)],
-    abend: [a('Schlafanzug anziehen', 'schlafanzug', 0), a('Zähne putzen', 'zaehne', 0)],
+    frueh: [a('Hände waschen', 'waschen', 0), a('Abendessen', 'abendbrot', 0), a('Spielzeit', 'spielen', 0)],
+    abend: [a('Aufräumen', 'aufraeumen', 0), a('Schlafanzug anziehen', 'schlafanzug', 0), a('Zähne putzen', 'zaehne', 0)],
     bett: [a('Toilette', 'toilette', 0, 'mond'), a('Lesen', 'lesen', 0)],
     schlafen: [a('Schlafen', 'schlafen', 0)],
   }
@@ -49,8 +49,8 @@ function wochenende(vormittag: Aufgabe): Tagesplan {
     vormittag: [vormittag],
     mittag: [a('Mittagessen', 'essen', 0), a('Mittagsruhe', 'mittagsruhe', 0)],
     nachmittag: [a('Spielplatz', 'spielplatz', 0)],
-    frueh: [a('Hände waschen', 'waschen', 0), a('Abendessen', 'abendbrot', 0), a('Spielzeit', 'spielen', 0), a('Aufräumen', 'aufraeumen', 0)],
-    abend: [a('Schlafanzug anziehen', 'schlafanzug', 0), a('Zähne putzen', 'zaehne', 0), a('Fernsehen', 'fernsehen', 0)],
+    frueh: [a('Hände waschen', 'waschen', 0), a('Abendessen', 'abendbrot', 0), a('Spielzeit', 'spielen', 0)],
+    abend: [a('Aufräumen', 'aufraeumen', 0), a('Schlafanzug anziehen', 'schlafanzug', 0), a('Zähne putzen', 'zaehne', 0), a('Fernsehen', 'fernsehen', 0)],
     bett: [a('Toilette', 'toilette', 0, 'mond'), a('Lesen', 'lesen', 0)],
     schlafen: [a('Schlafen', 'schlafen', 0)],
   }
@@ -67,6 +67,8 @@ export function standardWoche(): Record<TagId, Tagesplan> {
   woche.fr.nachmittag.push(a('Spielplatz', 'spielplatz', 0))
   woche.fr.abend.push(a('Fernsehen', 'fernsehen', 0))
   woche.sa = wochenende(a('Schwimmen', 'schwimmen', 0))
+  // Samstag: alleine lesen statt Spielzeit nach dem Abendessen
+  woche.sa.frueh = woche.sa.frueh.map((x) => (x.bild === 'spielen' ? a('Alleine Lesezeit', 'lesezeit', 0) : x))
   woche.so = wochenende(a('Spielplatz', 'spielplatz', 0))
   return woche
 }
@@ -189,7 +191,7 @@ export function planNormalisieren(roh: unknown): Plan {
 }
 
 /** Stand der einmaligen Umstellungen. Erhöhen, wenn neue Regeln in UMZUG dazukommen. */
-const STAND = 5
+const STAND = 6
 
 /** Neue Bildkarten für vorhandene Aufgaben (Titel + altes Bild → neues Bild, ggf. neuer Titel) */
 const UMZUG: { titel: string; alt: string; neu: string; neuerTitel?: string }[] = [
@@ -216,6 +218,16 @@ function umstellen(plan: Plan, vonStand: number) {
       if (letzte?.bild === 'waschen') tp.nachmittag.pop()
       tp.frueh.splice(i, 0, { id: neueId(), titel: 'Hände waschen', bild: 'waschen', minuten: 0 })
     }
+  // Stand 6: Aufräumen in die Abendzeit (vorne), Samstag alleine lesen statt Spielzeit
+  if (vonStand < 6) {
+    for (const tp of Object.values(plan.woche)) {
+      const i = tp.frueh.findIndex((x) => x.titel === 'Aufräumen')
+      if (i >= 0) tp.abend.unshift(...tp.frueh.splice(i, 1))
+    }
+    const sa = plan.woche.sa.frueh
+    const s = sa.findIndex((x) => x.titel === 'Spielzeit')
+    if (s >= 0) sa[s] = { id: neueId(), titel: 'Alleine Lesezeit', bild: 'lesezeit', minuten: 0 }
+  }
   const anpassen = (x: Aufgabe) => {
     const r = UMZUG.find((u) => u.titel === x.titel && u.alt === x.bild)
     if (!r) return

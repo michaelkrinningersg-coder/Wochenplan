@@ -1,7 +1,7 @@
 // Abgleich über GitHub: Der Planer (Handy/PC) lädt den Plan verschlüsselt hoch,
 // der Fernseher holt ihn regelmäßig ab. Ohne Familien-Passwort ist die Datei nicht lesbar.
 import { istApp } from './geraet'
-import { app, erledigtKuerzen, exportDaten, importDaten, type ErledigtStand } from './speicher.svelte'
+import { app, erledigtKuerzen, exportDaten, importDaten, zeigeHinweis, type ErledigtStand } from './speicher.svelte'
 
 export interface AbgleichEinst {
   rolle: 'planer' | 'anzeige'
@@ -66,7 +66,8 @@ function standSpeichern() {
 
 export function istEingerichtet(): boolean {
   const e = abgleich.einst
-  return !!(e.passwort && e.besitzer && e.repo && e.zweig && e.datei && (e.rolle === 'anzeige' || e.token))
+  // Lesen geht nur mit Passwort; der Token (zum Hochladen) kommt notfalls verschlüsselt mit dem Plan
+  return !!(e.passwort && e.besitzer && e.repo && e.zweig && e.datei)
 }
 
 // ---------- Verschlüsselung (AES-GCM, Schlüssel aus Passwort per PBKDF2) ----------
@@ -217,10 +218,38 @@ export async function holen(erzwingen = false): Promise<boolean> {
 
 /** Plan hochladen (nur Planer mit Token) */
 export async function hochladen(): Promise<boolean> {
-  if (!istEingerichtet() || abgleich.einst.rolle !== 'planer' || laeuft) return false
+  if (!istEingerichtet() || abgleich.einst.rolle !== 'planer' || !abgleich.einst.token || laeuft) return false
   laeuft = true
   abgleich.zustand = 'laeuft'
   try {
+    // Mehrere Planer (z. B. zwei Handys): wurde der Plan inzwischen woanders geändert?
+    // Dann nicht überschreiben, sondern den neueren Plan übernehmen.
+    {
+      const r = await fetch(`${apiUrl()}?ref=${encodeURIComponent(abgleich.einst.zweig)}`, {
+        headers: kopf({ Accept: 'application/vnd.github.raw+json' }),
+        cache: 'no-store',
+      })
+      if (r.ok) {
+        const fern = (await r.json()) as Paket
+        if (fern.app === 'wochenplan' && fern.geaendert > abgleich.stand.synchron) {
+          const vorher = abgleich.stand.synchron
+          const text = await entschluesseln(fern, abgleich.einst.passwort)
+          anwenden = true
+          const erfolg = importDaten(text)
+          queueMicrotask(() => (anwenden = false))
+          if (erfolg) {
+            abgleich.stand.synchron = fern.geaendert
+            abgleich.stand.lokal = fern.geaendert
+            abgleich.stand.etag = r.headers.get('ETag') ?? ''
+            standSpeichern()
+            ok()
+            if (vorher > 0)
+              zeigeHinweis('Der Plan wurde auf einem anderen Gerät geändert und neu geladen. Bitte die letzte Änderung noch einmal machen.')
+            return false
+          }
+        }
+      } else if (r.status !== 404) throw new Error(fehlerText(r.status))
+    }
     const geaendert = Math.max(abgleich.stand.lokal, Date.now())
     // Der Schreib-Token reist verschlüsselt mit, damit der Fernseher „Erledigt“ melden kann
     const daten = { ...JSON.parse(exportDaten()), zugang: { token: abgleich.einst.token.trim() } }
@@ -269,7 +298,8 @@ export async function hochladen(): Promise<boolean> {
 }
 
 function tokenUebernehmen(text: string) {
-  if (abgleich.einst.rolle !== 'anzeige') return
+  // Fernseher immer; zweites Planer-Handy nur, wenn dort noch kein Token eingetragen ist
+  if (abgleich.einst.rolle !== 'anzeige' && abgleich.einst.token) return
   try {
     const t = JSON.parse(text)?.zugang?.token
     if (typeof t === 'string' && t && t !== abgleich.einst.token) {
@@ -428,7 +458,10 @@ export function abgleichStarten(): () => void {
     void statusHolen()
   }
   takt()
-  const id = setInterval(takt, abgleich.einst.rolle === 'anzeige' ? 120_000 : 600_000)
+  // Planer schauen öfter nach (zweites Handy), solange die App sichtbar ist
+  const id = setInterval(() => {
+    if (abgleich.einst.rolle === 'anzeige' || document.visibilityState === 'visible') takt()
+  }, abgleich.einst.rolle === 'anzeige' ? 120_000 : 60_000)
   // Erledigt-Stand öfter nachsehen, solange die App sichtbar ist (Handy sieht, was abgehakt wurde)
   const statusId = setInterval(() => {
     if (!aus && document.visibilityState === 'visible') void statusHolen()

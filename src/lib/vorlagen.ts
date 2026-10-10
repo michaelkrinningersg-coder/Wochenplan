@@ -53,6 +53,9 @@ export const VORLAGEN: Vorlage[] = [
   { titel: 'Pflanzen gießen', bild: 'pflanze', minuten: 0, abschnitt: 'nachmittag' },
   { titel: 'Kuchen essen', bild: 'kuchen', minuten: 0, abschnitt: 'nachmittag' },
   { titel: 'Geburtstag', bild: 'geburtstag', minuten: 0, abschnitt: 'nachmittag' },
+  // Ausflüge
+  { titel: 'Ausflug Miniaturland', bild: 'miniaturland', minuten: 0, abschnitt: 'vormittag' },
+  { titel: 'Ausflug Zoo', bild: 'zoo', minuten: 0, abschnitt: 'vormittag' },
   // Einkaufen
   { titel: 'Einkaufen', bild: 'einkaufen', minuten: 0, abschnitt: 'vormittag' },
   { titel: 'Bäcker', bild: 'croissant', minuten: 0, abschnitt: 'vormittag' },
@@ -60,7 +63,7 @@ export const VORLAGEN: Vorlage[] = [
   { titel: 'Einkäufe auspacken', bild: 'apfel', minuten: 0, abschnitt: 'nachmittag' },
   // Abend
   { titel: 'Abendessen', bild: 'abendbrot', minuten: 0, abschnitt: 'frueh' },
-  { titel: 'Aufräumen', bild: 'aufraeumen', minuten: 0, abschnitt: 'frueh' },
+  { titel: 'Aufräumen', bild: 'aufraeumen', minuten: 0, abschnitt: 'abend' },
   { titel: 'Baden', bild: 'baden', minuten: 0, abschnitt: 'abend' },
   { titel: 'Duschen', bild: 'duschen', minuten: 0, abschnitt: 'abend' },
   { titel: 'Ausziehen', bild: 'ausziehen', minuten: 0, abschnitt: 'abend' },
@@ -69,6 +72,7 @@ export const VORLAGEN: Vorlage[] = [
   // Bettgehzeit und Schlafen
   { titel: 'Fernsehen', bild: 'fernsehen', minuten: 0, abschnitt: 'abend' },
   { titel: 'Vorlesen', bild: 'lesen', minuten: 0, abschnitt: 'bett' },
+  { titel: 'Alleine Lesezeit', bild: 'lesezeit', minuten: 0, abschnitt: 'frueh' },
   { titel: 'Kuscheln', bild: 'kuscheln', minuten: 0, abschnitt: 'bett' },
   { titel: 'Toilette vor dem Schlafen', bild: 'toilette', minuten: 0, abschnitt: 'bett', zusatz: 'mond' },
   { titel: 'Schlafen', bild: 'schlafen', minuten: 0, abschnitt: 'schlafen' },
