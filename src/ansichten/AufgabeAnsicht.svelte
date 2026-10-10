@@ -1,0 +1,330 @@
+<script lang="ts">
+  import Ampel from '../komponenten/Ampel.svelte'
+  import Bild from '../komponenten/Bild.svelte'
+  import Symbol from '../komponenten/Symbol.svelte'
+  import TimerScheibe from '../komponenten/TimerScheibe.svelte'
+  import { gelbAb } from '../lib/ampel'
+  import { ICON_URL } from '../lib/bilder'
+  import {
+    app,
+    finde,
+    istErledigt,
+    istHeute,
+    minutenBisStart,
+    naechsteNach,
+    oeffnen,
+    setzeErledigt,
+    timerAendern,
+    timerPause,
+    timerRest,
+    timerStart,
+    timerZuruecksetzen,
+  } from '../lib/speicher.svelte'
+  import { spieleTon } from '../lib/ton'
+  import type { AbschnittId, TagId } from '../lib/typen'
+  import { dauerText, inText } from '../lib/zeit'
+
+  let { tag, abschnitt, id }: { tag: TagId; abschnitt: AbschnittId; id: string } = $props()
+
+  let breite = $state(0)
+  let hoehe = $state(0)
+  let feiern = $state(false)
+
+  const fund = $derived(finde(tag, id))
+  const aufgabe = $derived(fund?.aufgabe)
+  const seg = $derived(fund?.abschnitt ?? abschnitt)
+  const heute = $derived(istHeute(tag))
+  const erledigt = $derived(heute && istErledigt(id))
+  const mitTimer = $derived((aufgabe?.minuten ?? 0) > 0 || app.timer[id] !== undefined)
+  const dauerMs = $derived(app.timer[id]?.dauerMs ?? (aufgabe?.minuten ?? 0) * 60_000)
+  const t = $derived(timerRest(id, dauerMs))
+  const bisStart = $derived(aufgabe ? minutenBisStart(tag, aufgabe) : null)
+  const danach = $derived(naechsteNach(tag, id))
+
+  const ampel = $derived.by((): 'rot' | 'gelb' | 'gruen' | 'aus' => {
+    if (!mitTimer) return 'aus'
+    if (t.restMs <= 0) return 'rot'
+    if (t.restMs <= gelbAb(dauerMs)) return 'gelb'
+    return 'gruen'
+  })
+  const farbe = $derived(ampel === 'rot' ? 'var(--rot)' : ampel === 'gelb' ? 'var(--gelb)' : 'var(--gruen)')
+
+  /** Anteil der Scheibe: Restzeit des Timers oder Wartezeit bis zum Start (max. 1 Stunde) */
+  const anteil = $derived.by(() => {
+    if (mitTimer) return dauerMs > 0 ? t.restMs / dauerMs : 0
+    if (bisStart !== null) return Math.min(1, bisStart / 60)
+    return null
+  })
+
+  // Platz aufteilen: Scheibe links, Ampel daneben, Knöpfe rechts
+  const quer = $derived(breite > hoehe * 1.25)
+  const scheibe = $derived(
+    Math.max(160, Math.floor(quer ? Math.min(hoehe * 0.96, breite * 0.48) : Math.min(breite * 0.78, hoehe * 0.5))),
+  )
+  const ampelHoehe = $derived(Math.floor(scheibe * 0.8))
+
+  function fertig() {
+    if (!aufgabe) return
+    setzeErledigt(id, true)
+    timerPause(id)
+    if (app.einst.ton) spieleTon('fertig')
+    feiern = true
+    setTimeout(() => {
+      feiern = false
+      document.querySelector<HTMLElement>('[data-fokus-id="danach"]')?.focus()
+    }, 1800)
+  }
+
+  function nochmal() {
+    setzeErledigt(id, false)
+    timerZuruecksetzen(id)
+  }
+
+  function starten() {
+    if (!aufgabe) return
+    if (t.gestartet && t.restMs <= 0) timerZuruecksetzen(id)
+    timerStart(id, app.timer[id] ? dauerMs / 60_000 : aufgabe.minuten)
+  }
+</script>
+
+{#if aufgabe}
+  <div class="aufgabe" class:quer data-seg={seg} bind:clientWidth={breite} bind:clientHeight={hoehe}>
+    <div class="bildteil">
+      <TimerScheibe anteil={erledigt ? null : anteil} farbe={bisStart !== null && !mitTimer ? 'var(--seg)' : farbe} groesse={scheibe}>
+        <div class="bild" class:erledigt>
+          <Bild id={aufgabe.bild} zusatz={aufgabe.zusatz} />
+        </div>
+      </TimerScheibe>
+      {#if mitTimer && !erledigt}
+        <Ampel zustand={ampel} blinken={t.gestartet && t.restMs <= 0} hoehe={ampelHoehe} />
+      {/if}
+    </div>
+
+    <div class="seite">
+      <h1 class="titel">{aufgabe.titel}</h1>
+
+      {#if erledigt}
+        <p class="status geschafft">Geschafft!</p>
+      {:else if mitTimer}
+        <p class="status zeit" class:vorbei={t.gestartet && t.restMs <= 0}>
+          {#if t.gestartet && t.restMs <= 0}
+            Zeit ist um
+          {:else}
+            noch {dauerText(t.restMs)}
+          {/if}
+        </p>
+      {:else if bisStart !== null}
+        <p class="status">Es geht los {inText(bisStart)}</p>
+      {/if}
+
+      <div class="knoepfe">
+        {#if !erledigt}
+          {#if mitTimer}
+            {#if t.laeuft}
+              <button class="knopf gross" onclick={() => timerPause(id)} data-autofokus><Symbol name="pause" />Pause</button>
+            {:else}
+              <button class="knopf gross haupt" onclick={starten} data-autofokus>
+                <Symbol name="start" />{t.gestartet && t.restMs > 0 ? 'Weiter' : 'Los'}
+              </button>
+            {/if}
+          {/if}
+          <button class="knopf gross fertig" onclick={fertig} data-autofokus={!mitTimer ? true : undefined}>
+            <Symbol name="haken" />Fertig
+          </button>
+        {:else}
+          <button class="knopf" onclick={nochmal}><Symbol name="neu" />Nochmal</button>
+        {/if}
+      </div>
+
+      {#if mitTimer && !erledigt}
+        <div class="feinstellung">
+          <button class="knopf klein" onclick={() => timerAendern(id, -1, aufgabe.minuten)} aria-label="Eine Minute weniger">− 1 Min</button>
+          <button class="knopf klein" onclick={() => timerAendern(id, 1, aufgabe.minuten)} aria-label="Eine Minute mehr">+ 1 Min</button>
+          {#if t.gestartet}
+            <button class="knopf klein" onclick={() => timerZuruecksetzen(id)}><Symbol name="neu" />Neu</button>
+          {/if}
+        </div>
+      {/if}
+
+      {#if danach}
+        <button
+          class="danach"
+          data-seg={danach.abschnitt}
+          data-fokus-id="danach"
+          onclick={() => oeffnen({ art: 'aufgabe', tag, abschnitt: danach.abschnitt, id: danach.aufgabe.id })}
+        >
+          <span class="danach-text">Danach</span>
+          <span class="danach-bild"><Bild id={danach.aufgabe.bild} zusatz={danach.aufgabe.zusatz} /></span>
+          <span class="danach-name">{danach.aufgabe.titel}</span>
+          <Symbol name="weiter" />
+        </button>
+      {/if}
+    </div>
+
+    {#if feiern}
+      <div class="feier" aria-live="polite">
+        <img src={ICON_URL['_leuchtstern']} alt="" />
+        <span>Super!</span>
+      </div>
+    {/if}
+  </div>
+{:else}
+  <div class="weg">
+    <p>Diese Aufgabe gibt es nicht mehr.</p>
+    <button class="knopf" onclick={() => oeffnen({ art: 'tag', tag })} data-autofokus>Zum Tag</button>
+  </div>
+{/if}
+
+<style>
+  .aufgabe {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--rand);
+    height: 100%;
+    min-height: 0;
+  }
+  .aufgabe.quer {
+    flex-direction: row;
+    justify-content: center;
+  }
+  .bildteil {
+    display: flex;
+    align-items: center;
+    gap: clamp(16px, 2.5vw, 40px);
+  }
+  .bild {
+    width: 100%;
+    height: 100%;
+  }
+  .bild.erledigt {
+    filter: saturate(1.1);
+  }
+  .seite {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: clamp(10px, 1.6vw, 22px);
+    min-width: 0;
+    max-width: 30em;
+  }
+  .aufgabe:not(.quer) .seite {
+    align-items: center;
+    text-align: center;
+  }
+  .titel {
+    font-size: var(--t-riesig);
+    line-height: 1;
+  }
+  .status {
+    margin: 0;
+    font-family: var(--schrift-titel);
+    font-size: var(--t-titel);
+    font-variant-numeric: tabular-nums;
+    color: var(--tinte-leise);
+  }
+  .status.vorbei {
+    color: var(--rot);
+  }
+  .status.geschafft {
+    color: var(--gruen);
+  }
+  .knoepfe,
+  .feinstellung {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .knopf.gross {
+    font-size: var(--t-gross);
+    min-height: 2.4em;
+    padding-inline: 1.3em;
+  }
+  .knopf.fertig {
+    border-color: var(--gruen);
+    color: var(--gruen);
+  }
+  .knopf.klein {
+    font-size: var(--t-klein);
+    min-height: 2.4em;
+  }
+  .danach {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 0.4em;
+    padding: 8px 16px 8px 14px;
+    border: none;
+    border-radius: 20px;
+    background: var(--seg-hell);
+    box-shadow: inset 0 0 0 3px var(--seg);
+    font-size: var(--t-text);
+  }
+  .danach-text {
+    color: var(--tinte-leise);
+    font-size: var(--t-klein);
+  }
+  .danach-bild {
+    width: clamp(36px, 4.5vw, 56px);
+    height: clamp(36px, 4.5vw, 56px);
+  }
+  .danach-name {
+    font-weight: 700;
+  }
+
+  .feier {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: var(--himmel);
+    opacity: 0.96;
+    animation: feier 1.8s ease both;
+    z-index: 10;
+  }
+  .feier img {
+    width: min(40vh, 40vw);
+    height: min(40vh, 40vw);
+    animation: stern 1.8s ease both;
+  }
+  .feier span {
+    font-family: var(--schrift-titel);
+    font-weight: 600;
+    font-size: var(--t-riesig);
+  }
+  @keyframes feier {
+    0% {
+      opacity: 0;
+    }
+    12%,
+    85% {
+      opacity: 0.96;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+  @keyframes stern {
+    0% {
+      transform: scale(0.3) rotate(-30deg);
+    }
+    30% {
+      transform: scale(1.1) rotate(8deg);
+    }
+    45%,
+    100% {
+      transform: scale(1) rotate(0);
+    }
+  }
+  .weg {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1em;
+    padding: var(--rand);
+  }
+</style>

@@ -1,0 +1,297 @@
+/* Wochenplan – Gestaltung
+   Idee: Der Tag als Himmel. Jeder Tagesabschnitt hat seine Himmelsfarbe (Morgenrot → Abendblau),
+   Aufgaben sind „Magnete“ auf einer Tafel, eine Sonne wandert über den Tag.
+   Schrift: Fredoka (rund, freundlich) für Überschriften, Andika (für Leseanfänger) für Beschriftungen. */
+
+@font-face {
+  font-family: 'Fredoka';
+  src: url('./assets/fonts/fredoka-latin-wght-normal.woff2') format('woff2-variations');
+  font-weight: 300 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Andika';
+  src: url('./assets/fonts/andika-latin-400-normal.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Andika';
+  src: url('./assets/fonts/andika-latin-700-normal.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* Tag */
+  --himmel: #e3edf6;
+  --tafel: #ffffff;
+  --tinte: #1d2b4f;
+  --tinte-leise: #56627f;
+  --linie: #c3d2e3;
+  --fokus: #1d2b4f;
+  --fokus-hof: #ffffff;
+  --schatten: rgba(29, 43, 79, 0.16);
+
+  --morgen: #ffb59e;
+  --morgen-tief: #d6634a;
+  --morgen-hell: #ffe6dd;
+  --vormittag: #8ecff5;
+  --vormittag-tief: #2a7fb8;
+  --vormittag-hell: #dcf0fc;
+  --mittag: #ffd45c;
+  --mittag-tief: #b98a00;
+  --mittag-hell: #fff3cc;
+  --nachmittag: #9ad98a;
+  --nachmittag-tief: #3b8f32;
+  --nachmittag-hell: #e2f5dc;
+  --abend: #8a7fe0;
+  --abend-tief: #4b3f9e;
+  --abend-hell: #e6e3fa;
+
+  --gruen: #2fae66;
+  --gelb: #ffc229;
+  --rot: #e5484d;
+  --gehaeuse: #22304f;
+  --sonne: #ffc83a;
+  /* Schrift auf den hellen Abschnittsfarben – in beiden Themen gleich */
+  --tinte-auf-farbe: #1d2b4f;
+
+  --schrift-titel: 'Fredoka', 'Andika', 'Trebuchet MS', system-ui, sans-serif;
+  --schrift-text: 'Andika', 'Fredoka', 'Trebuchet MS', system-ui, sans-serif;
+
+  --t-klein: clamp(13px, 1.35vw, 18px);
+  --t-text: clamp(15px, 1.7vw, 22px);
+  --t-gross: clamp(19px, 2.3vw, 30px);
+  --t-titel: clamp(24px, 3.3vw, 44px);
+  --t-riesig: clamp(34px, 5.6vw, 76px);
+
+  --rand: clamp(12px, 2.4vw, 32px);
+  --luecke: clamp(8px, 1.1vw, 14px);
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --himmel: #171c38;
+    --tafel: #262d57;
+    --tinte: #f2f3ff;
+    --tinte-leise: #a9b1d9;
+    --linie: #3a437c;
+    --fokus: #ffffff;
+    --fokus-hof: #171c38;
+    --schatten: rgba(0, 0, 0, 0.35);
+    --morgen-hell: #3d2d40;
+    --vormittag-hell: #1f3456;
+    --mittag-hell: #3b3628;
+    --nachmittag-hell: #223a31;
+    --abend-hell: #302b62;
+    --gehaeuse: #0e1228;
+    color-scheme: dark;
+  }
+}
+:root[data-theme='dark'] {
+  --himmel: #171c38;
+  --tafel: #262d57;
+  --tinte: #f2f3ff;
+  --tinte-leise: #a9b1d9;
+  --linie: #3a437c;
+  --fokus: #ffffff;
+  --fokus-hof: #171c38;
+  --schatten: rgba(0, 0, 0, 0.35);
+  --morgen-hell: #3d2d40;
+  --vormittag-hell: #1f3456;
+  --mittag-hell: #3b3628;
+  --nachmittag-hell: #223a31;
+  --abend-hell: #302b62;
+  --gehaeuse: #0e1228;
+  color-scheme: dark;
+}
+
+/* Die App wählt selbst: tagsüber hell, abends dunkel (Einstellung „automatisch“) */
+.app[data-thema='tag'] {
+  --himmel: #e3edf6;
+  --tafel: #ffffff;
+  --tinte: #1d2b4f;
+  --tinte-leise: #56627f;
+  --linie: #c3d2e3;
+  --fokus: #1d2b4f;
+  --fokus-hof: #ffffff;
+  --schatten: rgba(29, 43, 79, 0.16);
+  --morgen-hell: #ffe6dd;
+  --vormittag-hell: #dcf0fc;
+  --mittag-hell: #fff3cc;
+  --nachmittag-hell: #e2f5dc;
+  --abend-hell: #e6e3fa;
+  --gehaeuse: #22304f;
+  color-scheme: light;
+}
+.app[data-thema='nacht'] {
+  --himmel: #171c38;
+  --tafel: #262d57;
+  --tinte: #f2f3ff;
+  --tinte-leise: #a9b1d9;
+  --linie: #3a437c;
+  --fokus: #ffffff;
+  --fokus-hof: #171c38;
+  --schatten: rgba(0, 0, 0, 0.35);
+  --morgen-hell: #3d2d40;
+  --vormittag-hell: #1f3456;
+  --mittag-hell: #3b3628;
+  --nachmittag-hell: #223a31;
+  --abend-hell: #302b62;
+  --gehaeuse: #0e1228;
+  color-scheme: dark;
+}
+
+/* Segmentfarben als Variablen --seg, --seg-tief, --seg-hell */
+[data-seg='morgen'] { --seg: var(--morgen); --seg-tief: var(--morgen-tief); --seg-hell: var(--morgen-hell); }
+[data-seg='vormittag'] { --seg: var(--vormittag); --seg-tief: var(--vormittag-tief); --seg-hell: var(--vormittag-hell); }
+[data-seg='mittag'] { --seg: var(--mittag); --seg-tief: var(--mittag-tief); --seg-hell: var(--mittag-hell); }
+[data-seg='nachmittag'] { --seg: var(--nachmittag); --seg-tief: var(--nachmittag-tief); --seg-hell: var(--nachmittag-hell); }
+[data-seg='abend'] { --seg: var(--abend); --seg-tief: var(--abend-tief); --seg-hell: var(--abend-hell); }
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--himmel);
+  color: var(--tinte);
+  font-family: var(--schrift-text);
+  font-size: var(--t-text);
+  line-height: 1.35;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+}
+
+#app {
+  height: 100%;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--schrift-titel);
+  font-weight: 600;
+  margin: 0;
+  text-wrap: balance;
+}
+
+img {
+  max-width: 100%;
+}
+
+/* Sichtbarer Fokus für die Fernbedienung */
+:focus {
+  outline: none;
+}
+:focus-visible {
+  outline: 4px solid var(--fokus);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 9px var(--fokus-hof);
+}
+
+/* ---------- Knöpfe ---------- */
+.knopf {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45em;
+  min-height: 2.6em;
+  padding: 0.35em 1.05em;
+  border: 2px solid var(--linie);
+  border-radius: 999px;
+  background: var(--tafel);
+  color: var(--tinte);
+  font-family: var(--schrift-titel);
+  font-weight: 500;
+  font-size: var(--t-text);
+  line-height: 1.1;
+  white-space: nowrap;
+}
+.knopf svg {
+  width: 1.15em;
+  height: 1.15em;
+  flex: none;
+}
+.knopf:active {
+  transform: translateY(1px);
+}
+.knopf.haupt {
+  background: var(--tinte);
+  border-color: var(--tinte);
+  color: var(--tafel);
+}
+.knopf.gefahr {
+  border-color: var(--rot);
+  color: var(--rot);
+}
+.knopf.rund {
+  padding: 0;
+  width: 2.6em;
+}
+.knopf[aria-pressed='true'] {
+  background: var(--tinte);
+  border-color: var(--tinte);
+  color: var(--tafel);
+}
+
+/* ---------- Drag & Drop ---------- */
+.zieh-geist {
+  opacity: 0.92;
+  filter: drop-shadow(0 12px 18px var(--schatten));
+  transition: none !important;
+}
+.zieh-marke {
+  position: fixed;
+  z-index: 999;
+  border-radius: 6px;
+  background: var(--tinte);
+  pointer-events: none;
+  box-shadow: 0 0 0 3px var(--fokus-hof);
+}
+.wird-gezogen {
+  opacity: 0.3;
+}
+.ziehen-laeuft,
+.ziehen-laeuft * {
+  cursor: grabbing !important;
+  user-select: none;
+}
+
+.unsichtbar {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

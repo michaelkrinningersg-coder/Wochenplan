@@ -1,0 +1,273 @@
+<script lang="ts">
+  import Fenster from '../komponenten/Fenster.svelte'
+  import Symbol from '../komponenten/Symbol.svelte'
+  import ZeitWahl from '../komponenten/ZeitWahl.svelte'
+  import { abgleich, einstSpeichern, holen, hochladen, istEingerichtet } from '../lib/abgleich.svelte'
+  import { dateiExportieren, istApp } from '../lib/geraet'
+  import { ABSCHNITTE } from '../lib/konstanten'
+  import { app, exportDaten, importDaten, zeigeHinweis } from '../lib/speicher.svelte'
+  import { startplan } from '../lib/startplan'
+
+  let zuruecksetzenFragen = $state(false)
+  let passwortZeigen = $state(false)
+  let erweitert = $state(false)
+  let dateiFeld: HTMLInputElement | undefined = $state()
+
+  const e = abgleich.einst
+
+  function aenderung() {
+    einstSpeichern()
+  }
+
+  async function jetztAbgleichen() {
+    einstSpeichern()
+    if (e.rolle === 'planer') {
+      const geholt = await holen(false)
+      if (!geholt) await hochladen()
+    } else {
+      await holen(true)
+    }
+    if (abgleich.zustand === 'ok') zeigeHinweis(abgleich.meldung || 'Plan ist abgeglichen.')
+  }
+
+  async function exportieren() {
+    const d = new Date()
+    const name = `wochenplan-${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}.json`
+    try {
+      zeigeHinweis(await dateiExportieren(name, exportDaten()))
+    } catch {
+      zeigeHinweis('Die Datei konnte nicht gespeichert werden.')
+    }
+  }
+
+  async function importieren(ev: Event) {
+    const datei = (ev.target as HTMLInputElement).files?.[0]
+    if (!datei) return
+    const ok = importDaten(await datei.text())
+    zeigeHinweis(ok ? 'Plan übernommen.' : 'Diese Datei ist kein gültiger Wochenplan.')
+    ;(ev.target as HTMLInputElement).value = ''
+  }
+
+  function zuruecksetzen() {
+    app.plan = startplan()
+    app.fotos = {}
+    zuruecksetzenFragen = false
+    zeigeHinweis('Startplan wiederhergestellt.')
+  }
+</script>
+
+<Fenster titel="Einstellungen" breit>
+  <div class="einstellungen">
+    <section>
+      <h3>Dieses Gerät</h3>
+      <div class="reihe">
+        <button
+          class="knopf"
+          aria-pressed={e.rolle === 'planer'}
+          data-autofokus
+          onclick={() => {
+            e.rolle = 'planer'
+            aenderung()
+          }}>Planen (Handy, PC)</button
+        >
+        <button
+          class="knopf"
+          aria-pressed={e.rolle === 'anzeige'}
+          onclick={() => {
+            e.rolle = 'anzeige'
+            app.bearbeiten = false
+            aenderung()
+          }}>Nur anzeigen (Fernseher)</button
+        >
+      </div>
+      <p class="hilfe">
+        {#if e.rolle === 'planer'}
+          Hier wird der Plan bearbeitet. Jede Änderung wird verschlüsselt hochgeladen.
+        {:else}
+          Der Plan kommt vom Handy oder PC. Die App schaut alle 2 Minuten nach Änderungen.
+        {/if}
+      </p>
+    </section>
+
+    <section>
+      <h3>Abgleich</h3>
+      <label class="feld">
+        <span class="name">Familien-Passwort (auf allen Geräten gleich)</span>
+        <span class="mit-knopf">
+          <input
+            id="abgleich-passwort"
+            type={passwortZeigen ? 'text' : 'password'}
+            bind:value={e.passwort}
+            onchange={aenderung}
+            autocomplete="off"
+            placeholder="z. B. hase-sonne-blau-17"
+          />
+          <button class="knopf" onclick={() => (passwortZeigen = !passwortZeigen)}>{passwortZeigen ? 'Verbergen' : 'Zeigen'}</button>
+        </span>
+      </label>
+      {#if e.rolle === 'planer'}
+        <label class="feld">
+          <span class="name">GitHub-Token (nur zum Hochladen nötig)</span>
+          <input id="abgleich-token" type="password" bind:value={e.token} onchange={aenderung} autocomplete="off" placeholder="github_pat_…" />
+        </label>
+      {/if}
+      <div class="reihe">
+        <button class="knopf haupt" onclick={jetztAbgleichen} disabled={!istEingerichtet()}>
+          <Symbol name="neu" />{e.rolle === 'planer' ? 'Jetzt abgleichen' : 'Plan jetzt laden'}
+        </button>
+        <button class="knopf" onclick={() => (erweitert = !erweitert)} aria-expanded={erweitert}>Speicherort</button>
+      </div>
+      {#if abgleich.zustand === 'fehler'}
+        <p class="meldung fehler">{abgleich.meldung}</p>
+      {:else if abgleich.zuletzt}
+        <p class="meldung">
+          Zuletzt abgeglichen um {new Date(abgleich.zuletzt).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })} Uhr.
+          {abgleich.meldung}
+        </p>
+      {:else if !istEingerichtet()}
+        <p class="hilfe">
+          {e.rolle === 'planer' ? 'Passwort und Token eintragen, dann wird der Plan automatisch hochgeladen.' : 'Passwort eintragen, dann lädt der Fernseher den Plan.'}
+        </p>
+      {/if}
+      {#if erweitert}
+        <div class="raster">
+          <label class="feld"><span class="name">GitHub-Konto</span><input id="abgleich-besitzer" type="text" bind:value={e.besitzer} onchange={aenderung} /></label>
+          <label class="feld"><span class="name">Repo</span><input id="abgleich-repo" type="text" bind:value={e.repo} onchange={aenderung} /></label>
+          <label class="feld"><span class="name">Zweig</span><input id="abgleich-zweig" type="text" bind:value={e.zweig} onchange={aenderung} /></label>
+          <label class="feld"><span class="name">Datei</span><input id="abgleich-datei" type="text" bind:value={e.datei} onchange={aenderung} /></label>
+        </div>
+      {/if}
+    </section>
+
+    <section>
+      <h3>Tageszeiten</h3>
+      <div class="zeiten">
+        {#each ABSCHNITTE as ab (ab.id)}
+          <div class="zeit" data-seg={ab.id}>
+            <span class="name">{ab.name} ab</span>
+            <ZeitWahl bind:wert={app.plan.zeiten[ab.id]} label="{ab.name} ab" />
+          </div>
+        {/each}
+        <div class="zeit" data-seg="abend">
+          <span class="name">Abend bis</span>
+          <ZeitWahl bind:wert={app.plan.abendEnde} label="Abend bis" />
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h3>Anzeige</h3>
+      <div class="reihe">
+        <button class="knopf" aria-pressed={app.einst.thema === 'auto'} onclick={() => (app.einst.thema = 'auto')}>Abends dunkel</button>
+        <button class="knopf" aria-pressed={app.einst.thema === 'tag'} onclick={() => (app.einst.thema = 'tag')}>Immer hell</button>
+        <button class="knopf" aria-pressed={app.einst.thema === 'nacht'} onclick={() => (app.einst.thema = 'nacht')}>Immer dunkel</button>
+      </div>
+      <div class="reihe">
+        <button class="knopf" aria-pressed={app.einst.ton} onclick={() => (app.einst.ton = !app.einst.ton)}>
+          Ton {app.einst.ton ? 'an' : 'aus'}
+        </button>
+        <button class="knopf" aria-pressed={app.einst.wach} onclick={() => (app.einst.wach = !app.einst.wach)}>
+          Bildschirm anlassen: {app.einst.wach ? 'ja' : 'nein'}
+        </button>
+      </div>
+    </section>
+
+    <section>
+      <h3>Sichern</h3>
+      <div class="reihe">
+        <button class="knopf" onclick={exportieren}>Plan als Datei sichern</button>
+        <button class="knopf" onclick={() => dateiFeld?.click()}>Plan aus Datei laden</button>
+        <input bind:this={dateiFeld} id="import-datei" type="file" accept="application/json,.json" hidden onchange={importieren} />
+        {#if zuruecksetzenFragen}
+          <button class="knopf gefahr" onclick={zuruecksetzen}>Wirklich auf Startplan zurücksetzen</button>
+        {:else}
+          <button class="knopf gefahr" onclick={() => (zuruecksetzenFragen = true)}>Startplan wiederherstellen</button>
+        {/if}
+      </div>
+    </section>
+
+    <p class="info">
+      Wochenplan {istApp ? 'App' : 'im Browser'}. Bilder: Microsoft Fluent Emoji (MIT-Lizenz). Schriften: Fredoka und Andika (SIL Open Font License).
+    </p>
+  </div>
+</Fenster>
+
+<style>
+  .einstellungen {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+  section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  h3 {
+    font-size: var(--t-text);
+  }
+  .reihe {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .feld {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+  .name {
+    font-size: var(--t-klein);
+    color: var(--tinte-leise);
+    font-weight: 700;
+  }
+  input[type='text'],
+  input[type='password'] {
+    width: 100%;
+    min-width: 0;
+    padding: 0.5em 0.8em;
+    border: 2px solid var(--linie);
+    border-radius: 14px;
+    background: var(--himmel);
+    color: var(--tinte);
+    font: inherit;
+  }
+  .mit-knopf {
+    display: flex;
+    gap: 8px;
+  }
+  .hilfe,
+  .meldung,
+  .info {
+    margin: 0;
+    font-size: var(--t-klein);
+    color: var(--tinte-leise);
+    max-width: 44em;
+  }
+  .meldung.fehler {
+    color: var(--rot);
+    font-weight: 700;
+  }
+  .raster {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+  }
+  .zeiten {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+  }
+  .zeit {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 10px 12px;
+    border-radius: 18px;
+    background: var(--seg-hell);
+  }
+  .knopf:disabled {
+    opacity: 0.4;
+  }
+</style>
