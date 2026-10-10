@@ -1,0 +1,264 @@
+﻿Gruppe;Dateiname;Text
+lob;lob_super-gemacht.mp3;Super gemacht!
+lob;lob_toll-geschafft.mp3;Toll, geschafft!
+lob;lob_prima-das-hast-du-super-gemacht.mp3;Prima, das hast du super gemacht!
+lob;lob_klasse.mp3;Klasse!
+lob;lob_juhu-geschafft.mp3;Juhu, geschafft!
+lob;lob_das-ist-schon-geschafft.mp3;Das ist schon geschafft!
+lob;lob_du-hast-alles-geschafft-ganz-toll.mp3;Du hast alles geschafft! Ganz toll!
+satz;satz_jetzt-ist.mp3;Jetzt ist
+satz;satz_dran.mp3;dran.
+satz;satz_du-hast.mp3;Du hast
+satz;satz_zeit.mp3;Zeit.
+rest;rest_noch-10-minuten-fuer.mp3;Noch 10 Minuten für
+rest;rest_noch-5-minuten-fuer.mp3;Noch 5 Minuten für
+rest;rest_noch-eine-minute-fuer.mp3;Noch eine Minute für
+rest;rest_gleich-ist-die-zeit-um.mp3;Gleich ist die Zeit um.
+ende;ende_die-zeit-fuer.mp3;Die Zeit für
+ende;ende_ist-um.mp3;ist um.
+start;start_in-einer-minute-geht-es-los.mp3;In einer Minute geht es los:
+start;start_in-5-minuten-geht-es-los.mp3;In 5 Minuten geht es los:
+start;start_in-10-minuten-geht-es-los.mp3;In 10 Minuten geht es los:
+start;start_in-15-minuten-geht-es-los.mp3;In 15 Minuten geht es los:
+start;start_in-30-minuten-geht-es-los.mp3;In 30 Minuten geht es los:
+uhr;uhr_es-ist.mp3;Es ist
+uhr;uhr_uhr.mp3;Uhr
+probe;probe_hallo-so-klinge-ich.mp3;Hallo! So klinge ich.
+minuten;minuten_eine-minute.mp3;eine Minute
+minuten;minuten_2-minuten.mp3;2 Minuten
+minuten;minuten_3-minuten.mp3;3 Minuten
+minuten;minuten_4-minuten.mp3;4 Minuten
+minuten;minuten_5-minuten.mp3;5 Minuten
+minuten;minuten_6-minuten.mp3;6 Minuten
+minuten;minuten_7-minuten.mp3;7 Minuten
+minuten;minuten_8-minuten.mp3;8 Minuten
+minuten;minuten_9-minuten.mp3;9 Minuten
+minuten;minuten_10-minuten.mp3;10 Minuten
+minuten;minuten_12-minuten.mp3;12 Minuten
+minuten;minuten_15-minuten.mp3;15 Minuten
+minuten;minuten_20-minuten.mp3;20 Minuten
+minuten;minuten_25-minuten.mp3;25 Minuten
+minuten;minuten_30-minuten.mp3;30 Minuten
+minuten;minuten_40-minuten.mp3;40 Minuten
+minuten;minuten_45-minuten.mp3;45 Minuten
+minuten;minuten_50-minuten.mp3;50 Minuten
+minuten;minuten_60-minuten.mp3;60 Minuten
+minuten;minuten_90-minuten.mp3;90 Minuten
+minuten;minuten_120-minuten.mp3;120 Minuten
+stunde;stunde_0-uhr.mp3;0 Uhr
+stunde;stunde_ein-uhr.mp3;ein Uhr
+stunde;stunde_2-uhr.mp3;2 Uhr
+stunde;stunde_3-uhr.mp3;3 Uhr
+stunde;stunde_4-uhr.mp3;4 Uhr
+stunde;stunde_5-uhr.mp3;5 Uhr
+stunde;stunde_6-uhr.mp3;6 Uhr
+stunde;stunde_7-uhr.mp3;7 Uhr
+stunde;stunde_8-uhr.mp3;8 Uhr
+stunde;stunde_9-uhr.mp3;9 Uhr
+stunde;stunde_10-uhr.mp3;10 Uhr
+stunde;stunde_11-uhr.mp3;11 Uhr
+stunde;stunde_12-uhr.mp3;12 Uhr
+stunde;stunde_13-uhr.mp3;13 Uhr
+stunde;stunde_14-uhr.mp3;14 Uhr
+stunde;stunde_15-uhr.mp3;15 Uhr
+stunde;stunde_16-uhr.mp3;16 Uhr
+stunde;stunde_17-uhr.mp3;17 Uhr
+stunde;stunde_18-uhr.mp3;18 Uhr
+stunde;stunde_19-uhr.mp3;19 Uhr
+stunde;stunde_20-uhr.mp3;20 Uhr
+stunde;stunde_21-uhr.mp3;21 Uhr
+stunde;stunde_22-uhr.mp3;22 Uhr
+stunde;stunde_23-uhr.mp3;23 Uhr
+minute;minute_1.mp3;1
+minute;minute_2.mp3;2
+minute;minute_3.mp3;3
+minute;minute_4.mp3;4
+minute;minute_5.mp3;5
+minute;minute_6.mp3;6
+minute;minute_7.mp3;7
+minute;minute_8.mp3;8
+minute;minute_9.mp3;9
+minute;minute_10.mp3;10
+minute;minute_11.mp3;11
+minute;minute_12.mp3;12
+minute;minute_13.mp3;13
+minute;minute_14.mp3;14
+minute;minute_15.mp3;15
+minute;minute_16.mp3;16
+minute;minute_17.mp3;17
+minute;minute_18.mp3;18
+minute;minute_19.mp3;19
+minute;minute_20.mp3;20
+minute;minute_21.mp3;21
+minute;minute_22.mp3;22
+minute;minute_23.mp3;23
+minute;minute_24.mp3;24
+minute;minute_25.mp3;25
+minute;minute_26.mp3;26
+minute;minute_27.mp3;27
+minute;minute_28.mp3;28
+minute;minute_29.mp3;29
+minute;minute_30.mp3;30
+minute;minute_31.mp3;31
+minute;minute_32.mp3;32
+minute;minute_33.mp3;33
+minute;minute_34.mp3;34
+minute;minute_35.mp3;35
+minute;minute_36.mp3;36
+minute;minute_37.mp3;37
+minute;minute_38.mp3;38
+minute;minute_39.mp3;39
+minute;minute_40.mp3;40
+minute;minute_41.mp3;41
+minute;minute_42.mp3;42
+minute;minute_43.mp3;43
+minute;minute_44.mp3;44
+minute;minute_45.mp3;45
+minute;minute_46.mp3;46
+minute;minute_47.mp3;47
+minute;minute_48.mp3;48
+minute;minute_49.mp3;49
+minute;minute_50.mp3;50
+minute;minute_51.mp3;51
+minute;minute_52.mp3;52
+minute;minute_53.mp3;53
+minute;minute_54.mp3;54
+minute;minute_55.mp3;55
+minute;minute_56.mp3;56
+minute;minute_57.mp3;57
+minute;minute_58.mp3;58
+minute;minute_59.mp3;59
+aufgabe;aufgabe_abendessen.mp3;Abendessen
+aufgabe;aufgabe_abendzeit.mp3;Abendzeit
+aufgabe;aufgabe_abholen.mp3;Abholen
+aufgabe;aufgabe_alleine-lesezeit.mp3;Alleine Lesezeit
+aufgabe;aufgabe_anziehen.mp3;Anziehen
+aufgabe;aufgabe_apfel.mp3;Apfel
+aufgabe;aufgabe_arzt.mp3;Arzt
+aufgabe;aufgabe_aufraeumen.mp3;Aufräumen
+aufgabe;aufgabe_aufstehen.mp3;Aufstehen
+aufgabe;aufgabe_ausflug-zoo.mp3;Ausflug Zoo
+aufgabe;aufgabe_ausziehen.mp3;Ausziehen
+aufgabe;aufgabe_baden.mp3;Baden
+aufgabe;aufgabe_basteln.mp3;Basteln
+aufgabe;aufgabe_bettgehzeit.mp3;Bettgehzeit
+aufgabe;aufgabe_baecker.mp3;Bäcker
+aufgabe;aufgabe_draussen-spielen.mp3;Draußen spielen
+aufgabe;aufgabe_duschen.mp3;Duschen
+aufgabe;aufgabe_eincremen.mp3;Eincremen
+aufgabe;aufgabe_einkaufen.mp3;Einkaufen
+aufgabe;aufgabe_einkaeufe-auspacken.mp3;Einkäufe auspacken
+aufgabe;aufgabe_fahrrad-fahren.mp3;Fahrrad fahren
+aufgabe;aufgabe_fernsehen.mp3;Fernsehen
+aufgabe;aufgabe_frueher-abend.mp3;Früher Abend
+aufgabe;aufgabe_fruehstueck.mp3;Frühstück
+aufgabe;aufgabe_geburtstag.mp3;Geburtstag
+aufgabe;aufgabe_haende-waschen.mp3;Hände waschen
+aufgabe;aufgabe_jacke-anziehen.mp3;Jacke anziehen
+aufgabe;aufgabe_kinderturnen.mp3;Kinderturnen
+aufgabe;aufgabe_kita.mp3;Kita
+aufgabe;aufgabe_kuchen-essen.mp3;Kuchen essen
+aufgabe;aufgabe_kuscheln.mp3;Kuscheln
+aufgabe;aufgabe_lesen.mp3;Lesen
+aufgabe;aufgabe_malen.mp3;Malen
+aufgabe;aufgabe_medizin-nehmen.mp3;Medizin nehmen
+aufgabe;aufgabe_mittag.mp3;Mittag
+aufgabe;aufgabe_mittagessen.mp3;Mittagessen
+aufgabe;aufgabe_mittagsruhe.mp3;Mittagsruhe
+aufgabe;aufgabe_mond.mp3;Mond
+aufgabe;aufgabe_morgen.mp3;Morgen
+aufgabe;aufgabe_musik-und-tanzen.mp3;Musik und Tanzen
+aufgabe;aufgabe_nachmittag.mp3;Nachmittag
+aufgabe;aufgabe_obstpause.mp3;Obstpause
+aufgabe;aufgabe_oma-und-opa.mp3;Oma und Opa
+aufgabe;aufgabe_pflanzen-giessen.mp3;Pflanzen gießen
+aufgabe;aufgabe_puzzeln.mp3;Puzzeln
+aufgabe;aufgabe_rucksack-packen.mp3;Rucksack packen
+aufgabe;aufgabe_schlafanzug-anziehen.mp3;Schlafanzug anziehen
+aufgabe;aufgabe_schlafen.mp3;Schlafen
+aufgabe;aufgabe_schuhe-anziehen.mp3;Schuhe anziehen
+aufgabe;aufgabe_schwimmen.mp3;Schwimmen
+aufgabe;aufgabe_sonne.mp3;Sonne
+aufgabe;aufgabe_spielen.mp3;Spielen
+aufgabe;aufgabe_spieleverabredung.mp3;Spieleverabredung
+aufgabe;aufgabe_spielplatz.mp3;Spielplatz
+aufgabe;aufgabe_spielzeit.mp3;Spielzeit
+aufgabe;aufgabe_stern.mp3;Stern
+aufgabe;aufgabe_tisch-decken.mp3;Tisch decken
+aufgabe;aufgabe_toilette.mp3;Toilette
+aufgabe;aufgabe_toilette-vor-dem-schlafen.mp3;Toilette vor dem Schlafen
+aufgabe;aufgabe_trinken.mp3;Trinken
+aufgabe;aufgabe_vorlesen.mp3;Vorlesen
+aufgabe;aufgabe_vormittag.mp3;Vormittag
+aufgabe;aufgabe_vorschulaufgaben.mp3;Vorschulaufgaben
+aufgabe;aufgabe_vorschulheft.mp3;Vorschulheft
+aufgabe;aufgabe_wochenmarkt.mp3;Wochenmarkt
+aufgabe;aufgabe_zaehne-putzen.mp3;Zähne putzen
+ansage;ansage_jetzt-ist-abendessen-dran.mp3;Jetzt ist Abendessen dran.
+ansage;ansage_jetzt-ist-abendzeit-dran.mp3;Jetzt ist Abendzeit dran.
+ansage;ansage_jetzt-ist-abholen-dran.mp3;Jetzt ist Abholen dran.
+ansage;ansage_jetzt-ist-alleine-lesezeit-dran.mp3;Jetzt ist Alleine Lesezeit dran.
+ansage;ansage_jetzt-ist-anziehen-dran.mp3;Jetzt ist Anziehen dran.
+ansage;ansage_jetzt-ist-apfel-dran.mp3;Jetzt ist Apfel dran.
+ansage;ansage_jetzt-ist-arzt-dran.mp3;Jetzt ist Arzt dran.
+ansage;ansage_jetzt-ist-aufraeumen-dran.mp3;Jetzt ist Aufräumen dran.
+ansage;ansage_jetzt-ist-aufstehen-dran.mp3;Jetzt ist Aufstehen dran.
+ansage;ansage_jetzt-ist-ausflug-zoo-dran.mp3;Jetzt ist Ausflug Zoo dran.
+ansage;ansage_jetzt-ist-ausziehen-dran.mp3;Jetzt ist Ausziehen dran.
+ansage;ansage_jetzt-ist-baden-dran.mp3;Jetzt ist Baden dran.
+ansage;ansage_jetzt-ist-basteln-dran.mp3;Jetzt ist Basteln dran.
+ansage;ansage_jetzt-ist-bettgehzeit-dran.mp3;Jetzt ist Bettgehzeit dran.
+ansage;ansage_jetzt-ist-baecker-dran.mp3;Jetzt ist Bäcker dran.
+ansage;ansage_jetzt-ist-draussen-spielen-dran.mp3;Jetzt ist Draußen spielen dran.
+ansage;ansage_jetzt-ist-duschen-dran.mp3;Jetzt ist Duschen dran.
+ansage;ansage_jetzt-ist-eincremen-dran.mp3;Jetzt ist Eincremen dran.
+ansage;ansage_jetzt-ist-einkaufen-dran.mp3;Jetzt ist Einkaufen dran.
+ansage;ansage_jetzt-ist-einkaeufe-auspacken-dran.mp3;Jetzt ist Einkäufe auspacken dran.
+ansage;ansage_jetzt-ist-fahrrad-fahren-dran.mp3;Jetzt ist Fahrrad fahren dran.
+ansage;ansage_jetzt-ist-fernsehen-dran.mp3;Jetzt ist Fernsehen dran.
+ansage;ansage_jetzt-ist-frueher-abend-dran.mp3;Jetzt ist Früher Abend dran.
+ansage;ansage_jetzt-ist-fruehstueck-dran.mp3;Jetzt ist Frühstück dran.
+ansage;ansage_jetzt-ist-geburtstag-dran.mp3;Jetzt ist Geburtstag dran.
+ansage;ansage_jetzt-ist-haende-waschen-dran.mp3;Jetzt ist Hände waschen dran.
+ansage;ansage_jetzt-ist-jacke-anziehen-dran.mp3;Jetzt ist Jacke anziehen dran.
+ansage;ansage_jetzt-ist-kinderturnen-dran.mp3;Jetzt ist Kinderturnen dran.
+ansage;ansage_jetzt-ist-kita-dran.mp3;Jetzt ist Kita dran.
+ansage;ansage_jetzt-ist-kuchen-essen-dran.mp3;Jetzt ist Kuchen essen dran.
+ansage;ansage_jetzt-ist-kuscheln-dran.mp3;Jetzt ist Kuscheln dran.
+ansage;ansage_jetzt-ist-lesen-dran.mp3;Jetzt ist Lesen dran.
+ansage;ansage_jetzt-ist-malen-dran.mp3;Jetzt ist Malen dran.
+ansage;ansage_jetzt-ist-medizin-nehmen-dran.mp3;Jetzt ist Medizin nehmen dran.
+ansage;ansage_jetzt-ist-mittag-dran.mp3;Jetzt ist Mittag dran.
+ansage;ansage_jetzt-ist-mittagessen-dran.mp3;Jetzt ist Mittagessen dran.
+ansage;ansage_jetzt-ist-mittagsruhe-dran.mp3;Jetzt ist Mittagsruhe dran.
+ansage;ansage_jetzt-ist-mond-dran.mp3;Jetzt ist Mond dran.
+ansage;ansage_jetzt-ist-morgen-dran.mp3;Jetzt ist Morgen dran.
+ansage;ansage_jetzt-ist-musik-und-tanzen-dran.mp3;Jetzt ist Musik und Tanzen dran.
+ansage;ansage_jetzt-ist-nachmittag-dran.mp3;Jetzt ist Nachmittag dran.
+ansage;ansage_jetzt-ist-obstpause-dran.mp3;Jetzt ist Obstpause dran.
+ansage;ansage_jetzt-ist-oma-und-opa-dran.mp3;Jetzt ist Oma und Opa dran.
+ansage;ansage_jetzt-ist-pflanzen-giessen-dran.mp3;Jetzt ist Pflanzen gießen dran.
+ansage;ansage_jetzt-ist-puzzeln-dran.mp3;Jetzt ist Puzzeln dran.
+ansage;ansage_jetzt-ist-rucksack-packen-dran.mp3;Jetzt ist Rucksack packen dran.
+ansage;ansage_jetzt-ist-schlafanzug-anziehen-dran.mp3;Jetzt ist Schlafanzug anziehen dran.
+ansage;ansage_jetzt-ist-schlafen-dran.mp3;Jetzt ist Schlafen dran.
+ansage;ansage_jetzt-ist-schuhe-anziehen-dran.mp3;Jetzt ist Schuhe anziehen dran.
+ansage;ansage_jetzt-ist-schwimmen-dran.mp3;Jetzt ist Schwimmen dran.
+ansage;ansage_jetzt-ist-sonne-dran.mp3;Jetzt ist Sonne dran.
+ansage;ansage_jetzt-ist-spielen-dran.mp3;Jetzt ist Spielen dran.
+ansage;ansage_jetzt-ist-spieleverabredung-dran.mp3;Jetzt ist Spieleverabredung dran.
+ansage;ansage_jetzt-ist-spielplatz-dran.mp3;Jetzt ist Spielplatz dran.
+ansage;ansage_jetzt-ist-spielzeit-dran.mp3;Jetzt ist Spielzeit dran.
+ansage;ansage_jetzt-ist-stern-dran.mp3;Jetzt ist Stern dran.
+ansage;ansage_jetzt-ist-tisch-decken-dran.mp3;Jetzt ist Tisch decken dran.
+ansage;ansage_jetzt-ist-toilette-dran.mp3;Jetzt ist Toilette dran.
+ansage;ansage_jetzt-ist-toilette-vor-dem-schlafen-dran.mp3;Jetzt ist Toilette vor dem Schlafen dran.
+ansage;ansage_jetzt-ist-trinken-dran.mp3;Jetzt ist Trinken dran.
+ansage;ansage_jetzt-ist-vorlesen-dran.mp3;Jetzt ist Vorlesen dran.
+ansage;ansage_jetzt-ist-vormittag-dran.mp3;Jetzt ist Vormittag dran.
+ansage;ansage_jetzt-ist-vorschulaufgaben-dran.mp3;Jetzt ist Vorschulaufgaben dran.
+ansage;ansage_jetzt-ist-vorschulheft-dran.mp3;Jetzt ist Vorschulheft dran.
+ansage;ansage_jetzt-ist-wochenmarkt-dran.mp3;Jetzt ist Wochenmarkt dran.
+ansage;ansage_jetzt-ist-zaehne-putzen-dran.mp3;Jetzt ist Zähne putzen dran.
+aufgabe;aufgabe_ausflug-modellbahn.mp3;Ausflug Modellbahn
+ansage;ansage_jetzt-ist-ausflug-modellbahn-dran.mp3;Jetzt ist Ausflug Modellbahn dran.

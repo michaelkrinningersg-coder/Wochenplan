@@ -3,6 +3,7 @@
 // Es wird automatisch die beste deutsche Stimme gewählt; in den Einstellungen lässt sie sich ändern.
 import { app, kindName, kinderVon } from './speicher.svelte'
 import type { Aufgabe } from './typen'
+import { baustein as b, clipsSpielen, clipsStoppen } from './clips'
 
 export interface Stimme {
   index: number
@@ -75,6 +76,18 @@ export function sprechText(text: string): string {
 let letzter = ''
 let letzteZeit = 0
 
+/** Feste Ansage aus vorgerenderten Bausteinen; ohne Bausteine (oder bei gewählter Gerätestimme) Sprachmodul */
+async function vorlesenMit(teile: string[] | null, text: string, erzwingen = false) {
+  if ((!app.einst.vorlesen && !erzwingen) || !text) return
+  if (teile && !app.einst.stimme) {
+    if (!erzwingen && text === letzter && Date.now() - letzteZeit < 1500) return
+    letzter = text
+    letzteZeit = Date.now()
+    if (await clipsSpielen(teile)) return
+  }
+  return vorlesen(text, erzwingen)
+}
+
 export async function vorlesen(text: string, erzwingen = false) {
   if ((!app.einst.vorlesen && !erzwingen) || !text) return
   // dieselbe Ansage nicht doppelt kurz hintereinander
@@ -82,6 +95,7 @@ export async function vorlesen(text: string, erzwingen = false) {
   letzter = text
   letzteZeit = Date.now()
   try {
+    clipsStoppen()
     const { tts } = await plugin()
     const stimme = stimmeFuer(await deutscheStimmen())
     await tts.stop().catch(() => {})
@@ -116,11 +130,17 @@ function minutenText(m: number): string {
 export function aufgabeAnsagen(a: Aufgabe, erledigt: boolean) {
   const name = wer(a)
   if (erledigt) {
-    void vorlesen(`${a.titel}. Das ist schon geschafft!`)
+    void vorlesenMit(
+      name ? null : [b('aufgabe', a.titel), b('lob', 'Das ist schon geschafft!')],
+      `${a.titel}. Das ist schon geschafft!`,
+    )
     return
   }
   const zeit = a.minuten > 0 ? ` Du hast ${minutenText(a.minuten)} Zeit.` : ''
-  void vorlesen(`${name ? name + ', jetzt ' : 'Jetzt '}ist ${a.titel} dran.${zeit}`)
+  const teile = name
+    ? null
+    : [b('ansage', `Jetzt ist ${a.titel} dran.`), ...(a.minuten > 0 ? [b('satz', 'Du hast'), b('minuten', minutenText(a.minuten)), b('satz', 'Zeit.')] : [])]
+  void vorlesenMit(teile, `${name ? name + ', jetzt ' : 'Jetzt '}ist ${a.titel} dran.${zeit}`)
 }
 
 const LOB = ['Super gemacht!', 'Toll, geschafft!', 'Prima, das hast du super gemacht!', 'Klasse!', 'Juhu, geschafft!']
@@ -128,32 +148,34 @@ const LOB = ['Super gemacht!', 'Toll, geschafft!', 'Prima, das hast du super gem
 export function lobAnsagen(a: Aufgabe | undefined, alles: boolean) {
   const name = wer(a)
   if (alles) {
-    void vorlesen(`${name ? name + ', du' : 'Du'} hast alles geschafft! Ganz toll!`)
+    void vorlesenMit(name ? null : [b('lob', 'Du hast alles geschafft! Ganz toll!')], `${name ? name + ', du' : 'Du'} hast alles geschafft! Ganz toll!`)
     return
   }
   const lob = LOB[Math.floor(Math.random() * LOB.length)]
-  void vorlesen(name ? `${lob} ${name}!` : lob)
+  void vorlesenMit(name ? null : [b('lob', lob)], name ? `${lob} ${name}!` : lob)
 }
 
 /** Ansage, wenn ein Timer gewählt wurde */
 export function timerAnsagen(minuten: number) {
-  void vorlesen(`Du hast ${minutenText(minuten)} Zeit.`)
+  void vorlesenMit([b('satz', 'Du hast'), b('minuten', minutenText(minuten)), b('satz', 'Zeit.')], `Du hast ${minutenText(minuten)} Zeit.`)
 }
 
 /** Zeitansagen des Timers: noch 10 / 5 / 1 Minute, Zeit um */
 export function restAnsagen(minuten: number, titel: string) {
   if (app.einst.zeitAnsagen === false) return
-  if (minuten <= 1) void vorlesen(`Noch eine Minute für ${titel}! Gleich ist die Zeit um.`)
-  else void vorlesen(`Noch ${minuten} Minuten für ${titel}.`)
+  if (minuten <= 1)
+    void vorlesenMit([b('rest', 'Noch eine Minute für'), b('aufgabe', titel), b('rest', 'Gleich ist die Zeit um.')], `Noch eine Minute für ${titel}! Gleich ist die Zeit um.`)
+  else void vorlesenMit([b('rest', `Noch ${minuten} Minuten für`), b('aufgabe', titel)], `Noch ${minuten} Minuten für ${titel}.`)
 }
 export function endeAnsagen(titel: string) {
   if (app.einst.zeitAnsagen === false) return
-  void vorlesen(`Die Zeit für ${titel} ist um.`)
+  void vorlesenMit([b('ende', 'Die Zeit für'), b('aufgabe', titel), b('ende', 'ist um.')], `Die Zeit für ${titel} ist um.`)
 }
 /** Countdown bis zu einer Aufgabe mit fester Uhrzeit */
 export function startAnsagen(minuten: number, titel: string) {
   if (app.einst.zeitAnsagen === false) return
-  void vorlesen(minuten <= 1 ? `In einer Minute geht es los: ${titel}.` : `In ${minuten} Minuten geht es los: ${titel}.`)
+  const satz = minuten <= 1 ? 'In einer Minute geht es los:' : `In ${minuten} Minuten geht es los:`
+  void vorlesenMit([b('start', satz), b('aufgabe', titel)], `${satz} ${titel}.`)
 }
 
 /** Uhrzeit laut und deutlich ansagen: „Es ist 10 Uhr 51.“ */
@@ -161,7 +183,11 @@ export function uhrzeitAnsagen(d: Date) {
   const h = d.getHours()
   const m = d.getMinutes()
   const uhr = h === 1 ? 'ein Uhr' : `${h} Uhr`
-  void vorlesen(m === 0 ? `Es ist ${uhr}.` : `Es ist ${uhr} ${m}.`, true)
+  void vorlesenMit(
+    [b('uhr', 'Es ist'), b('stunde', uhr), ...(m === 0 ? [] : [b('minute', String(m))])],
+    m === 0 ? `Es ist ${uhr}.` : `Es ist ${uhr} ${m}.`,
+    true,
+  )
 }
 
 /** Probe in den Einstellungen */
