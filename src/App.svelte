@@ -268,7 +268,7 @@
   )
   const ruheAktiv = $derived(
     app.ruheVorschau ||
-      (abgleich.einst.rolle === 'anzeige' &&
+      ((app.einst.ruheHier === 'an' || ((app.einst.ruheHier ?? 'auto') === 'auto' && abgleich.einst.rolle === 'anzeige')) &&
         (app.einst.ruhe ?? 'an') === 'an' &&
         !timerLaeuft &&
         !app.dialog &&

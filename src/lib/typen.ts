@@ -119,6 +119,8 @@ export interface Einstellungen {
   ruheArt?: 'jahreszeit' | 'fotos' | 'schwarz'
   /** nachts (Schlafen bis Aufstehen) Bildschirm schwarz */
   ruheNacht?: boolean
+  /** Ruhebild auf diesem Gerät: auto = nur „Nur anzeigen“-Geräte (Fernseher) */
+  ruheHier?: 'auto' | 'an' | 'aus'
   /** Ort für echtes Wetter: "Name|Breite|Länge" */
   wetterOrt?: string
   /** Sekunden, bis das nächste Foto kommt */

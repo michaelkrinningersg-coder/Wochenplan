@@ -352,6 +352,18 @@
         (von–bis), wird sie in dieser Zeit groß gezeigt. Eine Taste auf der Fernbedienung oder Antippen führt zurück.
       </p>
       <div class="reihe">
+        <span class="name zeile">Auf diesem Gerät</span>
+        <button class="knopf klein" aria-pressed={(app.einst.ruheHier ?? 'auto') === 'auto'} onclick={() => (app.einst.ruheHier = 'auto')}>Automatisch (nur Fernseher)</button>
+        <button class="knopf klein" aria-pressed={app.einst.ruheHier === 'an'} onclick={() => (app.einst.ruheHier = 'an')}>Ja</button>
+        <button class="knopf klein" aria-pressed={app.einst.ruheHier === 'aus'} onclick={() => (app.einst.ruheHier = 'aus')}>Nein</button>
+      </div>
+      <p class="hilfe">
+        {(app.einst.ruheHier ?? 'auto') === 'auto' && abgleich.einst.rolle === 'planer'
+          ? 'Dieses Gerät plant – hier erscheint das Ruhebild nur mit „Ja“.'
+          : 'Ein laufender Timer hält das Ruhebild zurück; eine geöffnete Aufgabe ohne Timer nicht.'}
+      </p>
+      <div class="reihe">
+        <span class="name zeile">Für alle Geräte</span>
         <button class="knopf klein" aria-pressed={(app.einst.ruhe ?? 'an') === 'an'} onclick={() => (app.einst.ruhe = 'an')}>An</button>
         <button class="knopf klein" aria-pressed={app.einst.ruhe === 'aus'} onclick={() => (app.einst.ruhe = 'aus')}>Aus</button>
         <span class="name zeile">nach</span>
