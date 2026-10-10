@@ -11,6 +11,7 @@
   import AbschnittDialog from './dialoge/AbschnittDialog.svelte'
   import AblaeufeDialog from './dialoge/AblaeufeDialog.svelte'
   import GrosseUhr from './komponenten/GrosseUhr.svelte'
+  import LaufendeTimer from './komponenten/LaufendeTimer.svelte'
   import AktionDialog from './dialoge/AktionDialog.svelte'
   import AufgabeKopierenDialog from './dialoge/AufgabeKopierenDialog.svelte'
   import BearbeitenDialog from './dialoge/BearbeitenDialog.svelte'
@@ -294,6 +295,7 @@
       {/if}
     {/key}
   </main>
+  <LaufendeTimer />
 
   {#if app.dialog?.art === 'bearbeiten'}
     {#key app.dialog.aufgabe.id}

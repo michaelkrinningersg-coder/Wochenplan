@@ -1,5 +1,7 @@
 <script lang="ts">
   import { app, istTermin, verschiebeAufgabe } from '../lib/speicher.svelte'
+  import { ampelZustand } from '../lib/ampel'
+  import { dauerText } from '../lib/zeit'
   import type { Aufgabe, TagId } from '../lib/typen'
   import { inText } from '../lib/zeit'
   import { ziehbar } from '../lib/ziehen'
@@ -31,6 +33,12 @@
   const verschoben = $derived(app.verschieben?.id === aufgabe.id)
   const bearbeiten = $derived(app.bearbeiten)
   const termin = $derived(istTermin(aufgabe.id))
+  const timer = $derived.by(() => {
+    const t = app.timer[aufgabe.id]
+    if (!t || erledigt || (t.gestartet === null && t.vergangenMs === 0)) return null
+    const rest = t.dauerMs - (t.vergangenMs + (t.gestartet !== null ? app.jetzt - t.gestartet : 0))
+    return { rest, zustand: ampelZustand(rest, t.dauerMs), laeuft: t.gestartet !== null }
+  })
   const kind = $derived(aufgabe.fuer?.length === 1 ? app.plan.kinder.find((k) => k.id === aufgabe.fuer![0]) : undefined)
 </script>
 
@@ -64,6 +72,9 @@
     {/if}
     {#if erledigt}
       <span class="haken"><Symbol name="haken" /></span>
+    {/if}
+    {#if timer && !mini}
+      <span class="restzeit {timer.zustand}" class:pause={!timer.laeuft}>{timer.rest > 0 ? dauerText(timer.rest) : '0:00'}</span>
     {/if}
     {#if verschoben}
       <span class="pfeile"><Symbol name="pfeile" /></span>
@@ -99,6 +110,32 @@
   .kachel.bearbeiten {
     touch-action: none;
     cursor: grab;
+  }
+  .restzeit {
+    position: absolute;
+    left: 50%;
+    bottom: -4%;
+    transform: translateX(-50%);
+    padding: 0.05em 0.45em;
+    border-radius: 999px;
+    background: var(--gruen);
+    color: #fff;
+    font-family: var(--schrift-titel);
+    font-weight: 700;
+    font-size: calc(var(--s) * 0.16);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    box-shadow: 0 0 0 2px var(--tafel);
+  }
+  .restzeit.gelb {
+    background: var(--gelb);
+    color: #3a2a00;
+  }
+  .restzeit.rot {
+    background: var(--rot);
+  }
+  .restzeit.pause {
+    opacity: 0.75;
   }
   .flaeche {
     position: relative;
