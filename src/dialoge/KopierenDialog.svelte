@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '../lib/i18n.svelte'
   import Fenster from '../komponenten/Fenster.svelte'
   import Symbol from '../komponenten/Symbol.svelte'
   import { TAGE, tagName } from '../lib/konstanten'
@@ -32,14 +33,14 @@
     for (const ab of ABSCHNITTE) kopie[ab.id] = (quelle[ab.id] ?? []).map((x) => ({ ...x, id: neueId() }))
     app.plan.vorlagen.push({ id: neueId(), name, tag: kopie })
     vorlageName = ''
-    zeigeHinweis(`Tagesvorlage „${name}“ gespeichert`)
+    zeigeHinweis(t('Tagesvorlage „{name}“ gespeichert', { name }))
   }
   function vorlageAnwenden(id: string) {
     const v = app.plan.vorlagen.find((x) => x.id === id)
     if (!v) return
     const quelle = $state.snapshot(v.tag)
     for (const ab of ABSCHNITTE) app.plan.woche[tag][ab.id] = (quelle[ab.id] ?? []).map((x) => ({ ...x, id: neueId() }))
-    zeigeHinweis(`${tagName(tag)} nutzt jetzt „${v.name}“`)
+    zeigeHinweis(t('{tag} nutzt jetzt „{name}“', { tag: t(tagName(tag)), name: v.name }))
     app.dialog = null
   }
   function vorlageLoeschen(id: string) {
@@ -51,67 +52,67 @@
   function kopieren() {
     if (ziele.length === 0) return
     tagKopieren(tag, ziele, ersetzen)
-    zeigeHinweis(`${tagName(tag)} kopiert nach ${ziele.map(tagName).join(', ')}`)
+    zeigeHinweis(t('{tag} kopiert nach {ziele}', { tag: t(tagName(tag)), ziele: ziele.map((z) => t(tagName(z))).join(', ') }))
     app.dialog = null
   }
 </script>
 
-<Fenster titel="{tagName(tag)} kopieren">
+<Fenster titel={t('{tag} kopieren', { tag: t(tagName(tag)) })}>
   <div class="inhalt">
-    <p class="erklaerung">Auf welche Tage soll der Plan von {tagName(tag)} kommen?</p>
+    <p class="erklaerung">{t('Auf welche Tage soll der Plan von {tag} kommen?', { tag: t(tagName(tag)) })}</p>
     <div class="tage">
-      {#each TAGE as t (t.id)}
+      {#each TAGE as tg (tg.id)}
         <button
           class="knopf"
-          disabled={t.id === tag}
-          aria-pressed={ziele.includes(t.id)}
-          onclick={() => umschalten(t.id)}
-          data-autofokus={t.id === TAGE[(TAGE.findIndex((x) => x.id === tag) + 1) % 7].id ? true : undefined}
+          disabled={tg.id === tag}
+          aria-pressed={ziele.includes(tg.id)}
+          onclick={() => umschalten(tg.id)}
+          data-autofokus={tg.id === TAGE[(TAGE.findIndex((x) => x.id === tag) + 1) % 7].id ? true : undefined}
         >
-          {t.kurz}
+          {t(tg.kurz)}
         </button>
       {/each}
     </div>
     <div class="wahl">
-      <button class="knopf klein" onclick={() => auswahl(['mo', 'di', 'mi', 'do', 'fr'])}>Mo–Fr</button>
-      <button class="knopf klein" onclick={() => auswahl(['sa', 'so'])}>Wochenende</button>
-      <button class="knopf klein" onclick={() => auswahl(TAGE.map((t) => t.id))}>Alle Tage</button>
-      <button class="knopf klein" onclick={() => (ziele = [])}>Keine</button>
+      <button class="knopf klein" onclick={() => auswahl(['mo', 'di', 'mi', 'do', 'fr'])}>{t('Mo–Fr')}</button>
+      <button class="knopf klein" onclick={() => auswahl(['sa', 'so'])}>{t('Wochenende')}</button>
+      <button class="knopf klein" onclick={() => auswahl(TAGE.map((x) => x.id))}>{t('Alle Tage')}</button>
+      <button class="knopf klein" onclick={() => (ziele = [])}>{t('Keine')}</button>
     </div>
     <div class="wahl">
-      <button class="knopf" aria-pressed={ersetzen} onclick={() => (ersetzen = true)}>Vorhandenes ersetzen</button>
-      <button class="knopf" aria-pressed={!ersetzen} onclick={() => (ersetzen = false)}>Hinten anhängen</button>
+      <button class="knopf" aria-pressed={ersetzen} onclick={() => (ersetzen = true)}>{t('Vorhandenes ersetzen')}</button>
+      <button class="knopf" aria-pressed={!ersetzen} onclick={() => (ersetzen = false)}>{t('Hinten anhängen')}</button>
     </div>
     <div class="aktionen">
-      <button class="knopf haupt" disabled={ziele.length === 0} onclick={kopieren}><Symbol name="kopie" />Kopieren</button>
+      <button class="knopf haupt" disabled={ziele.length === 0} onclick={kopieren}><Symbol name="kopie" />{t('Kopieren')}</button>
       {#if leerenFragen}
         <button
           class="knopf gefahr"
           onclick={() => {
             tagLeeren(tag)
             app.dialog = null
-          }}><Symbol name="muell" />{tagName(tag)} wirklich leeren</button
+          }}><Symbol name="muell" />{t('{tag} wirklich leeren', { tag: t(tagName(tag)) })}</button
         >
       {:else}
-        <button class="knopf gefahr" onclick={() => (leerenFragen = true)}><Symbol name="muell" />{tagName(tag)} leeren</button>
+        <button class="knopf gefahr" onclick={() => (leerenFragen = true)}><Symbol name="muell" />{t('{tag} leeren', { tag: t(tagName(tag)) })}</button>
       {/if}
     </div>
 
     <section class="vorlagen">
-      <h3>Tagesvorlagen</h3>
-      <p class="erklaerung">Z. B. „Kita-Tag“, „Wochenende“, „Ferien“ oder „Krank“. Speichere den Ablauf von {tagName(tag)} als Vorlage oder übernimm eine Vorlage für {tagName(tag)}. Im Kalender kannst du eine Vorlage auch für ein einzelnes Datum wählen.</p>
+      <h3>{t('Tagesvorlagen')}</h3>
+      <p class="erklaerung">{t('Z. B. „Kita-Tag“, „Wochenende“, „Ferien“ oder „Krank“. Speichere den Ablauf von {tag} als Vorlage oder übernimm eine Vorlage für {tag}. Im Kalender kannst du eine Vorlage auch für ein einzelnes Datum wählen.', { tag: t(tagName(tag)) })}</p>
       <div class="wahl">
-        <input id="vorlage-name" type="text" bind:value={vorlageName} placeholder="Name der Vorlage" maxlength="40" autocomplete="off" />
-        <button class="knopf" disabled={!vorlageName.trim()} onclick={alsVorlageSpeichern}><Symbol name="plus" />Als Vorlage speichern</button>
+        <input id="vorlage-name" type="text" bind:value={vorlageName} placeholder={t('Name der Vorlage')} maxlength="40" autocomplete="off" />
+        <button class="knopf" disabled={!vorlageName.trim()} onclick={alsVorlageSpeichern}><Symbol name="plus" />{t('Als Vorlage speichern')}</button>
       </div>
       {#each app.plan.vorlagen as v (v.id)}
         <div class="wahl vorlage">
           <b>{v.name}</b>
-          <button class="knopf klein" onclick={() => vorlageAnwenden(v.id)}>Für {tagName(tag)} übernehmen</button>
+          <button class="knopf klein" onclick={() => vorlageAnwenden(v.id)}>{t('Für {tag} übernehmen', { tag: t(tagName(tag)) })}</button>
           {#if loeschenId === v.id}
-            <button class="knopf klein gefahr" onclick={() => vorlageLoeschen(v.id)}>Wirklich löschen</button>
+            <button class="knopf klein gefahr" onclick={() => vorlageLoeschen(v.id)}>{t('Wirklich löschen')}</button>
           {:else}
-            <button class="knopf klein gefahr" onclick={() => (loeschenId = v.id)} aria-label="Vorlage {v.name} löschen"><Symbol name="muell" /></button>
+            <button class="knopf klein gefahr" onclick={() => (loeschenId = v.id)} aria-label={t('Vorlage {name} löschen', { name: v.name })}><Symbol name="muell" /></button>
           {/if}
         </div>
       {/each}

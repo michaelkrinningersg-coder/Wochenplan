@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '../lib/i18n.svelte'
   import { segVon } from '../lib/konstanten'
   import Bild from '../komponenten/Bild.svelte'
   import Fenster from '../komponenten/Fenster.svelte'
@@ -21,33 +22,33 @@
   function kopieren() {
     if (!fund || ziele.length === 0) return
     aufgabeKopieren(tag, id, ziele)
-    zeigeHinweis(`„${fund.aufgabe.titel}“ kopiert nach ${ziele.map(tagName).join(', ')}`)
+    zeigeHinweis(t('„{titel}“ kopiert nach {ziele}', { titel: fund.aufgabe.titel, ziele: ziele.map((z) => t(tagName(z))).join(', ') }))
     app.dialog = null
   }
 </script>
 
-<Fenster titel="Aufgabe kopieren">
+<Fenster titel={t('Aufgabe kopieren')}>
   {#if fund}
     <div class="inhalt">
       <div class="aufgabe" data-seg={segVon(fund.abschnitt)}>
         <span class="bild"><Bild id={fund.aufgabe.bild} zusatz={fund.aufgabe.zusatz} /></span>
-        <span><b>{fund.aufgabe.titel}</b><br /><small>{abschnittInfo(fund.abschnitt).name}, gleiche Tageszeit an jedem Zieltag</small></span>
+        <span><b>{fund.aufgabe.titel}</b><br /><small>{t('{name}, gleiche Tageszeit an jedem Zieltag', { name: t(abschnittInfo(fund.abschnitt).name) })}</small></span>
       </div>
-      <p>Auf welche Tage soll die Aufgabe zusätzlich?</p>
+      <p>{t('Auf welche Tage soll die Aufgabe zusätzlich?')}</p>
       <div class="reihe">
-        {#each TAGE as t (t.id)}
-          <button class="knopf" aria-pressed={ziele.includes(t.id)} onclick={() => umschalten(t.id)} data-autofokus={t.id === 'mo' ? true : undefined}>
-            {t.kurz}{t.id === tag ? ' (nochmal)' : ''}
+        {#each TAGE as tg (tg.id)}
+          <button class="knopf" aria-pressed={ziele.includes(tg.id)} onclick={() => umschalten(tg.id)} data-autofokus={tg.id === 'mo' ? true : undefined}>
+            {t(tg.kurz)}{tg.id === tag ? ' ' + t('(nochmal)') : ''}
           </button>
         {/each}
       </div>
       <div class="reihe">
-        <button class="knopf klein" onclick={() => (ziele = ['mo', 'di', 'mi', 'do', 'fr'].filter((z) => z !== tag) as TagId[])}>Mo–Fr</button>
-        <button class="knopf klein" onclick={() => (ziele = TAGE.map((t) => t.id).filter((z) => z !== tag))}>Alle anderen Tage</button>
+        <button class="knopf klein" onclick={() => (ziele = ['mo', 'di', 'mi', 'do', 'fr'].filter((z) => z !== tag) as TagId[])}>{t('Mo–Fr')}</button>
+        <button class="knopf klein" onclick={() => (ziele = TAGE.map((x) => x.id).filter((z) => z !== tag))}>{t('Alle anderen Tage')}</button>
       </div>
       <div class="reihe">
-        <button class="knopf haupt" disabled={ziele.length === 0} onclick={kopieren}><Symbol name="kopie" />Kopieren</button>
-        <button class="knopf" onclick={() => (app.dialog = null)}>Abbrechen</button>
+        <button class="knopf haupt" disabled={ziele.length === 0} onclick={kopieren}><Symbol name="kopie" />{t('Kopieren')}</button>
+        <button class="knopf" onclick={() => (app.dialog = null)}>{t('Abbrechen')}</button>
       </div>
     </div>
   {/if}

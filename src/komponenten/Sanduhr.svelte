@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '../lib/i18n.svelte'
   // Sanduhr als Alternative zur Ampel: oben rinnt der Sand weg, unten wächst der Haufen.
   let {
     anteil,
@@ -15,7 +16,7 @@
   const GLAS = 'M22 16 H78 C78 50 57 68 52 80 C57 92 78 110 78 144 H22 C22 110 43 92 48 80 C43 68 22 50 22 16 Z'
 </script>
 
-<div class="sanduhr" class:vorbei style="--h: {hoehe}px" role="img" aria-label={vorbei ? 'Die Zeit ist um' : `Noch ${Math.round(a * 100)} Prozent Sand oben`}>
+<div class="sanduhr" class:vorbei style="--h: {hoehe}px" role="img" aria-label={vorbei ? t('Die Zeit ist um') : t('Noch {n} Prozent Sand oben', { n: Math.round(a * 100) })}>
   <svg viewBox="0 0 100 160" aria-hidden="true">
     <defs>
       <clipPath id="sanduhr-glas"><path d={GLAS} /></clipPath>

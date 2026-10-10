@@ -1,5 +1,6 @@
 // Abgleich über GitHub: Der Planer (Handy/PC) lädt den Plan verschlüsselt hoch,
 // der Fernseher holt ihn regelmäßig ab. Ohne Familien-Passwort ist die Datei nicht lesbar.
+import { t } from './i18n.svelte'
 import { dateiGeaendert } from './dateiabgleich.svelte'
 import { istApp } from './geraet'
 import { ruhe, ruhebildEntfernen, ruhebildSpeichern } from './ruhebilder.svelte'
@@ -149,11 +150,11 @@ function kopf(extra: Record<string, string> = {}): Record<string, string> {
 }
 
 function fehlerText(status: number): string {
-  if (status === 401) return 'Der GitHub-Token ist ungültig oder abgelaufen.'
-  if (status === 403) return 'GitHub verweigert den Zugriff. Prüfe die Rechte des Tokens (Inhalte: Lesen und Schreiben).'
-  if (status === 404) return 'Plan-Datei oder Zweig nicht gefunden. Prüfe Repo und Zweig in den Einstellungen.'
-  if (status === 409 || status === 422) return 'Der Plan wurde gleichzeitig woanders geändert. Bitte noch einmal versuchen.'
-  return `GitHub antwortet mit Fehler ${status}.`
+  if (status === 401) return t('Der GitHub-Token ist ungültig oder abgelaufen.')
+  if (status === 403) return t('GitHub verweigert den Zugriff. Prüfe die Rechte des Tokens (Inhalte: Lesen und Schreiben).')
+  if (status === 404) return t('Plan-Datei oder Zweig nicht gefunden. Prüfe Repo und Zweig in den Einstellungen.')
+  if (status === 409 || status === 422) return t('Der Plan wurde gleichzeitig woanders geändert. Bitte noch einmal versuchen.')
+  return t('GitHub antwortet mit Fehler {status}.', { status })
 }
 
 let laeuft = false
@@ -193,7 +194,7 @@ export async function holen(erzwingen = false): Promise<boolean> {
     if (r.status === 404) {
       // noch nie hochgeladen – kein Fehler für den Planer
       if (abgleich.einst.rolle === 'planer') {
-        ok('Noch kein Plan hochgeladen.')
+        ok(t('Noch kein Plan hochgeladen.'))
         return false
       }
       throw new Error(fehlerText(404))
@@ -201,7 +202,7 @@ export async function holen(erzwingen = false): Promise<boolean> {
     if (!r.ok) throw new Error(fehlerText(r.status))
     const paket = (await r.json()) as Paket
     abgleich.stand.etag = r.headers.get('ETag') ?? ''
-    if (paket.app !== 'wochenplan') throw new Error('Die Datei ist kein Wochenplan.')
+    if (paket.app !== 'wochenplan') throw new Error(t('Die Datei ist kein Wochenplan.'))
     const lokalUngespeichert = abgleich.einst.rolle === 'planer' && abgleich.stand.lokal > abgleich.stand.synchron
     if (!erzwingen && (paket.geaendert <= abgleich.stand.synchron || lokalUngespeichert)) {
       standSpeichern()
@@ -212,13 +213,13 @@ export async function holen(erzwingen = false): Promise<boolean> {
     try {
       text = await entschluesseln(paket, abgleich.einst.passwort)
     } catch {
-      throw new Error('Das Familien-Passwort passt nicht zum Plan.')
+      throw new Error(t('Das Familien-Passwort passt nicht zum Plan.'))
     }
     tokenUebernehmen(text)
     anwenden = true
     const erfolg = importDaten(text)
     queueMicrotask(() => (anwenden = false))
-    if (!erfolg) throw new Error('Der Plan konnte nicht gelesen werden.')
+    if (!erfolg) throw new Error(t('Der Plan konnte nicht gelesen werden.'))
     abgleich.stand.synchron = paket.geaendert
     abgleich.stand.lokal = paket.geaendert
     standSpeichern()
@@ -260,7 +261,7 @@ export async function hochladen(): Promise<boolean> {
             standSpeichern()
             ok()
             if (vorher > 0)
-              zeigeHinweis('Der Plan wurde auf einem anderen Gerät geändert und neu geladen. Bitte die letzte Änderung noch einmal machen.')
+              zeigeHinweis(t('Der Plan wurde auf einem anderen Gerät geändert und neu geladen. Bitte die letzte Änderung noch einmal machen.'))
             return false
           }
         }
@@ -513,7 +514,7 @@ function ok(meldung = '') {
 function fehler(e: unknown) {
   abgleich.zustand = 'fehler'
   abgleich.meldung =
-    e instanceof TypeError ? 'Keine Verbindung zu GitHub. Ist das Gerät online?' : e instanceof Error ? e.message : String(e)
+    e instanceof TypeError ? t('Keine Verbindung zu GitHub. Ist das Gerät online?') : e instanceof Error ? e.message : String(e)
   console.warn('Abgleich', e)
 }
 

@@ -1,4 +1,5 @@
 // Echtes Wetter für das Ruhebild (Open-Meteo, kostenlos, ohne Schlüssel). Nur wenn in den Einstellungen ein Ort gewählt ist.
+import { spr, t } from './i18n.svelte'
 import { app } from './speicher.svelte'
 
 export type WetterArt = 'klar' | 'wolkig' | 'nebel' | 'regen' | 'schnee' | 'gewitter'
@@ -51,8 +52,8 @@ export async function wetterAktualisieren(erzwingen = false) {
 
 /** Ort suchen (Name → Koordinaten) */
 export async function ortSuchen(name: string): Promise<{ name: string; lat: number; lon: number; land: string }[]> {
-  const r = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(name)}&count=5&language=de&format=json`)
-  if (!r.ok) throw new Error('Ortssuche nicht erreichbar')
+  const r = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(name)}&count=5&language=${spr.aktuell}&format=json`)
+  if (!r.ok) throw new Error(t('Ortssuche nicht erreichbar'))
   const d = (await r.json()) as { results?: { name: string; latitude: number; longitude: number; admin1?: string; country?: string }[] }
   return (d.results ?? []).map((x) => ({
     name: x.name,

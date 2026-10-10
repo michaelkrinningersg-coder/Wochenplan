@@ -1,9 +1,10 @@
 <script lang="ts">
+  import { t } from '../lib/i18n.svelte'
   let { zustand, blinken = false, hoehe }: { zustand: 'rot' | 'gelb' | 'gruen' | 'aus'; blinken?: boolean; hoehe: number } =
     $props()
 
   const text = $derived(
-    zustand === 'gruen' ? 'Grün: genug Zeit' : zustand === 'gelb' ? 'Gelb: gleich vorbei' : zustand === 'rot' ? 'Rot: Zeit ist um' : 'Ampel aus',
+    zustand === 'gruen' ? t('Grün: genug Zeit') : zustand === 'gelb' ? t('Gelb: gleich vorbei') : zustand === 'rot' ? t('Rot: Zeit ist um') : t('Ampel aus'),
   )
 </script>
 

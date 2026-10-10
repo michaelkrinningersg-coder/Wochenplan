@@ -2,12 +2,14 @@
   import Bild from '../komponenten/Bild.svelte'
   import Symbol from '../komponenten/Symbol.svelte'
   import { geburtstageAm } from '../lib/countdown'
+  import { lokale, t } from '../lib/i18n.svelte'
+  import { monatsName, wochentagKurz } from '../lib/i18n/namen-ansichten'
   import { app, oeffnen } from '../lib/speicher.svelte'
-  import { datumKey, MONATE } from '../lib/zeit'
+  import { datumKey } from '../lib/zeit'
 
   let { jahr, monat }: { jahr: number; monat: number } = $props()
 
-  const WOCHENTAGE = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So']
+  const WOCHENTAGE = $derived(wochentagKurz())
   const heute = $derived(datumKey(new Date(app.jetzt)))
 
   /** Tage des Monats mit Leerfeldern davor (Woche beginnt Montag) */
@@ -34,10 +36,10 @@
 
 <div class="monat">
   <div class="leiste">
-    <button class="knopf rund" onclick={() => wechseln(-1)} aria-label="Voriger Monat"><Symbol name="zurueck" /></button>
-    <h2>{MONATE[monat]} {jahr}</h2>
-    <button class="knopf rund" onclick={() => wechseln(1)} aria-label="Nächster Monat"><Symbol name="weiter" /></button>
-    <button class="knopf" onclick={() => oeffnen({ art: 'jahr', jahr })}>Ganzes Jahr</button>
+    <button class="knopf rund" onclick={() => wechseln(-1)} aria-label={t('Voriger Monat')}><Symbol name="zurueck" /></button>
+    <h2>{monatsName(monat)} {jahr}</h2>
+    <button class="knopf rund" onclick={() => wechseln(1)} aria-label={t('Nächster Monat')}><Symbol name="weiter" /></button>
+    <button class="knopf" onclick={() => oeffnen({ art: 'jahr', jahr })}>{t('Ganzes Jahr')}</button>
   </div>
   <div class="raster">
     {#each WOCHENTAGE as w (w)}
@@ -55,13 +57,15 @@
           data-fokus-id={'datum:' + datum}
           data-autofokus={datum === heute ? true : undefined}
           onclick={() => (app.dialog = { art: 'datum', datum })}
-          aria-label="{Number(datum.slice(8))}. {MONATE[monat]}{termine.length ? `, ${termine.length} Termine` : ''}{geb.length ? ', Geburtstag' : ''}"
+          aria-label={new Intl.DateTimeFormat(lokale(), { day: 'numeric', month: 'long' }).format(new Date(jahr, monat, Number(datum.slice(8)))) +
+            (termine.length ? ', ' + (termine.length === 1 ? t('1 Termin') : t('{n} Termine', { n: termine.length })) : '') +
+            (geb.length ? ', ' + t('Geburtstag') : '')}
         >
           <span class="zahl">{Number(datum.slice(8))}</span>
           {#if vorlage}<span class="vorlage">{vorlage}</span>{/if}
           <span class="bilder">
             {#each geb as g (g.name)}
-              <span class="mini" title="{g.name} wird {g.alter}"><Bild id="geburtstag" /></span>
+              <span class="mini" title={t('{name} wird {alter}', { name: g.name, alter: g.alter })}><Bild id="geburtstag" /></span>
             {/each}
             {#each termine.slice(0, 4) as t (t.id)}
               <span class="mini" title={t.titel}><Bild id={t.bild} /></span>

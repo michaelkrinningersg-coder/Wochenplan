@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '../lib/i18n.svelte'
   // Laufende Timer bleiben sichtbar, auch in Wochen-, Tages- oder Kalenderansicht:
   // eine runde Plakette unten rechts mit Bild, Restzeit und Ampelfarbe. Antippen öffnet die Aufgabe.
   import { ampelZustand } from '../lib/ampel'
@@ -34,7 +35,7 @@
         class:pause={!l.laeuft}
         style="--farbe: {FARBE[zustand]}"
         onclick={() => oeffnen({ art: 'aufgabe', tag: heuteTag(), abschnitt: l.f.abschnitt, id: l.id })}
-        aria-label="{l.f.aufgabe.titel}: {l.rest > 0 ? 'noch ' + dauerText(l.rest) : 'Zeit ist um'}{l.laeuft ? '' : ', pausiert'}"
+        aria-label={l.f.aufgabe.titel + ': ' + (l.rest > 0 ? t('noch {zeit}', { zeit: dauerText(l.rest) }) : t('Zeit ist um')) + (l.laeuft ? '' : ', ' + t('pausiert'))}
       >
         <span class="ring">
           <svg viewBox="0 0 100 100" aria-hidden="true">
@@ -50,7 +51,7 @@
           </svg>
           <span class="bild"><Bild id={l.f.aufgabe.bild} /></span>
         </span>
-        <span class="zeit">{l.rest > 0 ? dauerText(l.rest) : 'Zeit!'}{l.laeuft ? '' : ' ⏸'}</span>
+        <span class="zeit">{l.rest > 0 ? dauerText(l.rest) : t('Zeit!')}{l.laeuft ? '' : ' ⏸'}</span>
       </button>
     {/each}
   </div>

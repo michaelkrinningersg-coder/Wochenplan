@@ -1,8 +1,9 @@
 <script lang="ts">
+  import { lokale, t } from '../lib/i18n.svelte'
   // Live-Modus / Ruhebild: nach Inaktivität. Läuft gerade eine Aufgabe mit fester Zeit (von–bis), wird sie groß gezeigt,
   // sonst die Jahreszeit (Datum, Uhr, drei typische Dinge im Wechsel) oder eigene Fotos als Diashow.
   import { onMount } from 'svelte'
-  import { dreiDinge, jahreszeit, JAHRESZEIT_NAME, TYPISCH } from '../lib/jahreszeit'
+    import { dreiDinge, jahreszeit, JAHRESZEIT_NAME, TYPISCH } from '../lib/jahreszeit'
   import { app, istErledigt, tagesListe } from '../lib/speicher.svelte'
   import { ruhe } from '../lib/ruhebilder.svelte'
   import { heuteTag, minutenVon } from '../lib/zeit'
@@ -18,7 +19,7 @@
   const nacht = $derived(jetzt.getHours() >= 19 || jetzt.getHours() < 6)
   const hh = $derived(String(jetzt.getHours()).padStart(2, '0'))
   const mm = $derived(String(jetzt.getMinutes()).padStart(2, '0'))
-  const datum = $derived(jetzt.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }))
+  const datum = $derived(jetzt.toLocaleDateString(lokale(), { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }))
 
   /** Aufgabe, deren feste Zeit gerade läuft */
   const live = $derived.by(() => {
@@ -74,15 +75,17 @@
 </script>
 
 <!-- svelte-ignore a11y_click_events_have_key_events -->
-<div class="ruhe" role="button" tabindex="-1" aria-label="Ruhebild – antippen zum Zurückkehren" onclick={onwecken}>
+<div class="ruhe" role="button" tabindex="-1" aria-label={t('Ruhebild – antippen zum Zurückkehren')} onclick={onwecken}>
   {#if live}
     <div class="live" data-seg="vormittag">
       <div class="live-bild"><AufgabenBild aufgabe={live.aufgabe} /></div>
       <div class="live-text">
-        <span class="live-jetzt">Jetzt</span>
+        <span class="live-jetzt">{t('Jetzt')}</span>
         <span class="live-titel">{live.aufgabe.titel}</span>
         <span class="live-zeit">
-          {live.aufgabe.bis ? `${uhrZiel(live.aufgabe.uhrzeit!)} – ${uhrZiel(live.aufgabe.bis)} Uhr` : `ab ${uhrZiel(live.aufgabe.uhrzeit!)} Uhr`} · noch {live.rest} Min
+          {live.aufgabe.bis
+            ? t('{von} – {bis} Uhr', { von: uhrZiel(live.aufgabe.uhrzeit!), bis: uhrZiel(live.aufgabe.bis) })
+            : t('ab {von} Uhr', { von: uhrZiel(live.aufgabe.uhrzeit!) })} · {t('noch {n} Min', { n: live.rest })}
         </span>
         <span class="live-uhr">{hh}:{mm}</span>
       </div>
@@ -94,7 +97,7 @@
       <img class="foto" src={fotos[fotoNr % fotos.length]} alt="" />
     {/key}
     <div class="ecke">
-      <span class="ecke-jz">{JAHRESZEIT_NAME[jz]}</span>
+      <span class="ecke-jz">{t(JAHRESZEIT_NAME[jz])}</span>
       <span class="ecke-uhr">{hh}:{mm}</span>
       <span class="ecke-datum">{datum}</span>
     </div>
@@ -103,7 +106,7 @@
     <div class="inhalt">
       <div class="kopf">
         <div class="datum-block">
-          <span class="jz">{JAHRESZEIT_NAME[jz]}</span>
+          <span class="jz">{t(JAHRESZEIT_NAME[jz])}</span>
           <span class="datum">{datum}{#if wetter.temperatur !== null}{` · ${wetter.temperatur} °C`}{/if}</span>
         </div>
         {#if analog}
@@ -116,7 +119,7 @@
         {#each dinge as d (d.t)}
           <div class="ding">
             <span class="emoji">{d.e}</span>
-            {#if app.einst.ruheNamen}<span class="ding-text">{d.t}</span>{/if}
+            {#if app.einst.ruheNamen}<span class="ding-text">{t(d.t)}</span>{/if}
           </div>
         {/each}
       </div>

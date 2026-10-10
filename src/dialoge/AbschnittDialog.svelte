@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { lokale, t } from '../lib/i18n.svelte'
   import { segVon } from '../lib/konstanten'
   // Tageszeit anpassen: eigener Name und eigenes Bild (Symbol, Bildkarte oder Foto aus der Galerie)
   import BildZuschnitt from '../komponenten/BildZuschnitt.svelte'
@@ -42,7 +43,7 @@
     try {
       zuschnittQuelle = await fotoVerkleinern(datei, 1400)
     } catch {
-      zeigeHinweis('Das Foto konnte nicht geladen werden.')
+      zeigeHinweis(t('Das Foto konnte nicht geladen werden.'))
     } finally {
       ;(e.target as HTMLInputElement).value = ''
     }
@@ -71,52 +72,52 @@
   }
 </script>
 
-<Fenster titel="Tageszeit anpassen" breit>
+<Fenster titel={t('Tageszeit anpassen')} breit>
   <div class="inhalt" data-seg={segVon(abId)}>
     <div class="kopf">
       <span class="vorschau"><Bild id={vorschau} /></span>
       <label class="feld">
-        <span class="name">Name (Standard: {info.grundName})</span>
-        <input id="abschnitt-name" type="text" bind:value={name} placeholder={info.grundName} maxlength="30" autocomplete="off" />
+        <span class="name">{t('Name (Standard: {name})', { name: t(info.grundName) })}</span>
+        <input id="abschnitt-name" type="text" bind:value={name} placeholder={t(info.grundName)} maxlength="30" autocomplete="off" />
       </label>
     </div>
 
     <div class="reihe zeiten">
-      <span class="name zeile">von</span>
-      <ZeitWahl bind:wert={app.plan.zeiten[abId]} label="{info.name} von" />
-      <span class="name zeile">bis</span>
+      <span class="name zeile">{t('von')}</span>
+      <ZeitWahl bind:wert={app.plan.zeiten[abId]} label={t('{name} von', { name: t(info.name) })} />
+      <span class="name zeile">{t('bis')}</span>
       {#if naechster}
-        <ZeitWahl bind:wert={app.plan.zeiten[naechster.id]} label="{info.name} bis" />
+        <ZeitWahl bind:wert={app.plan.zeiten[naechster.id]} label={t('{name} bis', { name: t(info.name) })} />
       {:else}
-        <span class="name">Aufstehen am nächsten Tag</span>
+        <span class="name">{t('Aufstehen am nächsten Tag')}</span>
       {/if}
     </div>
 
     <div class="feld">
-      <span class="name">Darstellung</span>
+      <span class="name">{t('Darstellung')}</span>
       <div class="reihe">
-        <button type="button" class="knopf klein" aria-pressed={!nacht} onclick={() => (nacht = false)}>Tag (Sonne)</button>
-        <button type="button" class="knopf klein" aria-pressed={nacht} onclick={() => (nacht = true)}>Nacht (dunkel, Mond)</button>
+        <button type="button" class="knopf klein" aria-pressed={!nacht} onclick={() => (nacht = false)}>{t('Tag (Sonne)')}</button>
+        <button type="button" class="knopf klein" aria-pressed={nacht} onclick={() => (nacht = true)}>{t('Nacht (dunkel, Mond)')}</button>
       </div>
-      <span class="name">Farbe</span>
-      <div class="reihe" role="group" aria-label="Farbe">
+      <span class="name">{t('Farbe')}</span>
+      <div class="reihe" role="group" aria-label={t('Farbe')}>
         {#each STANDARD_ABSCHNITTE as f (f)}
-          <button type="button" class="farbpunkt" data-seg={f} style="background: var(--seg)" aria-pressed={farbe === f} aria-label="Farbe {abschnittInfo(f).grundName}" title={abschnittInfo(f).grundName} onclick={() => (farbe = f)}></button>
+          <button type="button" class="farbpunkt" data-seg={f} style="background: var(--seg)" aria-pressed={farbe === f} aria-label={t('Farbe {name}', { name: t(abschnittInfo(f).grundName) })} title={t(abschnittInfo(f).grundName)} onclick={() => (farbe = f)}></button>
         {/each}
       </div>
     </div>
 
     <div class="feld">
-      <span class="name">Bild</span>
-      <input id="abschnitt-suche" type="search" bind:value={suche} placeholder="Bild suchen" autocomplete="off" aria-label="Bild suchen" />
-      <div class="reihe" role="group" aria-label="Bildgruppen">
+      <span class="name">{t('Bild')}</span>
+      <input id="abschnitt-suche" type="search" bind:value={suche} placeholder={t('Bild suchen')} autocomplete="off" aria-label={t('Bild suchen')} />
+      <div class="reihe" role="group" aria-label={t('Bildgruppen')}>
         {#each gruppen as g (g)}
-          <button type="button" class="knopf klein" aria-pressed={!suche.trim() && gruppe === g} onclick={() => ((gruppe = g), (suche = ''))}>{g}</button>
+          <button type="button" class="knopf klein" aria-pressed={!suche.trim() && gruppe === g} onclick={() => ((gruppe = g), (suche = ''))}>{t(g)}</button>
         {/each}
       </div>
       <div class="bildwahl">
         {#each icons as ic (ic.id)}
-          <button type="button" class="bildknopf" aria-pressed={vorschau === ic.id} aria-label={ic.name} title={ic.name} onclick={() => (bild = ic.id === info.grundBild ? '' : ic.id)}>
+          <button type="button" class="bildknopf" aria-pressed={vorschau === ic.id} aria-label={t(ic.name)} title={t(ic.name)} onclick={() => (bild = ic.id === info.grundBild ? '' : ic.id)}>
             <img src={bildUrl(ic.id, app.fotos)} alt="" draggable="false" />
           </button>
         {/each}
@@ -124,21 +125,21 @@
     </div>
 
     <div class="feld">
-      <span class="name">Eigenes Foto</span>
+      <span class="name">{t('Eigenes Foto')}</span>
       {#if zuschnittQuelle}
         <BildZuschnitt quelle={zuschnittQuelle} onfertig={zuschnittFertig} onabbrechen={() => (zuschnittQuelle = null)} />
       {:else}
         <div class="reihe">
-          <button type="button" class="knopf" onclick={() => dateiFeld?.click()}><Symbol name="bild" />Foto aus der Galerie</button>
+          <button type="button" class="knopf" onclick={() => dateiFeld?.click()}><Symbol name="bild" />{t('Foto aus der Galerie')}</button>
         </div>
         <input bind:this={dateiFeld} id="abschnitt-foto" type="file" accept="image/*" hidden onchange={fotoGewaehlt} />
       {/if}
     </div>
 
     <div class="reihe">
-      <button type="button" class="knopf haupt" onclick={speichern}><Symbol name="haken" />Speichern</button>
-      <button type="button" class="knopf" onclick={() => (app.dialog = { art: 'einstellungen' })}>Abbrechen</button>
-      <button type="button" class="knopf" onclick={zuruecksetzen}><Symbol name="neu" />Standard</button>
+      <button type="button" class="knopf haupt" onclick={speichern}><Symbol name="haken" />{t('Speichern')}</button>
+      <button type="button" class="knopf" onclick={() => (app.dialog = { art: 'einstellungen' })}>{t('Abbrechen')}</button>
+      <button type="button" class="knopf" onclick={zuruecksetzen}><Symbol name="neu" />{t('Standard')}</button>
     </div>
   </div>
 </Fenster>

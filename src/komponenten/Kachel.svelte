@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '../lib/i18n.svelte'
   import { app, istTermin, verschiebeAufgabe } from '../lib/speicher.svelte'
   import { ampelZustand } from '../lib/ampel'
   import { dauerText } from '../lib/zeit'
@@ -34,10 +35,10 @@
   const bearbeiten = $derived(app.bearbeiten)
   const termin = $derived(istTermin(aufgabe.id))
   const timer = $derived.by(() => {
-    const t = app.timer[aufgabe.id]
-    if (!t || erledigt || (t.gestartet === null && t.vergangenMs === 0)) return null
-    const rest = t.dauerMs - (t.vergangenMs + (t.gestartet !== null ? app.jetzt - t.gestartet : 0))
-    return { rest, zustand: ampelZustand(rest, t.dauerMs), laeuft: t.gestartet !== null }
+    const tm = app.timer[aufgabe.id]
+    if (!tm || erledigt || (tm.gestartet === null && tm.vergangenMs === 0)) return null
+    const rest = tm.dauerMs - (tm.vergangenMs + (tm.gestartet !== null ? app.jetzt - tm.gestartet : 0))
+    return { rest, zustand: ampelZustand(rest, tm.dauerMs), laeuft: tm.gestartet !== null }
   })
   const kind = $derived(aufgabe.fuer?.length === 1 ? app.plan.kinder.find((k) => k.id === aufgabe.fuer![0]) : undefined)
 </script>
@@ -55,7 +56,7 @@
   data-aufgabe-id={aufgabe.id}
   data-fokus-id={'aufgabe:' + aufgabe.id}
   data-autofokus={autofokus ? true : undefined}
-  aria-label={aufgabe.titel + (erledigt ? ', erledigt' : '') + (status === 'jetzt' ? ', jetzt dran' : '')}
+  aria-label={aufgabe.titel + (erledigt ? ', ' + t('erledigt') : '') + (status === 'jetzt' ? ', ' + t('jetzt dran') : '')}
   title={mini ? aufgabe.titel : undefined}
   onclick={onwahl}
   use:ziehbar={{
@@ -68,7 +69,7 @@
   <span class="flaeche">
     <AufgabenBild {aufgabe} />
     {#if kind && app.einst.kind === 'alle'}
-      <span class="kind" style="--kind: {kind.farbe}" title="nur {kind.name}">{kind.name.slice(0, 1)}</span>
+      <span class="kind" style="--kind: {kind.farbe}" title={t('nur {name}', { name: kind.name })}>{kind.name.slice(0, 1)}</span>
     {/if}
     {#if erledigt}
       <span class="haken"><Symbol name="haken" /></span>
@@ -81,11 +82,11 @@
     {/if}
   </span>
   {#if !mini}
-    <span class="titel">{aufgabe.titel || 'Neue Aufgabe'}</span>
+    <span class="titel">{aufgabe.titel || t('Neue Aufgabe')}</span>
     {#if bisStart !== null}
       <span class="uhrzeit">{inText(bisStart)}</span>
     {:else if aufgabe.uhrzeit}
-      <span class="uhrzeit">{aufgabe.uhrzeit.replace(/^0/, '')} Uhr</span>
+      <span class="uhrzeit">{t('{zeit} Uhr', { zeit: aufgabe.uhrzeit.replace(/^0/, '') })}</span>
     {/if}
   {/if}
 </button>

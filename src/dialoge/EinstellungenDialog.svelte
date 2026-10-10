@@ -7,7 +7,7 @@
   import { onDestroy, onMount } from 'svelte'
   import ZeitWahl from '../komponenten/ZeitWahl.svelte'
   import Lizenzen from '../komponenten/Lizenzen.svelte'
-  import { SPRACHEN, spr, spracheSetzen } from '../lib/i18n.svelte'
+  import { SPRACHEN, lokale, spr, spracheSetzen, t } from '../lib/i18n.svelte'
   import { datei, dateiAbgleichen, dateiInfoLaden, dateiMoeglich, dateiTrennen, dateiWaehlen, passwortSpeichern } from '../lib/dateiabgleich.svelte'
   import { empfangStarten, empfangStoppen, fernseherSuchen, kopplung, kopplungMoeglich, planSenden, type Geraet } from '../lib/kopplung.svelte'
   import { abgleich, einstSpeichern, holen, hochladen, istEingerichtet, ruhebildFernLoeschen, ruhebildHochladen, statusHochladen } from '../lib/abgleich.svelte'
@@ -68,9 +68,9 @@
     if (!ortEingabe.trim()) return
     try {
       ortTreffer = await ortSuchen(ortEingabe.trim())
-      if (!ortTreffer.length) ortMeldung = 'Kein Ort gefunden.'
+      if (!ortTreffer.length) ortMeldung = t('Kein Ort gefunden.')
     } catch {
-      ortMeldung = 'Die Ortssuche ist gerade nicht erreichbar.'
+      ortMeldung = t('Die Ortssuche ist gerade nicht erreichbar.')
     }
   }
 
@@ -86,7 +86,7 @@
     fotoLaedt = true
     let n = 0
     for (const d of dateien) {
-      fotoFortschritt = `${++n} von ${dateien.length}`
+      fotoFortschritt = t('{n} von {gesamt}', { n: ++n, gesamt: dateien.length })
       try {
         const daten = await ruhebildVorbereiten(d)
         const id = neueId()
@@ -94,11 +94,11 @@
         app.plan.ruhebilder = [...(app.plan.ruhebilder ?? []), id].slice(-60)
         void ruhebildHochladen(id, daten)
       } catch {
-        zeigeHinweis(`${d.name} konnte nicht geladen werden.`)
+        zeigeHinweis(t('{name} konnte nicht geladen werden.', { name: d.name }))
       }
     }
     fotoLaedt = false
-    zeigeHinweis(`${dateien.length} Foto${dateien.length === 1 ? '' : 's'} hinzugefügt`)
+    zeigeHinweis(dateien.length === 1 ? t('1 Foto hinzugefügt') : t('{n} Fotos hinzugefügt', { n: dateien.length }))
   }
   function fotoLoeschen(id: string) {
     app.plan.ruhebilder = (app.plan.ruhebilder ?? []).filter((x) => x !== id)
@@ -123,8 +123,8 @@
     })
   })
   function stimmenName(s: Stimme): string {
-    const land = /AT/i.test(s.lang) ? ' (Österreich)' : /CH/i.test(s.lang) ? ' (Schweiz)' : ''
-    return `${s.name}${land}${s.lokal ? '' : ' – online'}`
+    const land = /AT/i.test(s.lang) ? ` (${t('Österreich')})` : /CH/i.test(s.lang) ? ` (${t('Schweiz')})` : ''
+    return `${s.name}${land}${s.lokal ? '' : ' – ' + t('online')}`
   }
   let passwortZeigen = $state(false)
   let erweitert = $state(false)
@@ -145,7 +145,7 @@
       await holen(true)
     }
     await statusHochladen()
-    if (abgleich.zustand === 'ok') zeigeHinweis(abgleich.meldung || 'Plan ist abgeglichen.')
+    if (abgleich.zustand === 'ok') zeigeHinweis(abgleich.meldung || t('Plan ist abgeglichen.'))
   }
 
   async function exportieren() {
@@ -154,7 +154,7 @@
     try {
       zeigeHinweis(await dateiExportieren(name, exportDaten()))
     } catch {
-      zeigeHinweis('Die Datei konnte nicht gespeichert werden.')
+      zeigeHinweis(t('Die Datei konnte nicht gespeichert werden.'))
     }
   }
 
@@ -162,7 +162,7 @@
     const datei = (ev.target as HTMLInputElement).files?.[0]
     if (!datei) return
     const ok = importDaten(await datei.text())
-    zeigeHinweis(ok ? 'Plan übernommen.' : 'Diese Datei ist kein gültiger Wochenplan.')
+    zeigeHinweis(ok ? t('Plan übernommen.') : t('Diese Datei ist kein gültiger Wochenplan.'))
     ;(ev.target as HTMLInputElement).value = ''
   }
 
@@ -170,27 +170,27 @@
     app.plan = startplan()
     app.fotos = {}
     zuruecksetzenFragen = false
-    zeigeHinweis('Startplan wiederhergestellt.')
+    zeigeHinweis(t('Startplan wiederhergestellt.'))
   }
 </script>
 
 {#snippet schalter(wert: boolean, setze: (v: boolean) => void)}
-  <button class="knopf klein" aria-pressed={wert} onclick={() => setze(true)}>An</button>
-  <button class="knopf klein" aria-pressed={!wert} onclick={() => setze(false)}>Aus</button>
+  <button class="knopf klein" aria-pressed={wert} onclick={() => setze(true)}>{t('An')}</button>
+  <button class="knopf klein" aria-pressed={!wert} onclick={() => setze(false)}>{t('Aus')}</button>
 {/snippet}
 
-<Fenster titel="Einstellungen" breit>
+<Fenster titel={t('Einstellungen')} breit>
   <div class="einstellungen">
-    <div class="reiter" role="tablist" aria-label="Bereiche der Einstellungen">
+    <div class="reiter" role="tablist" aria-label={t('Bereiche der Einstellungen')}>
       {#each REITER as r (r.id)}
-        <button class="reiter-knopf" role="tab" aria-selected={reiter === r.id} onclick={() => (reiter = r.id)}>{r.name}</button>
+        <button class="reiter-knopf" role="tab" aria-selected={reiter === r.id} onclick={() => (reiter = r.id)}>{t(r.name)}</button>
       {/each}
     </div>
     {#if reiter === 'geraet'}
     <section>
-      <h3>Dieses Gerät</h3>
+      <h3>{t('Dieses Gerät')}</h3>
       <div class="z">
-        <span class="zl">Aufgabe</span>
+        <span class="zl">{t('Aufgabe')}</span>
         <div class="zr">
           <button
             class="knopf"
@@ -199,7 +199,7 @@
             onclick={() => {
               e.rolle = 'planer'
               aenderung()
-            }}>Planen (Handy, PC)</button
+            }}>{t('Planen (Handy, PC)')}</button
           >
           <button
             class="knopf"
@@ -208,47 +208,47 @@
               e.rolle = 'anzeige'
               app.bearbeiten = false
               aenderung()
-            }}>Nur anzeigen (Fernseher)</button
+            }}>{t('Nur anzeigen (Fernseher)')}</button
           >
         </div>
         <p class="zh">
           {#if e.rolle === 'planer'}
-            {__STORE__ ? 'Hier wird der Plan bearbeitet. Alle Daten bleiben auf diesem Gerät.' : 'Hier wird der Plan bearbeitet. Jede Änderung wird verschlüsselt hochgeladen.'}
+            {__STORE__ ? t('Hier wird der Plan bearbeitet. Alle Daten bleiben auf diesem Gerät.') : t('Hier wird der Plan bearbeitet. Jede Änderung wird verschlüsselt hochgeladen.')}
           {:else}
-            {__STORE__ ? 'Dieses Gerät zeigt den Plan nur an und ist gegen versehentliche Änderungen gesperrt.' : 'Der Plan kommt vom Handy oder PC. Die App schaut alle 2 Minuten nach Änderungen.'}
+            {__STORE__ ? t('Dieses Gerät zeigt den Plan nur an und ist gegen versehentliche Änderungen gesperrt.') : t('Der Plan kommt vom Handy oder PC. Die App schaut alle 2 Minuten nach Änderungen.')}
           {/if}
         </p>
       </div>
       <div class="z">
-        <span class="zl">Bildschirm anlassen</span>
+        <span class="zl">{t('Bildschirm anlassen')}</span>
         <div class="zr">{@render schalter(app.einst.wach, (v) => (app.einst.wach = v))}</div>
       </div>
     </section>
 
     {#if kopplungMoeglich}
       <section>
-        <h3>Plan auf den Fernseher übertragen</h3>
-        <p class="zh">Beide Geräte müssen im selben WLAN sein. Es läuft kein Server dazwischen: Der Plan wird mit dem Code verschlüsselt und direkt gesendet.</p>
+        <h3>{t('Plan auf den Fernseher übertragen')}</h3>
+        <p class="zh">{t('Beide Geräte müssen im selben WLAN sein. Es läuft kein Server dazwischen: Der Plan wird mit dem Code verschlüsselt und direkt gesendet.')}</p>
         <div class="z">
-          <span class="zl">1. Am Fernseher</span>
+          <span class="zl">{t('1. Am Fernseher')}</span>
           <div class="zr">
             {#if kopplung.modus === 'wartet'}
               <div class="kopplung-code">
                 <span class="gross">{kopplung.code}</span>
-                <span>Adresse {kopplung.ip}{kopplung.port !== 8765 ? ':' + kopplung.port : ''}</span>
+                <span>{t('Adresse {adresse}', { adresse: kopplung.ip + (kopplung.port !== 8765 ? ':' + kopplung.port : '') })}</span>
               </div>
-              <button class="knopf klein" onclick={() => void empfangStoppen()}>Abbrechen</button>
+              <button class="knopf klein" onclick={() => void empfangStoppen()}>{t('Abbrechen')}</button>
             {:else}
-              <button class="knopf klein" onclick={() => void empfangStarten()}>Plan empfangen</button>
+              <button class="knopf klein" onclick={() => void empfangStarten()}>{t('Plan empfangen')}</button>
             {/if}
           </div>
-          {#if kopplung.modus === 'wartet'}<p class="zh">Warte auf das Handy … Am Handy „Fernseher suchen“ wählen und den Code eintippen.</p>{/if}
+          {#if kopplung.modus === 'wartet'}<p class="zh">{t('Warte auf das Handy … Am Handy „Fernseher suchen“ wählen und den Code eintippen.')}</p>{/if}
         </div>
         <div class="z">
-          <span class="zl">2. Am Handy</span>
+          <span class="zl">{t('2. Am Handy')}</span>
           <div class="zr">
             <button class="knopf klein" onclick={() => ((gewaehlt = null), void fernseherSuchen())} disabled={kopplung.modus === 'sucht' || kopplung.modus === 'sendet'}>
-              {kopplung.modus === 'sucht' ? 'Suche …' : 'Fernseher suchen'}
+              {kopplung.modus === 'sucht' ? t('Suche …') : t('Fernseher suchen')}
             </button>
             {#each kopplung.geraete as g (g.ip + g.port)}
               <button class="knopf klein" aria-pressed={gewaehlt?.ip === g.ip} onclick={() => (gewaehlt = g)}>{g.name} ({g.ip})</button>
@@ -256,16 +256,16 @@
           </div>
           {#if kopplung.modus === 'bereit' || kopplung.modus === 'sendet' || kopplung.modus === 'fertig'}
             <div class="zr">
-              <input type="text" bind:value={ipEingabe} placeholder="oder Adresse des Fernsehers, z. B. 192.168.0.23" aria-label="Adresse des Fernsehers" />
+              <input type="text" bind:value={ipEingabe} placeholder={t('oder Adresse des Fernsehers, z. B. 192.168.0.23')} aria-label={t('Adresse des Fernsehers')} />
             </div>
             <div class="zr">
-              <input type="text" inputmode="numeric" maxlength="6" bind:value={codeEingabe} placeholder="Code vom Fernseher" aria-label="Code vom Fernseher" />
+              <input type="text" inputmode="numeric" maxlength="6" bind:value={codeEingabe} placeholder={t('Code vom Fernseher')} aria-label={t('Code vom Fernseher')} />
               <button
                 class="knopf haupt klein"
                 disabled={kopplung.modus === 'sendet' || codeEingabe.trim().length !== 6 || (!gewaehlt && !ipEingabe.trim())}
                 onclick={() => void planSenden(gewaehlt ?? { ip: ipEingabe.trim(), port: 8765, name: ipEingabe.trim() }, codeEingabe)}
               >
-                {kopplung.modus === 'sendet' ? 'Sende …' : 'Plan senden'}
+                {kopplung.modus === 'sendet' ? t('Sende …') : t('Plan senden')}
               </button>
             </div>
           {/if}
@@ -277,7 +277,7 @@
     <section>
       <h3>Sprache / Language</h3>
       <div class="z">
-        <span class="zl">Sprache der App</span>
+        <span class="zl">{t('Sprache der App')}</span>
         <div class="zr">
           {#each SPRACHEN as l (l.id)}
             <button class="knopf klein" aria-pressed={spr.aktuell === l.id} onclick={() => spracheSetzen(l.id)}>{l.name}</button>
@@ -287,86 +287,86 @@
     </section>
 
     <section>
-      <h3>Aussehen</h3>
-      <p class="zh">Gilt für alle Geräte.</p>
+      <h3>{t('Aussehen')}</h3>
+      <p class="zh">{t('Gilt für alle Geräte.')}</p>
       <div class="z">
-        <span class="zl">Helligkeit</span>
+        <span class="zl">{t('Helligkeit')}</span>
         <div class="zr">
-          <button class="knopf klein" aria-pressed={app.einst.thema === 'auto'} onclick={() => (app.einst.thema = 'auto')}>Abends dunkel</button>
-          <button class="knopf klein" aria-pressed={app.einst.thema === 'tag'} onclick={() => (app.einst.thema = 'tag')}>Immer hell</button>
-          <button class="knopf klein" aria-pressed={app.einst.thema === 'nacht'} onclick={() => (app.einst.thema = 'nacht')}>Immer dunkel</button>
+          <button class="knopf klein" aria-pressed={app.einst.thema === 'auto'} onclick={() => (app.einst.thema = 'auto')}>{t('Abends dunkel')}</button>
+          <button class="knopf klein" aria-pressed={app.einst.thema === 'tag'} onclick={() => (app.einst.thema = 'tag')}>{t('Immer hell')}</button>
+          <button class="knopf klein" aria-pressed={app.einst.thema === 'nacht'} onclick={() => (app.einst.thema = 'nacht')}>{t('Immer dunkel')}</button>
         </div>
       </div>
       <div class="z">
-        <span class="zl">Uhr</span>
+        <span class="zl">{t('Uhr')}</span>
         <div class="zr">
-          <button class="knopf klein" aria-pressed={(app.einst.uhrArt ?? 'digital') === 'digital'} onclick={() => (app.einst.uhrArt = 'digital')}>Digital</button>
-          <button class="knopf klein" aria-pressed={app.einst.uhrArt === 'analog'} onclick={() => (app.einst.uhrArt = 'analog')}>Analog</button>
+          <button class="knopf klein" aria-pressed={(app.einst.uhrArt ?? 'digital') === 'digital'} onclick={() => (app.einst.uhrArt = 'digital')}>{t('Digital')}</button>
+          <button class="knopf klein" aria-pressed={app.einst.uhrArt === 'analog'} onclick={() => (app.einst.uhrArt = 'analog')}>{t('Analog')}</button>
         </div>
       </div>
     </section>
 
     <section>
-      <h3>Timer und Belohnung</h3>
+      <h3>{t('Timer und Belohnung')}</h3>
       <div class="z">
-        <span class="zl">Timer zeigen als</span>
+        <span class="zl">{t('Timer zeigen als')}</span>
         <div class="zr">
-          <button class="knopf klein" aria-pressed={app.einst.timerArt === 'ampel'} onclick={() => (app.einst.timerArt = 'ampel')}>Ampel</button>
-          <button class="knopf klein" aria-pressed={app.einst.timerArt === 'sanduhr'} onclick={() => (app.einst.timerArt = 'sanduhr')}>Sanduhr</button>
+          <button class="knopf klein" aria-pressed={app.einst.timerArt === 'ampel'} onclick={() => (app.einst.timerArt = 'ampel')}>{t('Ampel')}</button>
+          <button class="knopf klein" aria-pressed={app.einst.timerArt === 'sanduhr'} onclick={() => (app.einst.timerArt = 'sanduhr')}>{t('Sanduhr')}</button>
         </div>
       </div>
       <div class="z">
-        <span class="zl">Töne (inkl. Countdown-Piepen)</span>
+        <span class="zl">{t('Töne (inkl. Countdown-Piepen)')}</span>
         <div class="zr">{@render schalter(app.einst.ton, (v) => (app.einst.ton = v))}</div>
       </div>
       <div class="z">
-        <span class="zl">Sternenregen</span>
+        <span class="zl">{t('Sternenregen')}</span>
         <div class="zr">
           {#each [['alle', 'Bei allen Aufgaben'], ['auswahl', 'Nur ausgewählte'], ['aus', 'Aus']] as [wert, text] (wert)}
-            <button class="knopf klein" aria-pressed={(app.einst.sternenregen ?? 'alle') === wert} onclick={() => (app.einst.sternenregen = wert as 'alle' | 'auswahl' | 'aus')}>{text}</button>
+            <button class="knopf klein" aria-pressed={(app.einst.sternenregen ?? 'alle') === wert} onclick={() => (app.einst.sternenregen = wert as 'alle' | 'auswahl' | 'aus')}>{t(text)}</button>
           {/each}
         </div>
       </div>
     </section>
     {:else if reiter === 'sprache'}
     <section>
-      <h3>Vorlesen</h3>
-      <p class="zh">Aufgaben, Lob, Uhrzeit und Timer werden laut angesagt.</p>
+      <h3>{t('Vorlesen')}</h3>
+      <p class="zh">{t('Aufgaben, Lob, Uhrzeit und Timer werden laut angesagt.')}</p>
       <div class="z">
-        <span class="zl">Vorlesen</span>
+        <span class="zl">{t('Vorlesen')}</span>
         <div class="zr">{@render schalter(app.einst.vorlesen, (v) => (app.einst.vorlesen = v))}</div>
       </div>
       <div class="z">
-        <span class="zl">Zeit ansagen (10 / 5 / 1 Min)</span>
+        <span class="zl">{t('Zeit ansagen (10 / 5 / 1 Min)')}</span>
         <div class="zr">{@render schalter(app.einst.zeitAnsagen !== false, (v) => (app.einst.zeitAnsagen = v))}</div>
       </div>
     </section>
 
     {#if app.einst.vorlesen}
       <section>
-        <h3>Stimme</h3>
+        <h3>{t('Stimme')}</h3>
         {#if stimmen.length}
           <div class="z">
-            <span class="zl">Stimme</span>
+            <span class="zl">{t('Stimme')}</span>
             <div class="zr">
               <select id="stimme" bind:value={stimmeWahl} onchange={() => (app.einst.stimme = stimmeWahl || undefined)}>
-                <option value="">Automatisch (beste Stimme)</option>
+                <option value="">{t('Automatisch (beste Stimme)')}</option>
                 {#each stimmen as s (s.uri)}
                   <option value={s.uri}>{stimmenName(s)}</option>
                 {/each}
               </select>
-              <button class="knopf klein" onclick={probeSprechen}><Symbol name="lautsprecher" />Probe hören</button>
+              <button class="knopf klein" onclick={probeSprechen}><Symbol name="lautsprecher" />{t('Probe hören')}</button>
             </div>
           </div>
         {:else if stimmenGeladen}
-          <p class="zh">Auf diesem Gerät ist keine deutsche Stimme installiert. In den Android-Einstellungen unter „Sprachausgabe“ die Google-Sprachausgabe mit Deutsch installieren.</p>
-          <div class="zr"><button class="knopf klein" onclick={probeSprechen}><Symbol name="lautsprecher" />Probe hören</button></div>
+          <p class="zh">{t('Auf diesem Gerät ist keine deutsche Stimme installiert. In den Android-Einstellungen unter „Sprachausgabe“ die Google-Sprachausgabe mit Deutsch installieren.')}</p>
+          <div class="zr"><button class="knopf klein" onclick={probeSprechen}><Symbol name="lautsprecher" />{t('Probe hören')}</button></div>
         {/if}
         <div class="z">
-          <span class="zl">Tempo</span>
+          <span class="zl">{t('Tempo')}</span>
           <div class="zr">
-            {#each TEMPI as t (t.wert)}
-              <button class="knopf klein" aria-pressed={(app.einst.tempo ?? 0.85) === t.wert} onclick={() => ((app.einst.tempo = t.wert), probeSprechen())}>{t.name}</button>
+            {#each TEMPI as tp (tp.wert)}
+              <button class="knopf klein" aria-pressed={(app.einst.tempo ?? 0.85) === tp.wert} onclick={() => ((app.einst.tempo = tp.wert), probeSprechen())}>{t(tp.name)}</button>
             {/each}
           </div>
         </div>
@@ -374,138 +374,138 @@
     {/if}
     {:else if reiter === 'tag'}
     <section>
-      <h3>Tagesabläufe</h3>
-      <p class="hilfe">Abläufe wie „Kita-Tag“, „Ferien“ oder „Wochenende“ speichern und einer Woche (Mo–Fr, Sa, So getrennt) oder einem Datum zuordnen. Tage kopieren.</p>
+      <h3>{t('Tagesabläufe')}</h3>
+      <p class="hilfe">{t('Abläufe wie „Kita-Tag“, „Ferien“ oder „Wochenende“ speichern und einer Woche (Mo–Fr, Sa, So getrennt) oder einem Datum zuordnen. Tage kopieren.')}</p>
       <div class="reihe">
-        <button class="knopf haupt" onclick={() => (app.dialog = { art: 'ablaeufe' })}><Symbol name="kalender" />Tagesabläufe und Wochen</button>
+        <button class="knopf haupt" onclick={() => (app.dialog = { art: 'ablaeufe' })}><Symbol name="kalender" />{t('Tagesabläufe und Wochen')}</button>
       </div>
     </section>
 
     <section>
-      <h3>Tageszeiten</h3>
-      <p class="hilfe">Tippe auf Bild oder Namen, um eine Tageszeit umzubenennen, ihr ein Bild oder eine Farbe zu geben. Jeder Abschnitt endet, wenn der nächste beginnt. Änderst du ein „bis“, verschiebt sich der Beginn des nächsten Abschnitts mit. Die letzte Tageszeit dauert bis zum Aufstehen am nächsten Tag.</p>
+      <h3>{t('Tageszeiten')}</h3>
+      <p class="hilfe">{t('Tippe auf Bild oder Namen, um eine Tageszeit umzubenennen, ihr ein Bild oder eine Farbe zu geben. Jeder Abschnitt endet, wenn der nächste beginnt. Änderst du ein „bis“, verschiebt sich der Beginn des nächsten Abschnitts mit. Die letzte Tageszeit dauert bis zum Aufstehen am nächsten Tag.')}</p>
       <div class="reihe">
-        <button class="knopf haupt klein" onclick={() => (app.dialog = { art: 'abschnittBild', id: abschnittAnlegen() })}>＋ Neue Tageszeit</button>
+        <button class="knopf haupt klein" onclick={() => (app.dialog = { art: 'abschnittBild', id: abschnittAnlegen() })}>＋ {t('Neue Tageszeit')}</button>
       </div>
       <div class="zeiten">
         {#each ABSCHNITTE as ab, i (ab.id)}
           {@const naechster = ABSCHNITTE[i + 1]}
           <div class="zeit" data-seg={segVon(ab.id)}>
-            <button class="zeit-name" onclick={() => (app.dialog = { art: 'abschnittBild', id: ab.id })} aria-label="{ab.name}: Name und Bild ändern">
+            <button class="zeit-name" onclick={() => (app.dialog = { art: 'abschnittBild', id: ab.id })} aria-label={t('{name}: Name und Bild ändern', { name: t(ab.name) })}>
               <span class="zeit-bild"><Bild id={ab.bild} /></span>
-              <span>{ab.name}</span>
+              <span>{t(ab.name)}</span>
               <Symbol name="stift" />
             </button>
             <div class="von-bis">
-              <span class="name">von</span>
-              <ZeitWahl bind:wert={app.plan.zeiten[ab.id]} label="{ab.name} von" />
+              <span class="name">{t('von')}</span>
+              <ZeitWahl bind:wert={app.plan.zeiten[ab.id]} label={t('{name} von', { name: t(ab.name) })} />
             </div>
             <div class="von-bis">
-              <span class="name">bis</span>
+              <span class="name">{t('bis')}</span>
               {#if naechster}
-                <ZeitWahl bind:wert={app.plan.zeiten[naechster.id]} label="{ab.name} bis" />
+                <ZeitWahl bind:wert={app.plan.zeiten[naechster.id]} label={t('{name} bis', { name: t(ab.name) })} />
               {:else}
-                <span class="bis-auto">bis Aufstehen</span>
+                <span class="bis-auto">{t('bis Aufstehen')}</span>
               {/if}
             </div>
             {#if ABSCHNITTE.length > 1}
               {#if loeschenFragen === ab.id}
                 <div class="reihe">
-                  <button class="knopf klein gefahr" onclick={() => (abschnittLoeschen(ab.id), (loeschenFragen = null))}>Ja, löschen</button>
-                  <button class="knopf klein" onclick={() => (loeschenFragen = null)}>Nein</button>
+                  <button class="knopf klein gefahr" onclick={() => (abschnittLoeschen(ab.id), (loeschenFragen = null))}>{t('Ja, löschen')}</button>
+                  <button class="knopf klein" onclick={() => (loeschenFragen = null)}>{t('Nein')}</button>
                 </div>
-                <span class="hilfe">Die Aufgaben wandern in {ABSCHNITTE[Math.max(0, i === 0 ? 1 : i - 1)].name}.</span>
+                <span class="hilfe">{t('Die Aufgaben wandern in {name}.', { name: ABSCHNITTE[Math.max(0, i === 0 ? 1 : i - 1)].name })}</span>
               {:else}
-                <button class="knopf klein loeschen" onclick={() => (loeschenFragen = ab.id)} aria-label="{ab.name} löschen"><Symbol name="muell" />Löschen</button>
+                <button class="knopf klein loeschen" onclick={() => (loeschenFragen = ab.id)} aria-label={t('{name} löschen', { name: t(ab.name) })}><Symbol name="muell" />{t('Löschen')}</button>
               {/if}
             {/if}
             {#if naechster && minutenVon(app.plan.zeiten[ab.id]) >= minutenVon(app.plan.zeiten[naechster.id])}
-              <span class="warnung">„bis“ muss nach „von“ liegen</span>
+              <span class="warnung">{t('„bis“ muss nach „von“ liegen')}</span>
             {/if}
           </div>
         {/each}
       </div>
     </section>
     {:else if reiter === 'ruhe'}
-    <div class="unterreiter" role="tablist" aria-label="Ruhebild">
-      <button class="unter-knopf" role="tab" aria-selected={ruheUnter === 'wann'} onclick={() => (ruheUnter = 'wann')}>Wann</button>
-      <button class="unter-knopf" role="tab" aria-selected={ruheUnter === 'bild'} onclick={() => (ruheUnter = 'bild')}>Bild und Fotos</button>
+    <div class="unterreiter" role="tablist" aria-label={t('Ruhebild')}>
+      <button class="unter-knopf" role="tab" aria-selected={ruheUnter === 'wann'} onclick={() => (ruheUnter = 'wann')}>{t('Wann')}</button>
+      <button class="unter-knopf" role="tab" aria-selected={ruheUnter === 'bild'} onclick={() => (ruheUnter = 'bild')}>{t('Bild und Fotos')}</button>
     </div>
     {#if ruheUnter === 'wann'}
     <section>
-      <h3>Wann erscheint das Ruhebild?</h3>
+      <h3>{t('Wann erscheint das Ruhebild?')}</h3>
       <p class="zh">
-        Nach einer Weile ohne Bedienung erscheint ein Ruhebild, wenn gerade kein Timer läuft. Hat eine Aufgabe eine feste Zeit (von–bis), wird sie in dieser Zeit groß gezeigt.
-        Eine Taste auf der Fernbedienung oder Antippen führt zurück.
+        {t('Nach einer Weile ohne Bedienung erscheint ein Ruhebild, wenn gerade kein Timer läuft. Hat eine Aufgabe eine feste Zeit (von–bis), wird sie in dieser Zeit groß gezeigt.')}
+        {t('Eine Taste auf der Fernbedienung oder Antippen führt zurück.')}
       </p>
       <div class="z">
-        <span class="zl">Für alle Geräte</span>
+        <span class="zl">{t('Für alle Geräte')}</span>
         <div class="zr">{@render schalter((app.einst.ruhe ?? 'an') === 'an', (v) => (app.einst.ruhe = v ? 'an' : 'aus'))}</div>
       </div>
       <div class="z">
-        <span class="zl">Nach</span>
+        <span class="zl">{t('Nach')}</span>
         <div class="zr">
           {#each [2, 5, 10, 15, 30] as m (m)}
-            <button class="knopf klein" aria-pressed={(app.einst.ruheWarten ?? 5) === m} onclick={() => (app.einst.ruheWarten = m)}>{m} Min</button>
+            <button class="knopf klein" aria-pressed={(app.einst.ruheWarten ?? 5) === m} onclick={() => (app.einst.ruheWarten = m)}>{t('{m} Min', { m })}</button>
           {/each}
         </div>
       </div>
       <div class="z">
-        <span class="zl">Auf diesem Gerät</span>
+        <span class="zl">{t('Auf diesem Gerät')}</span>
         <div class="zr">
-          <button class="knopf klein" aria-pressed={(app.einst.ruheHier ?? 'auto') === 'auto'} onclick={() => (app.einst.ruheHier = 'auto')}>Automatisch (nur Fernseher)</button>
-          <button class="knopf klein" aria-pressed={app.einst.ruheHier === 'an'} onclick={() => (app.einst.ruheHier = 'an')}>Ja</button>
-          <button class="knopf klein" aria-pressed={app.einst.ruheHier === 'aus'} onclick={() => (app.einst.ruheHier = 'aus')}>Nein</button>
+          <button class="knopf klein" aria-pressed={(app.einst.ruheHier ?? 'auto') === 'auto'} onclick={() => (app.einst.ruheHier = 'auto')}>{t('Automatisch (nur Fernseher)')}</button>
+          <button class="knopf klein" aria-pressed={app.einst.ruheHier === 'an'} onclick={() => (app.einst.ruheHier = 'an')}>{t('Ja')}</button>
+          <button class="knopf klein" aria-pressed={app.einst.ruheHier === 'aus'} onclick={() => (app.einst.ruheHier = 'aus')}>{t('Nein')}</button>
         </div>
         <p class="zh">
           {(app.einst.ruheHier ?? 'auto') === 'auto' && abgleich.einst.rolle === 'planer'
-            ? 'Dieses Gerät plant – hier erscheint das Ruhebild nur mit „Ja“.'
-            : 'Ein laufender Timer hält das Ruhebild zurück; eine geöffnete Aufgabe ohne Timer nicht.'}
+            ? t('Dieses Gerät plant – hier erscheint das Ruhebild nur mit „Ja“.')
+            : t('Ein laufender Timer hält das Ruhebild zurück; eine geöffnete Aufgabe ohne Timer nicht.')}
         </p>
       </div>
       <div class="z">
-        <span class="zl">Nachts schwarz (Schlafen bis Aufstehen)</span>
+        <span class="zl">{t('Nachts schwarz (Schlafen bis Aufstehen)')}</span>
         <div class="zr">{@render schalter(!!app.einst.ruheNacht, (v) => (app.einst.ruheNacht = v))}</div>
       </div>
       <div class="z">
-        <span class="zl">Mini-Countdown in der Ecke</span>
+        <span class="zl">{t('Mini-Countdown in der Ecke')}</span>
         <div class="zr">{@render schalter(app.einst.ruheCountdown !== false, (v) => (app.einst.ruheCountdown = v))}</div>
       </div>
     </section>
     {:else}
     <section>
-      <h3>Bild</h3>
+      <h3>{t('Bild')}</h3>
       <div class="z">
-        <span class="zl">Zeigen</span>
+        <span class="zl">{t('Zeigen')}</span>
         <div class="zr">
-          <button class="knopf klein" aria-pressed={(app.einst.ruheArt ?? 'jahreszeit') === 'jahreszeit'} onclick={() => (app.einst.ruheArt = 'jahreszeit')}>Jahreszeit</button>
-          <button class="knopf klein" aria-pressed={app.einst.ruheArt === 'fotos'} onclick={() => (app.einst.ruheArt = 'fotos')}>Eigene Fotos</button>
-          <button class="knopf klein" aria-pressed={app.einst.ruheArt === 'schwarz'} onclick={() => (app.einst.ruheArt = 'schwarz')}>Schwarz</button>
-          <button class="knopf klein" onclick={() => ((app.dialog = null), (app.ruheVorschau = true))}>Vorschau zeigen</button>
+          <button class="knopf klein" aria-pressed={(app.einst.ruheArt ?? 'jahreszeit') === 'jahreszeit'} onclick={() => (app.einst.ruheArt = 'jahreszeit')}>{t('Jahreszeit')}</button>
+          <button class="knopf klein" aria-pressed={app.einst.ruheArt === 'fotos'} onclick={() => (app.einst.ruheArt = 'fotos')}>{t('Eigene Fotos')}</button>
+          <button class="knopf klein" aria-pressed={app.einst.ruheArt === 'schwarz'} onclick={() => (app.einst.ruheArt = 'schwarz')}>{t('Schwarz')}</button>
+          <button class="knopf klein" onclick={() => ((app.dialog = null), (app.ruheVorschau = true))}>{t('Vorschau zeigen')}</button>
         </div>
-        {#if app.einst.ruheArt === 'schwarz'}<p class="zh">„Schwarz“ macht den Bildschirm ganz dunkel. Bewegen, Antippen oder eine Taste holt die App zurück.</p>{/if}
+        {#if app.einst.ruheArt === 'schwarz'}<p class="zh">{t('„Schwarz“ macht den Bildschirm ganz dunkel. Bewegen, Antippen oder eine Taste holt die App zurück.')}</p>{/if}
       </div>
     </section>
     {#if (app.einst.ruheArt ?? 'jahreszeit') === 'jahreszeit'}
       <section>
-        <h3>Jahreszeiten-Bild</h3>
+        <h3>{t('Jahreszeiten-Bild')}</h3>
         <div class="z">
-          <span class="zl">Namen unter den Bildern</span>
+          <span class="zl">{t('Namen unter den Bildern')}</span>
           <div class="zr">{@render schalter(!!app.einst.ruheNamen, (v) => (app.einst.ruheNamen = v))}</div>
         </div>
         {#if !__STORE__}
         <div class="feld">
-          <span class="name">Echtes Wetter im Bild {wetterName ? `(jetzt: ${wetterName})` : ''}</span>
+          <span class="name">{wetterName ? t('Echtes Wetter im Bild (jetzt: {ort})', { ort: wetterName }) : t('Echtes Wetter im Bild')}</span>
           <div class="reihe">
-            <input type="text" bind:value={ortEingabe} placeholder="Ort, z. B. Göttingen" aria-label="Ort für das Wetter" onkeydown={(ev) => ev.key === 'Enter' && void ortSuche()} />
-            <button class="knopf klein" onclick={() => void ortSuche()}>Suchen</button>
-            {#if app.einst.wetterOrt}<button class="knopf klein" onclick={() => (app.einst.wetterOrt = undefined)}>Kein Wetter</button>{/if}
+            <input type="text" bind:value={ortEingabe} placeholder={t('Ort, z. B. Göttingen')} aria-label={t('Ort für das Wetter')} onkeydown={(ev) => ev.key === 'Enter' && void ortSuche()} />
+            <button class="knopf klein" onclick={() => void ortSuche()}>{t('Suchen')}</button>
+            {#if app.einst.wetterOrt}<button class="knopf klein" onclick={() => (app.einst.wetterOrt = undefined)}>{t('Kein Wetter')}</button>{/if}
           </div>
           {#if ortTreffer.length}
             <div class="reihe">
-              {#each ortTreffer as t (t.lat + ',' + t.lon)}
-                <button class="knopf klein" onclick={() => ((app.einst.wetterOrt = `${t.name}|${t.lat}|${t.lon}`), (ortTreffer = []), void wetterAktualisieren(true))}>
-                  {t.name}{t.land ? ` (${t.land})` : ''}
+              {#each ortTreffer as o (o.lat + ',' + o.lon)}
+                <button class="knopf klein" onclick={() => ((app.einst.wetterOrt = `${o.name}|${o.lat}|${o.lon}`), (ortTreffer = []), void wetterAktualisieren(true))}>
+                  {o.name}{o.land ? ` (${o.land})` : ''}
                 </button>
               {/each}
             </div>
@@ -517,29 +517,29 @@
     {/if}
     {#if app.einst.ruheArt === 'fotos'}
       <section>
-        <h3>Eigene Fotos</h3>
+        <h3>{t('Eigene Fotos')}</h3>
       <div class="reihe">
-        <button class="knopf" onclick={() => fotoFeld?.click()} disabled={fotoLaedt}><Symbol name="bild" />Fotos hinzufügen</button>
-        {#if !istApp}<button class="knopf" onclick={() => ordnerFeld?.click()} disabled={fotoLaedt}>Ganzen Ordner</button>{/if}
-        <span class="name zeile">Wechsel alle</span>
+        <button class="knopf" onclick={() => fotoFeld?.click()} disabled={fotoLaedt}><Symbol name="bild" />{t('Fotos hinzufügen')}</button>
+        {#if !istApp}<button class="knopf" onclick={() => ordnerFeld?.click()} disabled={fotoLaedt}>{t('Ganzen Ordner')}</button>{/if}
+        <span class="name zeile">{t('Wechsel alle')}</span>
         {#each [10, 20, 60] as sek (sek)}
-          <button class="knopf klein" aria-pressed={(app.einst.ruheWechsel ?? 20) === sek} onclick={() => (app.einst.ruheWechsel = sek)}>{sek} s</button>
+          <button class="knopf klein" aria-pressed={(app.einst.ruheWechsel ?? 20) === sek} onclick={() => (app.einst.ruheWechsel = sek)}>{t('{sek} s', { sek })}</button>
         {/each}
       </div>
       <input bind:this={fotoFeld} type="file" accept="image/*" multiple hidden onchange={fotosGewaehlt} />
       <input bind:this={ordnerFeld} type="file" accept="image/*" multiple hidden webkitdirectory onchange={fotosGewaehlt} />
-      {#if fotoLaedt}<p class="hilfe">Fotos werden vorbereitet … {fotoFortschritt}</p>{/if}
+      {#if fotoLaedt}<p class="hilfe">{t('Fotos werden vorbereitet …')} {fotoFortschritt}</p>{/if}
       {#if (app.plan.ruhebilder ?? []).length}
         <div class="ruhefotos">
           {#each app.plan.ruhebilder ?? [] as id (id)}
             <div class="ruhefoto">
               {#if ruhe.bilder[id]}<img src={ruhe.bilder[id]} alt="" />{:else}<span class="laedt">…</span>{/if}
-              <button class="knopf klein gefahr" onclick={() => fotoLoeschen(id)} aria-label="Foto entfernen"><Symbol name="muell" /></button>
+              <button class="knopf klein gefahr" onclick={() => fotoLoeschen(id)} aria-label={t('Foto entfernen')}><Symbol name="muell" /></button>
             </div>
           {/each}
         </div>
       {:else}
-        <p class="hilfe">Noch keine Fotos. Ohne Fotos wird das Jahreszeiten-Bild gezeigt.</p>
+        <p class="hilfe">{t('Noch keine Fotos. Ohne Fotos wird das Jahreszeiten-Bild gezeigt.')}</p>
       {/if}
       </section>
     {/if}
@@ -547,9 +547,9 @@
     {:else if reiter === 'abgleich'}
     {#if !__STORE__}
     <section>
-      <h3>Abgleich</h3>
+      <h3>{t('Abgleich')}</h3>
       <label class="feld">
-        <span class="name">Familien-Passwort (auf allen Geräten gleich)</span>
+        <span class="name">{t('Familien-Passwort (auf allen Geräten gleich)')}</span>
         <span class="mit-knopf">
           <input
             id="abgleich-passwort"
@@ -557,46 +557,46 @@
             bind:value={e.passwort}
             onchange={aenderung}
             autocomplete="off"
-            placeholder="z. B. hase-sonne-blau-17"
+            placeholder={t('z. B. hase-sonne-blau-17')}
           />
-          <button class="knopf" onclick={() => (passwortZeigen = !passwortZeigen)}>{passwortZeigen ? 'Verbergen' : 'Zeigen'}</button>
+          <button class="knopf" onclick={() => (passwortZeigen = !passwortZeigen)}>{passwortZeigen ? t('Verbergen') : t('Zeigen')}</button>
         </span>
       </label>
       {#if e.rolle === 'planer'}
         <label class="feld">
-          <span class="name">GitHub-Token (nur zum Hochladen nötig)</span>
+          <span class="name">{t('GitHub-Token (nur zum Hochladen nötig)')}</span>
           <input id="abgleich-token" type="password" bind:value={e.token} onchange={aenderung} autocomplete="off" placeholder="github_pat_…" />
         </label>
-        <p class="hilfe">Der Token wird verschlüsselt mit dem Plan übertragen. So kann auch der Fernseher melden, was die Kinder abgehakt haben, und du siehst es hier.</p>
+        <p class="hilfe">{t('Der Token wird verschlüsselt mit dem Plan übertragen. So kann auch der Fernseher melden, was die Kinder abgehakt haben, und du siehst es hier.')}</p>
       {:else if istEingerichtet()}
         <p class="hilfe">
-          {e.token ? 'Abgehakte Aufgaben werden an Handy und PC gemeldet.' : 'Abhaken wird gemeldet, sobald der Plan einmal vom Planer-Gerät hochgeladen wurde.'}
+          {e.token ? t('Abgehakte Aufgaben werden an Handy und PC gemeldet.') : t('Abhaken wird gemeldet, sobald der Plan einmal vom Planer-Gerät hochgeladen wurde.')}
         </p>
       {/if}
       <div class="reihe">
         <button class="knopf haupt" onclick={jetztAbgleichen} disabled={!istEingerichtet()}>
-          <Symbol name="neu" />{e.rolle === 'planer' ? 'Jetzt abgleichen' : 'Plan jetzt laden'}
+          <Symbol name="neu" />{e.rolle === 'planer' ? t('Jetzt abgleichen') : t('Plan jetzt laden')}
         </button>
-        <button class="knopf" onclick={() => (erweitert = !erweitert)} aria-expanded={erweitert}>Speicherort</button>
+        <button class="knopf" onclick={() => (erweitert = !erweitert)} aria-expanded={erweitert}>{t('Speicherort')}</button>
       </div>
       {#if abgleich.zustand === 'fehler'}
         <p class="meldung fehler">{abgleich.meldung}</p>
       {:else if abgleich.zuletzt}
         <p class="meldung">
-          Zuletzt abgeglichen um {new Date(abgleich.zuletzt).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })} Uhr.
+          {t('Zuletzt abgeglichen um {zeit}', { zeit: new Date(abgleich.zuletzt).toLocaleTimeString(lokale(), { hour: '2-digit', minute: '2-digit' }) })}
           {abgleich.meldung}
         </p>
       {:else if !istEingerichtet()}
         <p class="hilfe">
-          {e.rolle === 'planer' ? 'Passwort und Token eintragen, dann wird der Plan automatisch hochgeladen.' : 'Passwort eintragen, dann lädt der Fernseher den Plan.'}
+          {e.rolle === 'planer' ? t('Passwort und Token eintragen, dann wird der Plan automatisch hochgeladen.') : t('Passwort eintragen, dann lädt der Fernseher den Plan.')}
         </p>
       {/if}
       {#if erweitert}
         <div class="raster">
-          <label class="feld"><span class="name">GitHub-Konto</span><input id="abgleich-besitzer" type="text" bind:value={e.besitzer} onchange={aenderung} /></label>
+          <label class="feld"><span class="name">{t('GitHub-Konto')}</span><input id="abgleich-besitzer" type="text" bind:value={e.besitzer} onchange={aenderung} /></label>
           <label class="feld"><span class="name">Repo</span><input id="abgleich-repo" type="text" bind:value={e.repo} onchange={aenderung} /></label>
-          <label class="feld"><span class="name">Zweig</span><input id="abgleich-zweig" type="text" bind:value={e.zweig} onchange={aenderung} /></label>
-          <label class="feld"><span class="name">Datei</span><input id="abgleich-datei" type="text" bind:value={e.datei} onchange={aenderung} /></label>
+          <label class="feld"><span class="name">{t('Zweig')}</span><input id="abgleich-zweig" type="text" bind:value={e.zweig} onchange={aenderung} /></label>
+          <label class="feld"><span class="name">{t('Datei')}</span><input id="abgleich-datei" type="text" bind:value={e.datei} onchange={aenderung} /></label>
         </div>
       {/if}
     </section>
@@ -604,64 +604,63 @@
     {/if}
     {#if dateiMoeglich}
     <section>
-      <h3>Gemeinsame Datei (eigener Speicher){__STORE__ ? '' : ' – Test'}</h3>
+      <h3>{t('Gemeinsame Datei (eigener Speicher)')}{__STORE__ ? '' : ' – ' + t('Test')}</h3>
       <p class="zh">
-        Du wählst selbst, wo der Plan liegt – zum Beispiel in Google Drive, Nextcloud oder auf dem Gerät. Die App legt dort eine verschlüsselte Datei ab
-        und gleicht sie auf allen Geräten ab, die dieselbe Datei und dasselbe Passwort nutzen. Die jüngere Änderung gewinnt. Es läuft nichts über Server des App-Anbieters.
+        {t('Du wählst selbst, wo der Plan liegt – zum Beispiel in Google Drive, Nextcloud oder auf dem Gerät. Die App legt dort eine verschlüsselte Datei ab und gleicht sie auf allen Geräten ab, die dieselbe Datei und dasselbe Passwort nutzen. Die jüngere Änderung gewinnt. Es läuft nichts über Server des App-Anbieters.')}
       </p>
       <label class="feld">
-        <span class="name">Familien-Passwort (auf allen Geräten gleich)</span>
-        <input id="datei-passwort" type="password" bind:value={datei.passwort} onchange={passwortSpeichern} autocomplete="off" placeholder="z. B. hase-sonne-blau-17" />
+        <span class="name">{t('Familien-Passwort (auf allen Geräten gleich)')}</span>
+        <input id="datei-passwort" type="password" bind:value={datei.passwort} onchange={passwortSpeichern} autocomplete="off" placeholder={t('z. B. hase-sonne-blau-17')} />
       </label>
       <div class="reihe">
-        <button class="knopf" onclick={() => void dateiWaehlen(true)} disabled={!datei.passwort}>Neue Datei anlegen</button>
-        <button class="knopf" onclick={() => void dateiWaehlen(false)} disabled={!datei.passwort}>Vorhandene Datei wählen</button>
+        <button class="knopf" onclick={() => void dateiWaehlen(true)} disabled={!datei.passwort}>{t('Neue Datei anlegen')}</button>
+        <button class="knopf" onclick={() => void dateiWaehlen(false)} disabled={!datei.passwort}>{t('Vorhandene Datei wählen')}</button>
         {#if datei.gewaehlt}
-          <button class="knopf haupt" onclick={() => void dateiAbgleichen()}><Symbol name="neu" />Jetzt abgleichen</button>
-          <button class="knopf" onclick={() => void dateiTrennen()}>Trennen</button>
+          <button class="knopf haupt" onclick={() => void dateiAbgleichen()}><Symbol name="neu" />{t('Jetzt abgleichen')}</button>
+          <button class="knopf" onclick={() => void dateiTrennen()}>{t('Trennen')}</button>
         {/if}
       </div>
-      {#if datei.gewaehlt}<p class="hilfe">Datei: {datei.name}</p>{/if}
+      {#if datei.gewaehlt}<p class="hilfe">{t('Datei: {name}', { name: datei.name })}</p>{/if}
       {#if datei.zustand === 'fehler'}
         <p class="meldung fehler">{datei.meldung}</p>
       {:else if datei.zuletzt}
-        <p class="meldung">Zuletzt abgeglichen um {new Date(datei.zuletzt).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })} Uhr.</p>
+        <p class="meldung">{t('Zuletzt abgeglichen um {zeit}', { zeit: new Date(datei.zuletzt).toLocaleTimeString(lokale(), { hour: '2-digit', minute: '2-digit' }) })}</p>
       {/if}
-      <p class="hilfe">Tipp: Auf dem zweiten Gerät „Vorhandene Datei wählen“ und dieselbe Datei auswählen. Wer die Datei und das Passwort hat, kann den Plan lesen.</p>
+      <p class="hilfe">{t('Tipp: Auf dem zweiten Gerät „Vorhandene Datei wählen“ und dieselbe Datei auswählen. Wer die Datei und das Passwort hat, kann den Plan lesen.')}</p>
     </section>
     {/if}
     <section>
-      <h3>{__STORE__ ? 'Plan sichern und teilen' : 'Sichern'}</h3>
+      <h3>{__STORE__ ? t('Plan sichern und teilen') : t('Sichern')}</h3>
       {#if __STORE__}
-        <p class="zh">Alle Daten bleiben auf diesem Gerät. Um den Plan auf ein anderes Gerät zu bringen (Partner, Tablet, Fernseher), speicherst du ihn als Datei, schickst ihn per Nachricht oder E-Mail und lädst ihn dort wieder.</p>
+        <p class="zh">{t('Alle Daten bleiben auf diesem Gerät. Um den Plan auf ein anderes Gerät zu bringen (Partner, Tablet, Fernseher), speicherst du ihn als Datei, schickst ihn per Nachricht oder E-Mail und lädst ihn dort wieder.')}</p>
       {/if}
       <div class="reihe">
-        <button class="knopf" onclick={exportieren}>Plan als Datei sichern</button>
-        <button class="knopf" onclick={() => dateiFeld?.click()}>Plan aus Datei laden</button>
+        <button class="knopf" onclick={exportieren}>{t('Plan als Datei sichern')}</button>
+        <button class="knopf" onclick={() => dateiFeld?.click()}>{t('Plan aus Datei laden')}</button>
         <input bind:this={dateiFeld} id="import-datei" type="file" accept="application/json,.json" hidden onchange={importieren} />
         {#if zuruecksetzenFragen}
-          <button class="knopf gefahr" onclick={zuruecksetzen}>Wirklich auf Startplan zurücksetzen</button>
+          <button class="knopf gefahr" onclick={zuruecksetzen}>{t('Wirklich auf Startplan zurücksetzen')}</button>
         {:else}
-          <button class="knopf gefahr" onclick={() => (zuruecksetzenFragen = true)}>Startplan wiederherstellen</button>
+          <button class="knopf gefahr" onclick={() => (zuruecksetzenFragen = true)}>{t('Startplan wiederherstellen')}</button>
         {/if}
       </div>
     </section>
 
     {#if !__STORE__}
     <section>
-      <h3>App-Version</h3>
+      <h3>{t('App-Version')}</h3>
       <p class="hilfe">
-        Installiert: {update.aktuell ? `1.0.${update.aktuell}` : 'Testversion'}{update.neu ? ` · neueste: 1.0.${update.neu}` : ''}
+        {t('Installiert: {version}', { version: update.aktuell ? `1.0.${update.aktuell}` : t('Testversion') })}{update.neu ? ' · ' + t('neueste: 1.0.{nr}', { nr: update.neu }) : ''}
       </p>
       <div class="reihe">
         {#if updateVerfuegbar() || !istApp}
           <button class="knopf haupt" onclick={() => void installieren()} disabled={update.zustand === 'laden'}>
-            <Symbol name="neu" />{istApp ? 'Jetzt aktualisieren' : 'Seite neu laden'}
+            <Symbol name="neu" />{istApp ? t('Jetzt aktualisieren') : t('Seite neu laden')}
           </button>
         {/if}
         {#if istApp}
           <button class="knopf" onclick={() => void suchen()} disabled={update.zustand === 'suche' || update.zustand === 'laden'}>
-            Nach Update suchen
+            {t('Nach Update suchen')}
           </button>
         {/if}
       </div>
@@ -674,13 +673,13 @@
     </section>
     {/if}
     <section>
-      <h3>Info und Datenschutz</h3>
+      <h3>{t('Info und Datenschutz')}</h3>
       <Lizenzen />
     </section>
     {/if}
 
     <p class="info">
-      Wochenplan {istApp ? 'App' : 'im Browser'}{update.aktuell ? ` · Version 1.0.${update.aktuell}` : ''}.
+      {istApp ? t('Wochenplan App') : t('Wochenplan im Browser')}{update.aktuell ? ' · ' + t('Version 1.0.{nr}', { nr: update.aktuell }) : ''}.
     </p>
   </div>
 </Fenster>

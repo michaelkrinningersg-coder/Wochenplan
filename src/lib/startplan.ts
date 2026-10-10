@@ -1,3 +1,4 @@
+import { t } from './i18n.svelte'
 import { STANDARD_ABSCHNITTE, TAGE } from './konstanten'
 import type { AbschnittId, Aufgabe, GeteilteOptionen, Kind, KindId, Plan, TagId, Tagesplan, Termin } from './typen'
 
@@ -16,7 +17,8 @@ export function leererTag(ids: string[] = STANDARD_ABSCHNITTE): Tagesplan {
 }
 
 function a(titel: string, bild: string, minuten: number, zusatz?: string): Aufgabe {
-  return { id: neueId(), titel, bild, minuten, ...(zusatz ? { zusatz } : {}) }
+  // Titel in der aktuellen Sprache festschreiben (nur für neu erzeugte Pläne)
+  return { id: neueId(), titel: t(titel), bild, minuten, ...(zusatz ? { zusatz } : {}) }
 }
 
 export const KIND_FARBEN = ['#2a7fb8', '#3b8f32', '#d6634a', '#7a5cc4', '#b98a00', '#c2417a']

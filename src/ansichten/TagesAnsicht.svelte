@@ -9,6 +9,7 @@
   import Symbol from '../komponenten/Symbol.svelte'
   import { aufgabeGewaehlt } from '../lib/aktionen'
   import { ABSCHNITTE, tagName } from '../lib/konstanten'
+  import { t } from '../lib/i18n.svelte'
   import { tagesRaster } from '../lib/raster'
   import {
     allesErledigt,
@@ -92,13 +93,13 @@
     <div class="countdowns-schmal"><Countdowns max={2} /></div>
   {/if}
   {#if vorlageFuer(tag)}
-    <p class="vorlage-hinweis">Heute gilt der Ablauf „{vorlageFuer(tag)}“</p>
+    <p class="vorlage-hinweis">{t('Heute gilt der Ablauf „{name}“', { name: t(vorlageFuer(tag) ?? '') })}</p>
   {/if}
 
   {#if tagLeer && !app.bearbeiten}
     <div class="leer-hinweis">
-      <h2>Für {tagName(tag)} ist noch nichts geplant.</h2>
-      <p>Zum Planen den Stift oben rechts gedrückt halten.</p>
+      <h2>{t('Für {tag} ist noch nichts geplant.', { tag: t(tagName(tag)) })}</h2>
+      <p>{t('Zum Planen den Stift oben rechts gedrückt halten.')}</p>
     </div>
   {:else}
     <div class="spalten" bind:this={spaltenEl} bind:clientWidth={breite} bind:clientHeight={hoehe}>
@@ -118,15 +119,15 @@
           >
             <span class="kopf-bild"><Bild id={ab.bild} /></span>
             {#if allesErledigt(tag, ab.id)}
-              <span class="kopf-haken" aria-label="alles erledigt"><Symbol name="haken" /></span>
+              <span class="kopf-haken" aria-label={t('alles erledigt')}><Symbol name="haken" /></span>
             {/if}
             <span class="kopf-text">
-              <span class="kopf-name">{ab.name}</span>
+              <span class="kopf-name">{t(ab.name)}</span>
               <span class="kopf-zeit">{spanneText(app.plan, ab.id)}</span>
             </span>
           </button>
           {#if anzahlen[i] === 0 && !schmal}
-            <span class="senkrecht" aria-hidden="true">{ab.name}</span>
+            <span class="senkrecht" aria-hidden="true">{t(ab.name)}</span>
           {/if}
           <div
             class="kacheln"
@@ -148,7 +149,7 @@
               />
             {/each}
             {#if app.bearbeiten}
-              <button class="neu" style="--s: {s}px" onclick={() => neueAufgabe(tag, ab.id)} aria-label="Aufgabe hinzufügen: {ab.name}">
+              <button class="neu" style="--s: {s}px" onclick={() => neueAufgabe(tag, ab.id)} aria-label={t('Aufgabe hinzufügen: {abschnitt}', { abschnitt: t(ab.name) })}>
                 <Symbol name="plus" />
               </button>
             {/if}

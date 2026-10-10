@@ -1,4 +1,5 @@
 import { gelbAb, rotAb } from './ampel'
+import { t } from './i18n.svelte'
 import { ABSCHNITTE, TAGE, abschnittAnpassungVon } from './konstanten'
 import { neueId, planNormalisieren, startplan } from './startplan'
 import type {
@@ -151,6 +152,7 @@ export function zurueck(): boolean {
 }
 
 export function zeigeHinweis(text: string) {
+  text = t(text) // bereits übersetzte Texte bleiben unverändert
   app.hinweis = text
   setTimeout(() => {
     if (app.hinweis === text) app.hinweis = null
@@ -432,7 +434,7 @@ export function abschnittAnlegen(): AbschnittId {
   const start = e - s >= 60 ? Math.round(mitte / 15) * 15 : Math.round(mitte)
   const id = 't' + Math.random().toString(36).slice(2, 8)
   app.plan.zeiten[id] = hhmm(start)
-  app.plan.abschnitte[id] = { name: 'Neue Tageszeit', bild: '_sonne', nacht: start >= 18 * 60 + 30, farbe: start >= 18 * 60 + 30 ? 'abend' : 'vormittag' }
+  app.plan.abschnitte[id] = { name: t('Neue Tageszeit'), bild: '_sonne', nacht: start >= 18 * 60 + 30, farbe: start >= 18 * 60 + 30 ? 'abend' : 'vormittag' }
   for (const tp of alleTage()) tp[id] = []
   const neu = [...ids]
   neu.splice(beste + 1, 0, id)

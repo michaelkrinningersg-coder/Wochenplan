@@ -1,3 +1,4 @@
+import { lokale, t } from './i18n.svelte'
 import { ABSCHNITTE } from './konstanten'
 import type { AbschnittId, Plan, TagId } from './typen'
 
@@ -9,8 +10,8 @@ export function heuteTag(d = new Date()): TagId {
 
 export function datumKey(d = new Date()): string {
   const m = String(d.getMonth() + 1).padStart(2, '0')
-  const t = String(d.getDate()).padStart(2, '0')
-  return `${d.getFullYear()}-${m}-${t}`
+  const tag = String(d.getDate()).padStart(2, '0')
+  return `${d.getFullYear()}-${m}-${tag}`
 }
 
 export function minutenVon(hhmm: string): number {
@@ -34,7 +35,7 @@ export function abschnittSpanne(plan: Plan, id: AbschnittId): [number, number] {
 
 export function spanneText(plan: Plan, id: AbschnittId): string {
   const [s, e] = abschnittSpanne(plan, id)
-  return e >= 24 * 60 ? `ab ${uhr(s)}` : `${uhr(s)}–${uhr(e)}`
+  return e >= 24 * 60 ? t('ab {zeit}', { zeit: uhr(s) }) : `${uhr(s)}–${uhr(e)}`
 }
 
 export type TagesPhase =
@@ -81,15 +82,15 @@ export function dauerText(ms: number): string {
 /** "in 5 Min", "in 1 Std 10 Min" */
 export function inText(min: number): string {
   const m = Math.max(0, Math.ceil(min))
-  if (m < 1) return 'gleich'
-  if (m < 60) return `in ${m} Min`
+  if (m < 1) return t('gleich')
+  if (m < 60) return t('in {m} Min', { m })
   const h = Math.floor(m / 60)
   const r = m % 60
-  return r ? `in ${h} Std ${r} Min` : `in ${h} Std`
+  return r ? t('in {h} Std {m} Min', { h, m: r }) : t('in {h} Std', { h })
 }
 
 export function datumLang(d = new Date()): string {
-  return d.toLocaleDateString('de-DE', { day: 'numeric', month: 'long' })
+  return d.toLocaleDateString(lokale(), { day: 'numeric', month: 'long' })
 }
 
 const TAG_INDEX: Record<TagId, number> = { mo: 0, di: 1, mi: 2, do: 3, fr: 4, sa: 5, so: 6 }

@@ -3,6 +3,7 @@
   // Je Jahreszeit zehn Ereignisse, dazu Extras (Geburtstag, Hahn am Morgen, Mondaufgang) und Ereignisse mit Datumsbezug
   // (Ostereier, St. Martin, Rentierschlitten). Antippen einer Figur lässt sie hüpfen oder platzen – ohne das Ruhebild zu beenden.
   import { onMount } from 'svelte'
+  import { t } from '../lib/i18n.svelte'
   import { countdowns, geburtstageHeute } from '../lib/countdown'
   import { ruhe } from '../lib/ruhebilder.svelte'
   import { sterne, termineAm } from '../lib/speicher.svelte'
@@ -528,7 +529,7 @@
         {@const x = 12 + e.zufall[0] * 70}
         <div class="ding" data-spiel="hops" style="left: {x}%; top: {orte.boden[0]}%" use:animiere={{ k: sichtbar(0.05, 0.9), dauer: 9000 }}>
           <span class="figur emoji">🐓</span>
-          <span class="blase-text" style="animation-delay: 1.4s">Kikeriki!</span>
+          <span class="blase-text" style="animation-delay: 1.4s">{t('Kikeriki!')}</span>
         </div>
 
       <!-- ================= Wachsen ================= -->
@@ -853,7 +854,7 @@
       {:else if e.id === 'specht'}
         <div class="ding" data-spiel="hops" style="left: {orte.stamm.x + 2.5}%; top: {orte.stamm.y - 4}%" use:animiere={{ k: sichtbar(0.04, 0.9), dauer: 9000 }}>
           <span class="figur emoji klopfen" style="transform: scaleX(-1)">🐦</span>
-          <span class="blase-text" style="animation-delay: 1s">Tock tock tock</span>
+          <span class="blase-text" style="animation-delay: 1s">{t('Tock tock tock')}</span>
         </div>
       {:else if e.id === 'bluetenregen'}
         <div class="flaeche" use:animiere={{ k: [{ opacity: 1 }, { opacity: 1 }], dauer: 8000 }}>
@@ -884,7 +885,7 @@
       {:else if e.id === 'eule'}
         <div class="ding" data-spiel="hops" style="left: {orte.krone.x + 2}%; top: {orte.krone.y}%" use:animiere={{ k: sichtbar(0.04, 0.9), dauer: 10000 }}>
           <span class="figur emoji wippen">🦉</span>
-          <span class="blase-text" style="animation-delay: 2s">Uhu!</span>
+          <span class="blase-text" style="animation-delay: 2s">{t('Uhu!')}</span>
         </div>
       {:else if e.id === 'sternschnuppe'}
         {@const y = 6 + e.zufall[0] * 20}
@@ -945,7 +946,7 @@
       {:else if e.id === 'fahrrad'}
         <div class="ding" data-spiel="hops" use:animiere={{ k: boden(e, 0, 8), dauer: 9000 }}>
           <span class="figur emoji gross">🚴</span>
-          <span class="blase-text" style="animation-delay: 2s">Kling kling!</span>
+          <span class="blase-text" style="animation-delay: 2s">{t('Kling kling!')}</span>
         </div>
       {:else if e.id === 'picknick'}
         {@const x = 22 + e.zufall[0] * 50}
@@ -1161,8 +1162,8 @@
         {@const c = countdowns(14)[0]}
         <div class="ding banner" data-spiel="hops" use:animiere={{ k: flug(e, [8, 22], 2, 6, 2).map((f) => ({ ...f, transform: 'none' })), dauer: 16000 }}>
           <span class="figur reihe banner-zug">
-            {#if e.links}<span class="banner-tuch">Noch {c?.tage}× schlafen: {c?.titel}</span><span class="emoji" style="transform: scaleX(-1)">✈️</span>
-            {:else}<span class="emoji">✈️</span><span class="banner-tuch">Noch {c?.tage}× schlafen: {c?.titel}</span>{/if}
+            {#if e.links}<span class="banner-tuch">{t('Noch {n}× schlafen: {titel}', { n: c?.tage ?? 0, titel: c?.titel ?? '' })}</span><span class="emoji" style="transform: scaleX(-1)">✈️</span>
+            {:else}<span class="emoji">✈️</span><span class="banner-tuch">{t('Noch {n}× schlafen: {titel}', { n: c?.tage ?? 0, titel: c?.titel ?? '' })}</span>{/if}
           </span>
         </div>
       {:else if e.id === 'wochentier'}
@@ -1216,24 +1217,24 @@
             {#each Array.from({ length: 18 }) as _, i (i)}
               <span class="luftschlange" style="left: {(i * 23) % 100}%; background: {BALLON_FARBEN[i % 6]}; animation-delay: {(i % 9) * 0.5}s"></span>
             {/each}
-            <span class="feier-text">Helau! Alaaf! 🎭</span>
+            <span class="feier-text">{t('Helau! Alaaf! 🎭')}</span>
           {:else if heuteFeiertag === 'muttertag' || heuteFeiertag === 'vatertag'}
             <div class="ding" data-spiel="platzen" use:animiere={{ k: Array.from({ length: 7 }, (_, j) => ({ left: `${50 + Math.sin(j) * 6}%`, top: `${108 - (j / 6) * 125}%` })), dauer: 14000, ende: false }}>
               <span class="figur emoji riesig">❤️</span>
             </div>
-            <span class="feier-text">{heuteFeiertag === 'muttertag' ? 'Alles Liebe zum Muttertag!' : 'Alles Liebe zum Vatertag!'}</span>
+            <span class="feier-text">{heuteFeiertag === 'muttertag' ? t('Alles Liebe zum Muttertag!') : t('Alles Liebe zum Vatertag!')}</span>
           {:else if heuteFeiertag === 'einschulung'}
             <div class="ding" data-spiel="hops" style="left: 50%; top: {orte.boden[0] - 8}%" use:animiere={{ k: wachsen(0, 0.92), dauer: 14000, ende: false }}>
               <span class="figur emoji riesig">🎒</span>
             </div>
-            <span class="feier-text">Hurra, Schulanfang! 🎉</span>
+            <span class="feier-text">{t('Hurra, Schulanfang! 🎉')}</span>
           {:else}
             {#each [0, 1, 2, 3] as i (i)}
               <div class="ding laterne" data-spiel="hops" use:animiere={{ k: boden(e, 0, 10).map((f) => ({ ...f, top: `${orte.boden[0] - 6}%`, transform: 'none' })), dauer: 13000, verz: i * 1200, ende: false }}>
                 <span class="figur pendel"><span class="stab"></span><span class="emoji">🏮</span></span>
               </div>
             {/each}
-            <span class="feier-text">Laterne, Laterne … 🏮</span>
+            <span class="feier-text">{t('Laterne, Laterne … 🏮')}</span>
           {/if}
         </div>
       {/if}

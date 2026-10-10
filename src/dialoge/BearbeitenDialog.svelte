@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { lokale, t } from '../lib/i18n.svelte'
   import { segVon } from '../lib/konstanten'
   import AufgabenBild from '../komponenten/AufgabenBild.svelte'
   import Bild from '../komponenten/Bild.svelte'
@@ -47,7 +48,7 @@
     try {
       zuschnittQuelle = await fotoVerkleinern(datei, 1400)
     } catch {
-      zeigeHinweis('Das Foto konnte nicht geladen werden.')
+      zeigeHinweis(t('Das Foto konnte nicht geladen werden.'))
     } finally {
       ;(e.target as HTMLInputElement).value = ''
     }
@@ -113,10 +114,10 @@
 
 <Fenster
   titel={istTerminModus
-    ? `Termin am ${ausKey(datum!).toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' })}`
+    ? t('Termin am {datum}', { datum: ausKey(datum!).toLocaleDateString(lokale(), { weekday: 'long', day: 'numeric', month: 'long' }) })
     : neu
-      ? `Neue Aufgabe am ${tagName(tag)}`
-      : 'Aufgabe ändern'}
+      ? t('Neue Aufgabe am {tag}', { tag: t(tagName(tag)) })
+      : t('Aufgabe ändern')}
   breit
 >
   <form
@@ -128,45 +129,45 @@
   >
     <div class="vorschau" data-seg={segVon(abschnitt)}>
       <div class="vorschau-bild"><AufgabenBild aufgabe={entwurf} /></div>
-      <span class="vorschau-titel">{entwurf.titel || 'Neue Aufgabe'}</span>
+      <span class="vorschau-titel">{entwurf.titel || t('Neue Aufgabe')}</span>
     </div>
 
     <div class="felder">
       {#if neu}
         <div class="feld">
-          <span class="name">Aus der Bibliothek</span>
+          <span class="name">{t('Aus der Bibliothek')}</span>
           {#if zeigeVorlagen}
-            <input class="suche" id="vorlagen-suche" type="search" bind:value={vorlagenSuche} placeholder="Vorlage suchen, z. B. Spielplatz" autocomplete="off" aria-label="Vorlage suchen" />
-            {#if !gezeigteVorlagen.length}<p class="leer">Keine Vorlage gefunden.</p>{/if}
+            <input class="suche" id="vorlagen-suche" type="search" bind:value={vorlagenSuche} placeholder={t('Vorlage suchen, z. B. Spielplatz')} autocomplete="off" aria-label={t('Vorlage suchen')} />
+            {#if !gezeigteVorlagen.length}<p class="leer">{t('Keine Vorlage gefunden.')}</p>{/if}
             <div class="vorlagen">
               {#each gezeigteVorlagen as v (v.titel + v.abschnitt)}
                 <button type="button" class="vorlage" data-seg={segVon(v.abschnitt)} onclick={() => vorlageWaehlen(v)}>
                   <span class="vorlage-bild"><Bild id={v.bild} zusatz={v.zusatz} /></span>
-                  <span>{v.titel}</span>
+                  <span>{t(v.titel)}</span>
                 </button>
               {/each}
             </div>
           {:else}
-            <div><button type="button" class="knopf klein" onclick={() => (zeigeVorlagen = true)}>Andere Vorlage wählen</button></div>
+            <div><button type="button" class="knopf klein" onclick={() => (zeigeVorlagen = true)}>{t('Andere Vorlage wählen')}</button></div>
           {/if}
         </div>
       {/if}
       <label class="feld">
-        <span class="name">Name</span>
+        <span class="name">{t('Name')}</span>
         <input
           id="aufgabe-titel"
           type="text"
           bind:value={entwurf.titel}
           oninput={() => (titelGeaendert = true)}
           maxlength="40"
-          placeholder="z. B. Zähne putzen"
+          placeholder={t('z. B. Zähne putzen')}
           autocomplete="off"
           data-autofokus={!neu ? true : undefined}
         />
       </label>
 
       <div class="feld">
-        <span class="name">Tageszeit</span>
+        <span class="name">{t('Tageszeit')}</span>
         <div class="reihe">
           {#each ABSCHNITTE as ab (ab.id)}
             <button
@@ -176,7 +177,7 @@
               aria-pressed={abschnitt === ab.id}
               onclick={() => (abschnitt = ab.id)}
             >
-              {ab.name}
+              {t(ab.name)}
             </button>
           {/each}
         </div>
@@ -184,19 +185,19 @@
 
       <div class="feld zwei">
         <div>
-          <span class="name">Countdown</span>
+          <span class="name">{t('Countdown')}</span>
           <div class="reihe">
             <button type="button" class="knopf klein" aria-pressed={!!entwurf.countdown} onclick={() => (entwurf.countdown = !entwurf.countdown)}>
-              {entwurf.countdown ? 'Ja: „noch X× schlafen“' : 'Nein'}
+              {entwurf.countdown ? t('Ja: „noch X× schlafen“') : t('Nein')}
             </button>
           </div>
         </div>
         {#if app.einst.sternenregen === 'auswahl'}
           <div>
-            <span class="name">Sternenregen</span>
+            <span class="name">{t('Sternenregen')}</span>
             <div class="reihe">
               <button type="button" class="knopf klein" aria-pressed={!!entwurf.sternenregen} onclick={() => (entwurf.sternenregen = !entwurf.sternenregen)}>
-                {entwurf.sternenregen ? 'Ja ★' : 'Nein'}
+                {entwurf.sternenregen ? t('Ja ★') : t('Nein')}
               </button>
             </div>
           </div>
@@ -205,34 +206,34 @@
 
       <div class="feld zwei">
         <div>
-          <span class="name">Timer</span>
+          <span class="name">{t('Timer')}</span>
           <div class="reihe">
-            <button type="button" class="knopf rund" onclick={() => (entwurf.minuten = Math.max(0, entwurf.minuten - (entwurf.minuten > 10 ? 5 : 1)))} aria-label="Weniger Minuten">−</button>
-            <span class="wert">{entwurf.minuten > 0 ? `${entwurf.minuten} Min` : 'ohne'}</span>
-            <button type="button" class="knopf rund" onclick={() => (entwurf.minuten = Math.min(600, entwurf.minuten + (entwurf.minuten >= 10 ? 5 : 1)))} aria-label="Mehr Minuten">+</button>
+            <button type="button" class="knopf rund" onclick={() => (entwurf.minuten = Math.max(0, entwurf.minuten - (entwurf.minuten > 10 ? 5 : 1)))} aria-label={t('Weniger Minuten')}>−</button>
+            <span class="wert">{entwurf.minuten > 0 ? t('{n} Min', { n: entwurf.minuten }) : t('ohne')}</span>
+            <button type="button" class="knopf rund" onclick={() => (entwurf.minuten = Math.min(600, entwurf.minuten + (entwurf.minuten >= 10 ? 5 : 1)))} aria-label={t('Mehr Minuten')}>+</button>
           </div>
         </div>
         <div>
-          <span class="name">Feste Uhrzeit (von)</span>
-          <ZeitWahl bind:wert={entwurf.uhrzeit} leerErlaubt label="Uhrzeit von" />
+          <span class="name">{t('Feste Uhrzeit (von)')}</span>
+          <ZeitWahl bind:wert={entwurf.uhrzeit} leerErlaubt label={t('Uhrzeit von')} />
         </div>
         {#if entwurf.uhrzeit}
           <div>
-            <span class="name">bis (für den Live-Modus)</span>
-            <ZeitWahl bind:wert={entwurf.bis} leerErlaubt label="Uhrzeit bis" />
+            <span class="name">{t('bis (für den Live-Modus)')}</span>
+            <ZeitWahl bind:wert={entwurf.bis} leerErlaubt label={t('Uhrzeit bis')} />
           </div>
         {/if}
       </div>
 
       <div class="feld">
-        <span class="name">Bild</span>
-        <input class="suche" id="bild-suche" type="search" bind:value={bildSuche} placeholder="Bild suchen, z. B. Spielplatz" autocomplete="off" aria-label="Bild suchen" />
-        <div class="reihe gruppen" role="group" aria-label="Bildgruppen">
+        <span class="name">{t('Bild')}</span>
+        <input class="suche" id="bild-suche" type="search" bind:value={bildSuche} placeholder={t('Bild suchen, z. B. Spielplatz')} autocomplete="off" aria-label={t('Bild suchen')} />
+        <div class="reihe gruppen" role="group" aria-label={t('Bildgruppen')}>
           {#each ICON_GROUPS as g (g)}
-            <button type="button" class="knopf klein" aria-pressed={!bildSuche.trim() && gruppe === g} onclick={() => ((gruppe = g), (bildSuche = ''))}>{g}</button>
+            <button type="button" class="knopf klein" aria-pressed={!bildSuche.trim() && gruppe === g} onclick={() => ((gruppe = g), (bildSuche = ''))}>{t(g)}</button>
           {/each}
         </div>
-        {#if bildSuche.trim() && !gruppenIcons.length}<p class="leer">Kein Bild gefunden. Tipp: ein eigenes Foto geht immer.</p>{/if}
+        {#if bildSuche.trim() && !gruppenIcons.length}<p class="leer">{t('Kein Bild gefunden. Tipp: ein eigenes Foto geht immer.')}</p>{/if}
         {#if true}
           <div class="bildwahl">
             {#each gruppenIcons as ic (ic.id)}
@@ -240,8 +241,8 @@
                 type="button"
                 class="bildknopf"
                 aria-pressed={entwurf.bild === ic.id}
-                aria-label={ic.name}
-                title={ic.name}
+                aria-label={t(ic.name)}
+                title={t(ic.name)}
                 onclick={() => bildWaehlen(ic.id, ic.name)}
               >
                 <img src={bildUrl(ic.id, app.fotos)} alt="" draggable="false" />
@@ -252,53 +253,53 @@
       </div>
 
       <div class="feld">
-        <span class="name">Eigenes Foto</span>
+        <span class="name">{t('Eigenes Foto')}</span>
         {#if zuschnittQuelle}
           <BildZuschnitt quelle={zuschnittQuelle} onfertig={zuschnittFertig} onabbrechen={() => (zuschnittQuelle = null)} />
         {:else}
           <div class="foto-bereich">
             <div class="reihe">
-              <button type="button" class="knopf" onclick={() => dateiFeld?.click()}><Symbol name="bild" />{entwurf.foto ? 'Anderes Foto' : 'Foto aus der Galerie'}</button>
+              <button type="button" class="knopf" onclick={() => dateiFeld?.click()}><Symbol name="bild" />{entwurf.foto ? t('Anderes Foto') : t('Foto aus der Galerie')}</button>
               {#if entwurf.foto}
-                <img class="foto-vorschau" src={bildUrl(entwurf.foto, app.fotos)} alt="Gewähltes Foto" />
-                <button type="button" class="knopf klein gefahr" onclick={() => (entwurf.foto = undefined)}>Foto entfernen</button>
+                <img class="foto-vorschau" src={bildUrl(entwurf.foto, app.fotos)} alt={t('Gewähltes Foto')} />
+                <button type="button" class="knopf klein gefahr" onclick={() => (entwurf.foto = undefined)}>{t('Foto entfernen')}</button>
               {/if}
             </div>
             <input bind:this={dateiFeld} id="foto-datei" type="file" accept="image/*" hidden onchange={fotoGewaehlt} />
             {#if entwurf.foto}
               <div class="reihe">
-                <span class="name zeile">Kachel zeigt</span>
-                <button type="button" class="knopf klein" aria-pressed={entwurf.fotoModus === 'bild'} onclick={() => (entwurf.fotoModus = 'bild')}>Bild</button>
-                <button type="button" class="knopf klein" aria-pressed={entwurf.fotoModus === 'foto'} onclick={() => (entwurf.fotoModus = 'foto')}>Foto</button>
-                <button type="button" class="knopf klein" aria-pressed={(entwurf.fotoModus ?? 'wechsel') === 'wechsel'} onclick={() => (entwurf.fotoModus = 'wechsel')}>Abwechselnd</button>
+                <span class="name zeile">{t('Kachel zeigt')}</span>
+                <button type="button" class="knopf klein" aria-pressed={entwurf.fotoModus === 'bild'} onclick={() => (entwurf.fotoModus = 'bild')}>{t('Bild')}</button>
+                <button type="button" class="knopf klein" aria-pressed={entwurf.fotoModus === 'foto'} onclick={() => (entwurf.fotoModus = 'foto')}>{t('Foto')}</button>
+                <button type="button" class="knopf klein" aria-pressed={(entwurf.fotoModus ?? 'wechsel') === 'wechsel'} onclick={() => (entwurf.fotoModus = 'wechsel')}>{t('Abwechselnd')}</button>
                 {#if (entwurf.fotoModus ?? 'wechsel') === 'wechsel'}
-                  <button type="button" class="knopf rund" onclick={() => (entwurf.wechselSek = Math.max(2, (entwurf.wechselSek ?? 5) - 1))} aria-label="Schneller wechseln">−</button>
-                  <span class="wert">alle {entwurf.wechselSek ?? 5} s</span>
-                  <button type="button" class="knopf rund" onclick={() => (entwurf.wechselSek = Math.min(60, (entwurf.wechselSek ?? 5) + 1))} aria-label="Langsamer wechseln">+</button>
+                  <button type="button" class="knopf rund" onclick={() => (entwurf.wechselSek = Math.max(2, (entwurf.wechselSek ?? 5) - 1))} aria-label={t('Schneller wechseln')}>−</button>
+                  <span class="wert">{t('alle {n} s', { n: entwurf.wechselSek ?? 5 })}</span>
+                  <button type="button" class="knopf rund" onclick={() => (entwurf.wechselSek = Math.min(60, (entwurf.wechselSek ?? 5) + 1))} aria-label={t('Langsamer wechseln')}>+</button>
                 {/if}
               </div>
             {:else}
-              <p>Zum Beispiel die Kita, Oma oder der eigene Zahnputzbecher. Das Foto wird quadratisch zugeschnitten und kann mit dem Bild abwechseln.</p>
+              <p>{t('Zum Beispiel die Kita, Oma oder der eigene Zahnputzbecher. Das Foto wird quadratisch zugeschnitten und kann mit dem Bild abwechseln.')}</p>
             {/if}
           </div>
         {/if}
       </div>
 
       <div class="feld">
-        <span class="name">Zusatzzeichen</span>
+        <span class="name">{t('Zusatzzeichen')}</span>
         <div class="reihe">
-          <button type="button" class="knopf klein" aria-pressed={!entwurf.zusatz} onclick={() => (entwurf.zusatz = undefined)}>keins</button>
+          <button type="button" class="knopf klein" aria-pressed={!entwurf.zusatz} onclick={() => (entwurf.zusatz = undefined)}>{t('keins')}</button>
           {#each ZUSAETZE as z (z.id)}
             <button type="button" class="knopf klein zusatz" aria-pressed={entwurf.zusatz === z.id} onclick={() => (entwurf.zusatz = z.id)}>
-              <img src={bildUrl(z.bild, app.fotos)} alt="" />{z.name}
+              <img src={bildUrl(z.bild, app.fotos)} alt="" />{t(z.name)}
             </button>
           {/each}
         </div>
       </div>
 
       <div class="aktionen">
-        <button type="submit" class="knopf haupt" data-autofokus={neu ? true : undefined}><Symbol name="haken" />Speichern</button>
-        <button type="button" class="knopf" onclick={() => (app.dialog = null)}>Abbrechen</button>
+        <button type="submit" class="knopf haupt" data-autofokus={neu ? true : undefined}><Symbol name="haken" />{t('Speichern')}</button>
+        <button type="button" class="knopf" onclick={() => (app.dialog = null)}>{t('Abbrechen')}</button>
         {#if !neu && !istTerminModus}
           <button
             type="button"
@@ -306,14 +307,14 @@
             onclick={() => {
               speichern()
               app.dialog = { art: 'aufgabeKopieren', tag, id: entwurf.id }
-            }}><Symbol name="kopie" />Kopieren nach …</button
+            }}><Symbol name="kopie" />{t('Kopieren nach …')}</button
           >
         {/if}
         {#if !neu}
           {#if loeschenFragen}
-            <button type="button" class="knopf gefahr" onclick={loeschen}><Symbol name="muell" />Wirklich löschen</button>
+            <button type="button" class="knopf gefahr" onclick={loeschen}><Symbol name="muell" />{t('Wirklich löschen')}</button>
           {:else}
-            <button type="button" class="knopf gefahr" onclick={() => (loeschenFragen = true)}><Symbol name="muell" />Löschen</button>
+            <button type="button" class="knopf gefahr" onclick={() => (loeschenFragen = true)}><Symbol name="muell" />{t('Löschen')}</button>
           {/if}
         {/if}
       </div>

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '../lib/i18n.svelte'
   // Foto quadratisch zuschneiden: verschieben (Finger/Maus oder Pfeile) und zoomen
   let {
     quelle,
@@ -62,7 +63,7 @@
     class="rahmen"
     style="width: {RAHMEN}px; height: {RAHMEN}px"
     role="application"
-    aria-label="Foto verschieben"
+    aria-label={t('Foto verschieben')}
     tabindex="0"
     onpointerdown={(e) => {
       ziehen = { px: e.clientX, py: e.clientY, x, y }
@@ -94,21 +95,21 @@
     <img
       bind:this={img}
       src={quelle}
-      alt="Zuschnitt"
+      alt={t('Zuschnitt')}
       draggable="false"
       onload={geladen}
       style="width: {natur.b * mass}px; height: {natur.h * mass}px; transform: translate({x}px, {y}px)"
     />
   </div>
   <div class="regler">
-    <button type="button" class="knopf rund" onclick={() => zoomen(zoom / 1.2)} aria-label="Verkleinern">−</button>
-    <input type="range" min="1" max="4" step="0.05" value={zoom} oninput={(e) => zoomen(Number((e.target as HTMLInputElement).value))} aria-label="Zoom" />
-    <button type="button" class="knopf rund" onclick={() => zoomen(zoom * 1.2)} aria-label="Vergrößern">+</button>
+    <button type="button" class="knopf rund" onclick={() => zoomen(zoom / 1.2)} aria-label={t('Verkleinern')}>−</button>
+    <input type="range" min="1" max="4" step="0.05" value={zoom} oninput={(e) => zoomen(Number((e.target as HTMLInputElement).value))} aria-label={t('Zoom')} />
+    <button type="button" class="knopf rund" onclick={() => zoomen(zoom * 1.2)} aria-label={t('Vergrößern')}>+</button>
   </div>
-  <p class="hilfe">Foto mit dem Finger verschieben, mit dem Regler vergrößern.</p>
+  <p class="hilfe">{t('Foto mit dem Finger verschieben, mit dem Regler vergrößern.')}</p>
   <div class="reihe">
-    <button type="button" class="knopf haupt" onclick={fertig}>Zuschnitt übernehmen</button>
-    <button type="button" class="knopf" onclick={onabbrechen}>Abbrechen</button>
+    <button type="button" class="knopf haupt" onclick={fertig}>{t('Zuschnitt übernehmen')}</button>
+    <button type="button" class="knopf" onclick={onabbrechen}>{t('Abbrechen')}</button>
   </div>
 </div>
 

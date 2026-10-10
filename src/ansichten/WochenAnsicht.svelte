@@ -4,6 +4,7 @@
   import Symbol from '../komponenten/Symbol.svelte'
   import { aufgabeGewaehlt } from '../lib/aktionen'
   import { ABSCHNITTE, TAGE } from '../lib/konstanten'
+  import { t } from '../lib/i18n.svelte'
   import { wochenRaster } from '../lib/raster'
   import { app, aufgabenIn, istErledigt, istHeute, neueAufgabe, oeffnen, vorlageFuer } from '../lib/speicher.svelte'
 
@@ -21,7 +22,7 @@
         ? 48
         : 40
       : wochenRaster(
-          TAGE.map((t) => ABSCHNITTE.map((a) => aufgabenIn(t.id, a.id).length + (app.bearbeiten ? 1 : 0))),
+          TAGE.map((tg) => ABSCHNITTE.map((a) => aufgabenIn(tg.id, a.id).length + (app.bearbeiten ? 1 : 0))),
           spaltenBreite,
           hoehe,
           KOPF,
@@ -32,40 +33,40 @@
 </script>
 
 <div class="woche" class:schmal bind:clientWidth={breite} bind:clientHeight={hoehe}>
-  {#each TAGE as t (t.id)}
-    {@const heute = istHeute(t.id)}
+  {#each TAGE as tg (tg.id)}
+    {@const heute = istHeute(tg.id)}
     <section class="tag" class:heute>
       <div class="tag-kopf">
         <button
           class="tag-name"
-          data-fokus-id={'tag:' + t.id}
+          data-fokus-id={'tag:' + tg.id}
           data-autofokus={heute ? true : undefined}
-          onclick={() => oeffnen({ art: 'tag', tag: t.id })}
+          onclick={() => oeffnen({ art: 'tag', tag: tg.id })}
         >
-          <span class="kurz">{t.kurz}</span>
-          <span class="lang">{t.lang}</span>
+          <span class="kurz">{t(tg.kurz)}</span>
+          <span class="lang">{t(tg.lang)}</span>
         </button>
         {#if app.bearbeiten}
-          <button class="kopieren" onclick={() => (app.dialog = { art: 'kopieren', tag: t.id })} aria-label="{t.lang} kopieren, als Vorlage speichern oder leeren">
+          <button class="kopieren" onclick={() => (app.dialog = { art: 'kopieren', tag: tg.id })} aria-label={t('{tag} kopieren, als Vorlage speichern oder leeren', { tag: t(tg.lang) })}>
             <Symbol name="kopie" />
           </button>
         {/if}
       </div>
       <div class="baender">
         {#each ABSCHNITTE as ab (ab.id)}
-          <div class="band" data-seg={segVon(ab.id)} data-zone data-tag={t.id} data-abschnitt={ab.id} style="--luecke: {LUECKE}px">
-            {#each aufgabenIn(t.id, ab.id) as aufgabe (aufgabe.id)}
+          <div class="band" data-seg={segVon(ab.id)} data-zone data-tag={tg.id} data-abschnitt={ab.id} style="--luecke: {LUECKE}px">
+            {#each aufgabenIn(tg.id, ab.id) as aufgabe (aufgabe.id)}
               <Kachel
                 {aufgabe}
-                tag={t.id}
+                tag={tg.id}
                 groesse={s}
                 mini
                 erledigt={heute && istErledigt(aufgabe)}
-                onwahl={(e) => aufgabeGewaehlt(e, t.id, ab.id, aufgabe)}
+                onwahl={(e) => aufgabeGewaehlt(e, tg.id, ab.id, aufgabe)}
               />
             {/each}
             {#if app.bearbeiten}
-              <button class="neu" style="--s: {s}px" onclick={() => neueAufgabe(t.id, ab.id)} aria-label="Aufgabe hinzufügen: {t.lang}, {ab.name}">
+              <button class="neu" style="--s: {s}px" onclick={() => neueAufgabe(tg.id, ab.id)} aria-label={t('Aufgabe hinzufügen: {tag}, {abschnitt}', { tag: t(tg.lang), abschnitt: t(ab.name) })}>
                 <Symbol name="plus" />
               </button>
             {/if}

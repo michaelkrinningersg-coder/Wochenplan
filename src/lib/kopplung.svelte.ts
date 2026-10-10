@@ -1,6 +1,7 @@
 // Plan im WLAN vom Handy auf den Fernseher übertragen (Kopplungscode, ohne Server).
 // Fernseher: „Plan empfangen“ zeigt Adresse und 6-stelligen Code. Handy: „Plan senden“ sucht den Fernseher,
 // verschlüsselt den Plan mit dem Code und schickt ihn direkt. Nur in der App (nicht im Browser).
+import { t } from './i18n.svelte'
 import { registerPlugin, type PluginListenerHandle } from '@capacitor/core'
 import { entschluesseln, verschluesseln } from './abgleich.svelte'
 import { istApp } from './geraet'
@@ -57,14 +58,14 @@ export async function empfangStarten() {
       try {
         const klar = await entschluesseln(JSON.parse(daten), kopplung.code)
         ok = importDaten(klar)
-        kopplung.meldung = ok ? 'Plan übernommen.' : 'Die Daten sind kein gültiger Plan.'
+        kopplung.meldung = ok ? t('Plan übernommen.') : t('Die Daten sind kein gültiger Plan.')
       } catch {
         versuche++
-        kopplung.meldung = 'Ein Gerät hat einen falschen Code eingegeben.'
+        kopplung.meldung = t('Ein Gerät hat einen falschen Code eingegeben.')
         if (versuche >= 5) {
           kopplung.code = neuerCode()
           versuche = 0
-          kopplung.meldung += ' Der Code wurde erneuert.'
+          kopplung.meldung += ' ' + t('Der Code wurde erneuert.')
         }
       }
       await Kopplung.antworten({ ok })
@@ -79,7 +80,7 @@ export async function empfangStarten() {
     kopplung.modus = 'wartet'
     abbruch = setTimeout(() => void empfangStoppen(), 10 * 60_000)
   } catch (e) {
-    kopplung.meldung = e instanceof Error ? e.message : 'Der Empfang konnte nicht gestartet werden.'
+    kopplung.meldung = e instanceof Error ? e.message : t('Der Empfang konnte nicht gestartet werden.')
     kopplung.modus = 'aus'
   }
 }
@@ -113,9 +114,9 @@ export async function fernseherSuchen() {
   try {
     const r = await Kopplung.suchen()
     kopplung.geraete = r.geraete
-    kopplung.meldung = r.geraete.length ? '' : 'Kein Fernseher gefunden. Ist dort „Plan empfangen“ gestartet und sind beide im selben WLAN?'
+    kopplung.meldung = r.geraete.length ? '' : t('Kein Fernseher gefunden. Ist dort „Plan empfangen“ gestartet und sind beide im selben WLAN?')
   } catch {
-    kopplung.meldung = 'Die Suche ist fehlgeschlagen.'
+    kopplung.meldung = t('Die Suche ist fehlgeschlagen.')
   }
   kopplung.modus = 'bereit'
 }
@@ -129,13 +130,13 @@ export async function planSenden(g: Geraet, code: string): Promise<boolean> {
     const paket = await verschluesseln(exportDaten(), code.trim(), Date.now())
     const r = await Kopplung.senden({ ip: g.ip, port: g.port, daten: JSON.stringify(paket) })
     if (r.antwort === 'OK') {
-      kopplung.meldung = 'Der Plan ist auf dem Fernseher.'
+      kopplung.meldung = t('Der Plan ist auf dem Fernseher.')
       kopplung.modus = 'fertig'
       return true
     }
-    kopplung.meldung = r.antwort === 'FALSCH' ? 'Der Code stimmt nicht. Bitte noch einmal vom Fernseher ablesen.' : 'Der Fernseher hat den Plan nicht angenommen.'
+    kopplung.meldung = r.antwort === 'FALSCH' ? t('Der Code stimmt nicht. Bitte noch einmal vom Fernseher ablesen.') : t('Der Fernseher hat den Plan nicht angenommen.')
   } catch (e) {
-    kopplung.meldung = e instanceof Error ? e.message : 'Keine Verbindung zum Fernseher.'
+    kopplung.meldung = e instanceof Error ? e.message : t('Keine Verbindung zum Fernseher.')
   }
   kopplung.modus = 'bereit'
   return false

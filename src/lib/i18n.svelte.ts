@@ -44,9 +44,16 @@ for (const m of Object.values(dateien))
 
 /** Übersetzt einen deutschen Text; Platzhalter {name} werden durch werte ersetzt */
 export function t(text: string, werte?: Record<string, string | number>): string {
-  const roh = spr.aktuell === 'de' ? text : (WOERTER[spr.aktuell][text] ?? text)
+  let roh = text
+  if (spr.aktuell !== 'de') {
+    const w = WOERTER[spr.aktuell][text]
+    if (w !== undefined) roh = w
+    else (((globalThis as { __i18nFehlt?: Set<string> }).__i18nFehlt ??= new Set()) as Set<string>).add(text) // zum Prüfen der Wörterbücher
+  }
   return werte ? roh.replace(/\{(\w+)\}/g, (m, k) => (k in werte ? String(werte[k]) : m)) : roh
 }
 
 /** Locale für Datum und Uhrzeit, z. B. 'en-GB' */
 export const lokale = () => SPRACHEN.find((x) => x.id === spr.aktuell)!.lokale
+// zum Prüfen (Test): alle übersetzbaren deutschen Schlüssel
+;(globalThis as { __i18nKeys?: string[] }).__i18nKeys = Object.keys(WOERTER.en)

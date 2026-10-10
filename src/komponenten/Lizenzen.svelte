@@ -1,5 +1,6 @@
 <script lang="ts">
   // Datenschutz-Kurzfassung und Lizenzen der verwendeten Bausteine (in der App, auch ohne Internet lesbar)
+  import { t } from '../lib/i18n.svelte'
   import fluent from '../assets/icons/LICENSE-fluentui-emoji.txt?raw'
   import andika from '../assets/fonts/LICENSE-Andika-OFL.txt?raw'
   import fredoka from '../assets/fonts/LICENSE-Fredoka-OFL.txt?raw'
@@ -20,27 +21,27 @@
 </script>
 
 <details>
-  <summary>Datenschutz in Kürze</summary>
+  <summary>{t('Datenschutz in Kürze')}</summary>
   <div class="text">
     {#if __STORE__}
-      <p>Alle Eingaben (Plan, abgehakte Aufgaben, Einstellungen, eigene Fotos) bleiben ausschließlich auf diesem Gerät. Die App hat keine Konten, keine Werbung, keine Statistik- oder Absturzberichte und baut keine Verbindung zu Servern auf.</p>
-      <p>Fotos für das Ruhebild liest die App nur, wenn du sie selbst auswählst. Die Sprachausgabe nutzt die Sprachausgabe deines Geräts; je nach installierter Stimme kann Android sie selbst verarbeiten.</p>
-      <p>Wenn du den Plan als Datei teilst, entscheidest du, an wen er geht.</p>
+      <p>{t('Alle Eingaben (Plan, abgehakte Aufgaben, Einstellungen, eigene Fotos) bleiben ausschließlich auf diesem Gerät. Die App hat keine Konten, keine Werbung, keine Statistik- oder Absturzberichte und baut keine Verbindung zu Servern auf.')}</p>
+      <p>{t('Fotos für das Ruhebild liest die App nur, wenn du sie selbst auswählst. Die Sprachausgabe nutzt die Sprachausgabe deines Geräts; je nach installierter Stimme kann Android sie selbst verarbeiten.')}</p>
+      <p>{t('Wenn du den Plan als Datei teilst, entscheidest du, an wen er geht.')}</p>
     {:else}
-      <p>Der Plan wird auf dem Gerät mit deinem Familien-Passwort verschlüsselt, bevor er bei GitHub gespeichert wird. Wetter und Ortssuche (optional) senden den Ort an Open-Meteo, die Update-Suche fragt GitHub ab. Es gibt keine Werbung und keine Statistik.</p>
+      <p>{t('Der Plan wird auf dem Gerät mit deinem Familien-Passwort verschlüsselt, bevor er bei GitHub gespeichert wird. Wetter und Ortssuche (optional) senden den Ort an Open-Meteo, die Update-Suche fragt GitHub ab. Es gibt keine Werbung und keine Statistik.')}</p>
     {/if}
-    <p>Wenn du den Plan per Kopplungscode auf den Fernseher überträgst, geht er verschlüsselt direkt zwischen den beiden Geräten im WLAN; es ist kein Server beteiligt.</p>
-    <p>Die ausführliche Datenschutzerklärung steht unter michaelkrinningersg-coder.github.io/Wochenplan/datenschutz.html.</p>
+    <p>{t('Wenn du den Plan per Kopplungscode auf den Fernseher überträgst, geht er verschlüsselt direkt zwischen den beiden Geräten im WLAN; es ist kein Server beteiligt.')}</p>
+    <p>{t('Die ausführliche Datenschutzerklärung steht unter michaelkrinningersg-coder.github.io/Wochenplan/datenschutz.html.')}</p>
   </div>
 </details>
 
 <details>
-  <summary>Bilder und Lizenzen</summary>
+  <summary>{t('Bilder und Lizenzen')}</summary>
   <div class="text">
-    <p>Die großen Szenenbilder auf den Karten sind KI-generiert (Google Gemini). Die kleinen Symbole stammen von Microsoft Fluent Emoji (MIT-Lizenz). Schriften: Fredoka und Andika (SIL Open Font License 1.1).</p>
+    <p>{t('Die großen Szenenbilder auf den Karten sind KI-generiert (Google Gemini). Die kleinen Symbole stammen von Microsoft Fluent Emoji (MIT-Lizenz). Schriften: Fredoka und Andika (SIL Open Font License 1.1).')}</p>
     {#each LIZENZEN as l (l.name)}
       <details class="innen">
-        <summary>{l.name}</summary>
+        <summary>{t(l.name)}</summary>
         <pre>{l.text}</pre>
       </details>
     {/each}

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '../lib/i18n.svelte'
   // Große Uhr über dem ganzen Bildschirm (nach Auswahl der Uhr oben). Schließt mit OK, Zurück oder nach 20 Sekunden.
   import { onMount } from 'svelte'
   import { app, zurueck } from '../lib/speicher.svelte'
@@ -16,25 +17,25 @@
 
   onMount(() => {
     uhrzeitAnsagen(new Date())
-    const t = setTimeout(() => {
+    const timer = setTimeout(() => {
       if (app.dialog?.art === 'uhr') zurueck()
     }, 20_000)
-    return () => clearTimeout(t)
+    return () => clearTimeout(timer)
   })
 </script>
 
 <div class="grosse-uhr" bind:clientWidth={breite} bind:clientHeight={hoehe}>
-  <button class="flaeche" onclick={() => zurueck()} aria-label="Uhr schließen" data-autofokus>
+  <button class="flaeche" onclick={() => zurueck()} aria-label={t('Uhr schließen')} data-autofokus>
     {#if analog}
       <AnalogUhr zeit={jetzt} {groesse} sekunden />
-      <span class="digital klein">{hh}:{mm} Uhr</span>
+      <span class="digital klein">{t('{zeit} Uhr', { zeit: hh + ':' + mm })}</span>
     {:else}
       <span class="digital" style="font-size: {Math.floor(Math.min(breite * 0.26, hoehe * 0.5))}px">{hh}<span class="punkt">:</span>{mm}</span>
     {/if}
     <span class="datum">{datumLang(jetzt)}</span>
   </button>
-  <button class="zu" onclick={() => zurueck()} aria-label="Uhr schließen">✕</button>
-  <button class="knopf nochmal" onclick={() => uhrzeitAnsagen(new Date())}>Nochmal sagen</button>
+  <button class="zu" onclick={() => zurueck()} aria-label={t('Uhr schließen')}>✕</button>
+  <button class="knopf nochmal" onclick={() => uhrzeitAnsagen(new Date())}>{t('Nochmal sagen')}</button>
 </div>
 
 <style>

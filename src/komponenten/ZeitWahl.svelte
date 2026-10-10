@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '../lib/i18n.svelte'
   // Uhrzeit mit Minus/Plus einstellen – bequemer mit Fernbedienung als ein Texteingabefeld.
   import { minutenVon, uhr } from '../lib/zeit'
 
@@ -24,11 +25,11 @@
 </script>
 
 <div class="zeitwahl" role="group" aria-label={label}>
-  <button type="button" class="knopf rund" onclick={() => aendern(-schritt)} aria-label="{label} früher">−</button>
-  <span class="wert">{wert ? uhr(minutenVon(wert), true) : 'keine'}</span>
-  <button type="button" class="knopf rund" onclick={() => aendern(schritt)} aria-label="{label} später">+</button>
+  <button type="button" class="knopf rund" onclick={() => aendern(-schritt)} aria-label={t('{label} früher', { label })}>−</button>
+  <span class="wert">{wert ? uhr(minutenVon(wert), true) : t('keine')}</span>
+  <button type="button" class="knopf rund" onclick={() => aendern(schritt)} aria-label={t('{label} später', { label })}>+</button>
   {#if leerErlaubt && wert}
-    <button type="button" class="knopf" onclick={() => (wert = undefined)}>keine</button>
+    <button type="button" class="knopf" onclick={() => (wert = undefined)}>{t('keine')}</button>
   {/if}
 </div>
 

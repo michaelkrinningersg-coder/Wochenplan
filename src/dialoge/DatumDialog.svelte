@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { lokale, t } from '../lib/i18n.svelte'
   import { segVon } from '../lib/konstanten'
   import { abgleich } from '../lib/abgleich.svelte'
   import Bild from '../komponenten/Bild.svelte'
@@ -14,7 +15,7 @@
   // svelte-ignore state_referenced_locally
   const { datum } = props
 
-  const titel = ausKey(datum).toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+  const titel = $derived(ausKey(datum).toLocaleDateString(lokale(), { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }))
   const termine = $derived(app.plan.termine.filter((t) => t.datum === datum))
   const geb = $derived(geburtstageAm(datum))
   const darfAendern = $derived(abgleich.einst.rolle === 'planer')
@@ -35,41 +36,41 @@
 <Fenster titel={titel}>
   <div class="inhalt">
     {#each geb as g (g.name)}
-      <div class="geburtstag"><span class="bild"><Bild id="geburtstag" /></span><b>{g.name} wird {g.alter}!</b></div>
+      <div class="geburtstag"><span class="bild"><Bild id="geburtstag" /></span><b>{t('{name} wird {alter}!', { name: g.name, alter: g.alter })}</b></div>
     {/each}
 
     {#if termine.length}
       <ul class="termine">
-        {#each termine as t (t.id)}
+        {#each termine as tm (tm.id)}
           <li>
             <button
               class="termin"
-              data-seg={segVon(t.abschnitt)}
+              data-seg={segVon(tm.abschnitt)}
               disabled={!darfAendern}
-              onclick={() => (app.dialog = { art: 'termin', neu: false, termin: { ...t } })}
+              onclick={() => (app.dialog = { art: 'termin', neu: false, termin: { ...tm } })}
             >
-              <span class="bild"><Bild id={t.bild} zusatz={t.zusatz} /></span>
-              <span><b>{t.titel}</b><br /><small>{abschnittInfo(t.abschnitt).name}{t.uhrzeit ? `, ${t.uhrzeit} Uhr` : ''}{t.countdown ? ', mit Countdown' : ''}</small></span>
+              <span class="bild"><Bild id={tm.bild} zusatz={tm.zusatz} /></span>
+              <span><b>{tm.titel}</b><br /><small>{t(abschnittInfo(tm.abschnitt).name)}{tm.uhrzeit ? ', ' + t('{zeit} Uhr', { zeit: tm.uhrzeit }) : ''}{tm.countdown ? ', ' + t('mit Countdown') : ''}</small></span>
             </button>
           </li>
         {/each}
       </ul>
     {:else if !geb.length}
-      <p class="leise">Noch nichts eingetragen.</p>
+      <p class="leise">{t('Noch nichts eingetragen.')}</p>
     {/if}
 
     {#if darfAendern}
-      <div><button class="knopf haupt" onclick={neuerTermin} data-autofokus><Symbol name="plus" />Termin eintragen</button></div>
+      <div><button class="knopf haupt" onclick={neuerTermin} data-autofokus><Symbol name="plus" />{t('Termin eintragen')}</button></div>
       <section>
-        <h3>Tagesablauf an diesem Datum</h3>
+        <h3>{t('Tagesablauf an diesem Datum')}</h3>
         <div class="reihe">
-          <button class="knopf klein" aria-pressed={!app.plan.datumVorlage[datum]} onclick={() => vorlageSetzen(null)}>Normaler Wochentag</button>
+          <button class="knopf klein" aria-pressed={!app.plan.datumVorlage[datum]} onclick={() => vorlageSetzen(null)}>{t('Normaler Wochentag')}</button>
           {#each app.plan.vorlagen as v (v.id)}
             <button class="knopf klein" aria-pressed={app.plan.datumVorlage[datum] === v.id} onclick={() => vorlageSetzen(v.id)}>{v.name}</button>
           {/each}
         </div>
         {#if app.plan.vorlagen.length === 0}
-          <p class="leise">Tagesvorlagen (z. B. Ferien, Krank) legst du in der Wochenansicht über das Kopier-Symbol eines Tages an.</p>
+          <p class="leise">{t('Tagesvorlagen (z. B. Ferien, Krank) legst du in der Wochenansicht über das Kopier-Symbol eines Tages an.')}</p>
         {/if}
       </section>
     {/if}

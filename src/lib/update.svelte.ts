@@ -1,6 +1,7 @@
 // Neue App-Version finden und installieren.
 // App (Fernseher/Tablet): neueste APK aus den GitHub-Releases laden und den Android-Installer öffnen.
 // Browser: die Webseite wird mit jedem Release aktualisiert, dort genügt Neuladen.
+import { t } from './i18n.svelte'
 import { registerPlugin, type PluginListenerHandle } from '@capacitor/core'
 import { istApp } from './geraet'
 
@@ -45,18 +46,18 @@ export async function suchen(): Promise<boolean> {
   try {
     await versionLesen()
     const r = await fetch(RELEASES, { headers: { Accept: 'application/vnd.github+json' }, cache: 'no-store' })
-    if (!r.ok) throw new Error(`GitHub antwortet mit Fehler ${r.status}.`)
+    if (!r.ok) throw new Error(t('GitHub antwortet mit Fehler {status}.', { status: r.status }))
     const d = (await r.json()) as { tag_name?: string; assets?: { name: string; browser_download_url: string }[] }
     const nr = Number(/(\d+)$/.exec(d.tag_name ?? '')?.[1] ?? 0)
     const apk = d.assets?.find((a) => a.name.endsWith('.apk'))
     update.neu = nr
     update.url = apk?.browser_download_url ?? ''
     update.zustand = 'ruhe'
-    update.meldung = updateVerfuegbar() ? `Version 1.0.${nr} ist da.` : 'Die App ist aktuell.'
+    update.meldung = updateVerfuegbar() ? t('Version 1.0.{nr} ist da.', { nr }) : t('Die App ist aktuell.')
     return updateVerfuegbar()
   } catch (e) {
     update.zustand = 'fehler'
-    update.meldung = e instanceof TypeError ? 'Keine Verbindung zu GitHub.' : e instanceof Error ? e.message : String(e)
+    update.meldung = e instanceof TypeError ? t('Keine Verbindung zu GitHub.') : e instanceof Error ? e.message : String(e)
     return false
   }
 }
@@ -71,17 +72,17 @@ export async function installieren() {
   if (!update.url) return
   update.zustand = 'laden'
   update.prozent = 0
-  update.meldung = 'Neue Version wird geladen …'
+  update.meldung = t('Neue Version wird geladen …')
   const h = await Aktualisierer.addListener('fortschritt', (d) => (update.prozent = d.prozent))
   try {
     const r = await Aktualisierer.installieren({ url: update.url })
     update.zustand = 'ruhe'
     update.meldung =
       r.status === 'gestartet'
-        ? 'Bitte im Android-Fenster auf „Aktualisieren“ bzw. „Installieren“ drücken.'
+        ? t('Bitte im Android-Fenster auf „Aktualisieren“ bzw. „Installieren“ drücken.')
         : r.status === 'erlaubnis'
-          ? 'Einmalig erlauben: „Wochenplan“ darf Apps installieren. Danach noch einmal auf „Aktualisieren“ drücken.'
-          : 'Bitte in den Android-Einstellungen erlauben, dass „Wochenplan“ Apps installieren darf, dann noch einmal versuchen.'
+          ? t('Einmalig erlauben: „Wochenplan“ darf Apps installieren. Danach noch einmal auf „Aktualisieren“ drücken.')
+          : t('Bitte in den Android-Einstellungen erlauben, dass „Wochenplan“ Apps installieren darf, dann noch einmal versuchen.')
   } catch (e) {
     update.zustand = 'fehler'
     update.meldung = e instanceof Error ? e.message : String(e)

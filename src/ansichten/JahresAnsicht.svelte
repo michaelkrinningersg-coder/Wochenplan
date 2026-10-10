@@ -1,8 +1,10 @@
 <script lang="ts">
   import Symbol from '../komponenten/Symbol.svelte'
   import { geburtstageAm } from '../lib/countdown'
+  import { t } from '../lib/i18n.svelte'
+  import { monatsName } from '../lib/i18n/namen-ansichten'
   import { app, oeffnen } from '../lib/speicher.svelte'
-  import { datumKey, MONATE } from '../lib/zeit'
+  import { datumKey } from '../lib/zeit'
 
   let { jahr }: { jahr: number } = $props()
   const heute = $derived(datumKey(new Date(app.jetzt)))
@@ -19,12 +21,12 @@
 
 <div class="jahr">
   <div class="leiste">
-    <button class="knopf rund" onclick={() => oeffnen({ art: 'jahr', jahr: jahr - 1 })} aria-label="Voriges Jahr"><Symbol name="zurueck" /></button>
+    <button class="knopf rund" onclick={() => oeffnen({ art: 'jahr', jahr: jahr - 1 })} aria-label={t('Voriges Jahr')}><Symbol name="zurueck" /></button>
     <h2>{jahr}</h2>
-    <button class="knopf rund" onclick={() => oeffnen({ art: 'jahr', jahr: jahr + 1 })} aria-label="Nächstes Jahr"><Symbol name="weiter" /></button>
+    <button class="knopf rund" onclick={() => oeffnen({ art: 'jahr', jahr: jahr + 1 })} aria-label={t('Nächstes Jahr')}><Symbol name="weiter" /></button>
   </div>
   <div class="monate">
-    {#each MONATE as name, m (name)}
+    {#each Array.from({ length: 12 }, (_, i) => i) as m (m)}
       <button
         class="monat"
         class:aktuell={jahr === new Date(app.jetzt).getFullYear() && m === new Date(app.jetzt).getMonth()}
@@ -32,7 +34,7 @@
         data-fokus-id={'monat:' + m}
         onclick={() => oeffnen({ art: 'monat', jahr, monat: m }, null)}
       >
-        <span class="name">{name}</span>
+        <span class="name">{monatsName(m)}</span>
         <span class="tage">
           {#each tage(m) as d, i (d ?? 'l' + i)}
             {#if d}
@@ -50,7 +52,7 @@
       </button>
     {/each}
   </div>
-  <p class="legende"><span class="punkt termin"></span> Termin <span class="punkt geb"></span> Geburtstag <span class="punkt heute"></span> heute</p>
+  <p class="legende"><span class="punkt termin"></span> {t('Termin')} <span class="punkt geb"></span> {t('Geburtstag')} <span class="punkt heute"></span> {t('heute')}</p>
 </div>
 
 <style>

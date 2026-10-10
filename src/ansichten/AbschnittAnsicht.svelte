@@ -5,6 +5,7 @@
   import Symbol from '../komponenten/Symbol.svelte'
   import { aufgabeGewaehlt } from '../lib/aktionen'
   import { ABSCHNITTE } from '../lib/konstanten'
+  import { t } from '../lib/i18n.svelte'
   import { flaechenRaster } from '../lib/raster'
   import {
     app,
@@ -45,7 +46,7 @@
       class="nachbar links"
       data-seg={segVon(vorher.id)}
       onclick={() => oeffnen({ art: 'abschnitt', tag, abschnitt: vorher.id })}
-      aria-label="Zurück zu {vorher.name}"
+      aria-label={t('Zurück zu {name}', { name: t(vorher.name) })}
     >
       <span class="nachbar-bild"><Bild id={vorher.bild} /></span>
       <Symbol name="zurueck" />
@@ -56,7 +57,7 @@
 
   <div class="flaeche" bind:clientWidth={breite} bind:clientHeight={hoehe}>
     {#if liste.length === 0 && !app.bearbeiten}
-      <p class="leer">Hier ist nichts geplant.</p>
+      <p class="leer">{t('Hier ist nichts geplant.')}</p>
     {:else}
       <div
         class="kacheln"
@@ -78,7 +79,7 @@
           />
         {/each}
         {#if app.bearbeiten}
-          <button class="neu" style="--s: {raster.s}px" onclick={() => neueAufgabe(tag, abschnitt)} aria-label="Aufgabe hinzufügen">
+          <button class="neu" style="--s: {raster.s}px" onclick={() => neueAufgabe(tag, abschnitt)} aria-label={t('Aufgabe hinzufügen')}>
             <Symbol name="plus" />
           </button>
         {/if}
@@ -91,7 +92,7 @@
       class="nachbar rechts"
       data-seg={segVon(nachher.id)}
       onclick={() => oeffnen({ art: 'abschnitt', tag, abschnitt: nachher.id })}
-      aria-label="Weiter zu {nachher.name}"
+      aria-label={t('Weiter zu {name}', { name: t(nachher.name) })}
     >
       <span class="nachbar-bild"><Bild id={nachher.bild} /></span>
       <Symbol name="weiter" />

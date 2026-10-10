@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '../lib/i18n.svelte'
   import { countdowns } from '../lib/countdown'
   import Bild from './Bild.svelte'
 
@@ -14,11 +15,11 @@
         <span class="text">
           <b>{c.titel}</b>
           {#if c.tage <= 7}
-            <span class="monde" aria-label="noch {c.tage} mal schlafen">
+            <span class="monde" aria-label={t('noch {n} mal schlafen', { n: c.tage })}>
               {#each Array.from({ length: c.tage }) as _, i (i)}<span class="mond">☾</span>{/each}
             </span>
           {:else}
-            <span>in {c.tage} Tagen</span>
+            <span>{c.tage === 1 ? t('in 1 Tag') : t('in {n} Tagen', { n: c.tage })}</span>
           {/if}
         </span>
       </div>

@@ -31,6 +31,7 @@
   import { app, finde, minutenBisStart, tagesListe, planErneuert, planUmgestellt, oeffnen, schrittVerschieben, speichern, tagVerschieben, zurueck } from './lib/speicher.svelte'
   import { spieleTon, tonFreischalten } from './lib/ton'
   import { heuteTag, tagesPhase } from './lib/zeit'
+  import { t } from './lib/i18n.svelte'
 
   let appEl: HTMLDivElement
   let buehne: HTMLElement
@@ -48,7 +49,7 @@
     const fotos = $state.snapshot(app.fotos)
     const okPlan = speichern('plan', plan)
     const okFotos = speichern('fotos', fotos)
-    if (!okPlan || !okFotos) app.hinweis = 'Der Speicher ist voll. Bitte weniger oder kleinere Fotos verwenden.'
+    if (!okPlan || !okFotos) app.hinweis = t('Der Speicher ist voll. Bitte weniger oder kleinere Fotos verwenden.')
     if (ersterPlanLauf) {
       ersterPlanLauf = false
       return
@@ -376,7 +377,7 @@
   {#if ruheAktiv}
     <Ruhebild onwecken={aufwachen} />
   {:else if ruheMoeglich && app.einst.ruheCountdown !== false}
-    <div class="ruhe-countdown" aria-hidden="true" title="Bis zum Ruhebild">
+    <div class="ruhe-countdown" aria-hidden="true" title={t('Bis zum Ruhebild')}>
       ☾ {Math.floor(Math.max(0, ruheRestMs) / 60_000)}:{String(Math.floor((Math.max(0, ruheRestMs) % 60_000) / 1000)).padStart(2, '0')}
     </div>
   {/if}

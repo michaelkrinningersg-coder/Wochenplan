@@ -8,6 +8,7 @@
   import Sternenregen from '../komponenten/Sternenregen.svelte'
   import Sanduhr from '../komponenten/Sanduhr.svelte'
   import TimerScheibe from '../komponenten/TimerScheibe.svelte'
+  import { t } from '../lib/i18n.svelte'
   import { ampelZustand } from '../lib/ampel'
   import { ICON_URL } from '../lib/bilder'
   import {
@@ -48,19 +49,19 @@
   const erledigt = $derived(heute && !!aufgabe && istErledigt(aufgabe))
   const mitTimer = $derived((aufgabe?.minuten ?? 0) > 0 || app.timer[id] !== undefined)
   const dauerMs = $derived(app.timer[id]?.dauerMs ?? (aufgabe?.minuten ?? 0) * 60_000)
-  const t = $derived(timerRest(id, dauerMs))
+  const tm = $derived(timerRest(id, dauerMs))
   const bisStart = $derived(aufgabe ? minutenBisStart(tag, aufgabe) : null)
   const danach = $derived(naechsteNach(tag, id))
 
   const ampel = $derived.by((): 'rot' | 'gelb' | 'gruen' | 'aus' => {
     if (!mitTimer) return 'aus'
-    return ampelZustand(t.restMs, dauerMs)
+    return ampelZustand(tm.restMs, dauerMs)
   })
   const farbe = $derived(ampel === 'rot' ? 'var(--rot)' : ampel === 'gelb' ? 'var(--gelb)' : 'var(--gruen)')
 
   /** Anteil der Scheibe: Restzeit des Timers oder Wartezeit bis zum Start (max. 1 Stunde) */
   const anteil = $derived.by(() => {
-    if (mitTimer) return dauerMs > 0 ? t.restMs / dauerMs : 0
+    if (mitTimer) return dauerMs > 0 ? tm.restMs / dauerMs : 0
     if (bisStart !== null) return Math.min(1, bisStart / 60)
     return null
   })
@@ -109,7 +110,7 @@
 
   function starten() {
     if (!aufgabe) return
-    if (t.gestartet && t.restMs <= 0) timerZuruecksetzen(id)
+    if (tm.gestartet && tm.restMs <= 0) timerZuruecksetzen(id)
     timerStart(id, app.timer[id] ? dauerMs / 60_000 : aufgabe.minuten)
   }
 </script>
@@ -128,9 +129,9 @@
       </TimerScheibe>
       {#if mitTimer && !erledigt}
         {#if app.einst.timerArt === 'sanduhr'}
-          <Sanduhr anteil={dauerMs > 0 ? t.restMs / dauerMs : 0} laeuft={t.laeuft} vorbei={t.gestartet && t.restMs <= 0} hoehe={ampelHoehe} />
+          <Sanduhr anteil={dauerMs > 0 ? tm.restMs / dauerMs : 0} laeuft={tm.laeuft} vorbei={tm.gestartet && tm.restMs <= 0} hoehe={ampelHoehe} />
         {:else}
-          <Ampel zustand={ampel} blinken={t.gestartet && t.restMs <= 0} hoehe={ampelHoehe} />
+          <Ampel zustand={ampel} blinken={tm.gestartet && tm.restMs <= 0} hoehe={ampelHoehe} />
         {/if}
       {/if}
     </div>
@@ -139,60 +140,60 @@
       <div class="titelzeile">
         <h1 class="titel">{aufgabe.titel}</h1>
         {#if app.einst.vorlesen}
-          <button class="knopf rund vorlesen" onclick={() => aufgabeAnsagen(aufgabe, erledigt)} aria-label="Vorlesen">
+          <button class="knopf rund vorlesen" onclick={() => aufgabeAnsagen(aufgabe, erledigt)} aria-label={t('Vorlesen')}>
             <Symbol name="lautsprecher" />
           </button>
         {/if}
       </div>
 
       {#if erledigt}
-        <p class="status geschafft">Geschafft!</p>
+        <p class="status geschafft">{t('Geschafft!')}</p>
       {:else if mitTimer}
-        <p class="status zeit" class:vorbei={t.gestartet && t.restMs <= 0}>
-          {#if t.gestartet && t.restMs <= 0}
-            Zeit ist um
+        <p class="status zeit" class:vorbei={tm.gestartet && tm.restMs <= 0}>
+          {#if tm.gestartet && tm.restMs <= 0}
+            {t('Zeit ist um')}
           {:else}
-            noch {dauerText(t.restMs)}
+            {t('noch {zeit}', { zeit: dauerText(tm.restMs) })}
           {/if}
         </p>
       {:else if bisStart !== null}
-        <p class="status">Es geht los {inText(bisStart)}</p>
+        <p class="status">{t('Es geht los {zeit}', { zeit: inText(bisStart) })}</p>
       {/if}
 
       <div class="knoepfe">
         {#if !erledigt}
           {#if mitTimer}
-            {#if t.laeuft}
-              <button class="knopf gross pause" onclick={() => timerPause(id)} data-autofokus><Symbol name="pause" />Pause</button>
+            {#if tm.laeuft}
+              <button class="knopf gross pause" onclick={() => timerPause(id)} data-autofokus><Symbol name="pause" />{t('Pause')}</button>
             {:else}
               <button class="knopf gross los" onclick={starten} data-autofokus>
-                <Symbol name="start" />{t.gestartet && t.restMs > 0 ? 'Weiter' : 'Los'}
+                <Symbol name="start" />{tm.gestartet && tm.restMs > 0 ? t('Weiter') : t('Los')}
               </button>
             {/if}
           {/if}
           <button class="knopf gross fertig" onclick={fertig} data-autofokus={!mitTimer ? true : undefined}>
-            <Symbol name="haken" />Fertig
+            <Symbol name="haken" />{t('Fertig')}
           </button>
         {:else}
-          <button class="knopf" onclick={nochmal}><Symbol name="neu" />Nochmal</button>
+          <button class="knopf" onclick={nochmal}><Symbol name="neu" />{t('Nochmal')}</button>
         {/if}
       </div>
 
-      {#if !erledigt && !t.gestartet}
-        <div class="schnellwahl" role="group" aria-label="Timer einstellen">
-          <span class="schnell-text">Timer</span>
+      {#if !erledigt && !tm.gestartet}
+        <div class="schnellwahl" role="group" aria-label={t('Timer einstellen')}>
+          <span class="schnell-text">{t('Timer')}</span>
           {#each SCHNELL as m (m)}
-            <button class="knopf klein" aria-pressed={mitTimer && dauerMs === m * 60_000} onclick={() => (timerSetzen(id, m), timerAnsagen(m))}>{m} Min</button>
+            <button class="knopf klein" aria-pressed={mitTimer && dauerMs === m * 60_000} onclick={() => (timerSetzen(id, m), timerAnsagen(m))}>{t('{n} Min', { n: m })}</button>
           {/each}
         </div>
       {/if}
 
       {#if mitTimer && !erledigt}
         <div class="feinstellung">
-          <button class="knopf klein" onclick={() => timerAendern(id, -1, aufgabe.minuten)} aria-label="Eine Minute weniger">− 1 Min</button>
-          <button class="knopf klein" onclick={() => timerAendern(id, 1, aufgabe.minuten)} aria-label="Eine Minute mehr">+ 1 Min</button>
-          {#if t.gestartet}
-            <button class="knopf klein" onclick={() => timerZuruecksetzen(id)}><Symbol name="neu" />Neu</button>
+          <button class="knopf klein" onclick={() => timerAendern(id, -1, aufgabe.minuten)} aria-label={t('Eine Minute weniger')}>{t('− 1 Min')}</button>
+          <button class="knopf klein" onclick={() => timerAendern(id, 1, aufgabe.minuten)} aria-label={t('Eine Minute mehr')}>{t('+ 1 Min')}</button>
+          {#if tm.gestartet}
+            <button class="knopf klein" onclick={() => timerZuruecksetzen(id)}><Symbol name="neu" />{t('Neu')}</button>
           {/if}
         </div>
       {/if}
@@ -204,7 +205,7 @@
           data-fokus-id="danach"
           onclick={() => oeffnen({ art: 'aufgabe', tag, abschnitt: danach.abschnitt, id: danach.aufgabe.id })}
         >
-          <span class="danach-text">Danach</span>
+          <span class="danach-text">{t('Danach')}</span>
           <span class="danach-bild"><Bild id={danach.aufgabe.bild} zusatz={danach.aufgabe.zusatz} /></span>
           <span class="danach-name">{danach.aufgabe.titel}</span>
           <Symbol name="weiter" />
@@ -219,14 +220,14 @@
       <div class="feier" class:alles={feiern === 'alles'} aria-live="polite">
         <Konfetti anzahl={feiern === 'alles' ? 60 : 36} />
         <img src={ICON_URL[feiern === 'alles' ? 'party' : '_leuchtstern']} alt="" />
-        <span>{feiern === 'alles' ? 'Alles geschafft!' : 'Super gemacht!'}</span>
+        <span>{feiern === 'alles' ? t('Alles geschafft!') : t('Super gemacht!')}</span>
       </div>
     {/if}
   </div>
 {:else}
   <div class="weg">
-    <p>Diese Aufgabe gibt es nicht mehr.</p>
-    <button class="knopf" onclick={() => oeffnen({ art: 'tag', tag })} data-autofokus>Zum Tag</button>
+    <p>{t('Diese Aufgabe gibt es nicht mehr.')}</p>
+    <button class="knopf" onclick={() => oeffnen({ art: 'tag', tag })} data-autofokus>{t('Zum Tag')}</button>
   </div>
 {/if}
 

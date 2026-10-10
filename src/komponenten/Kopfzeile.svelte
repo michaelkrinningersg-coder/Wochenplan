@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '../lib/i18n.svelte'
   import { abgleich, holen } from '../lib/abgleich.svelte'
   import { abschnittInfo, tagName } from '../lib/konstanten'
   import { app, istHeute, oeffnen, zeigeHinweis, zurueck } from '../lib/speicher.svelte'
@@ -17,30 +18,30 @@
   const titel = $derived.by(() => {
     switch (a.art) {
       case 'woche':
-        return 'Woche'
+        return t('Woche')
       case 'monat':
-        return 'Kalender'
+        return t('Kalender')
       case 'jahr':
-        return 'Jahresplan'
+        return t('Jahresplan')
       case 'tag':
-        return tagName(a.tag)
+        return t(tagName(a.tag))
       case 'abschnitt':
       case 'aufgabe':
-        return abschnittInfo(a.abschnitt).name
+        return t(abschnittInfo(a.abschnitt).name)
     }
   })
   const unter = $derived.by(() => {
     switch (a.art) {
       case 'woche':
-        return 'jede Woche gleich'
+        return t('jede Woche gleich')
       case 'monat':
       case 'jahr':
-        return 'Termine und Geburtstage'
+        return t('Termine und Geburtstage')
       case 'tag':
-        return istHeute(a.tag) ? `heute, ${datumLang(jetzt)}` : 'jede Woche'
+        return istHeute(a.tag) ? t('heute, {datum}', { datum: datumLang(jetzt) }) : t('jede Woche')
       case 'abschnitt':
       case 'aufgabe':
-        return `${tagName(a.tag)}, ${spanneText(app.plan, a.abschnitt)} Uhr`
+        return t('{tag}, {zeit} Uhr', { tag: t(tagName(a.tag)), zeit: spanneText(app.plan, a.abschnitt) })
     }
   })
   const kopfBild = $derived(a.art === 'abschnitt' || a.art === 'aufgabe' ? abschnittInfo(a.abschnitt).bild : null)
@@ -51,7 +52,7 @@
 <header class="kopfzeile">
   <div class="links">
     {#if !istStart}
-      <button class="knopf rund zurueck" onclick={() => zurueck()} aria-label="Zurück"><Symbol name="zurueck" /></button>
+      <button class="knopf rund zurueck" onclick={() => zurueck()} aria-label={t('Zurück')}><Symbol name="zurueck" /></button>
     {/if}
     {#if kopfBild}
       <span class="kopf-bild"><Bild id={kopfBild} /></span>
@@ -63,33 +64,33 @@
   </div>
 
   <div class="rechts">
-    <nav class="wechsel" aria-label="Ansicht">
+    <nav class="wechsel" aria-label={t('Ansicht')}>
       <button
         class="knopf"
-        aria-label="Heute"
+        aria-label={t('Heute')}
         aria-pressed={zeigeHeute}
         onclick={() => oeffnen({ art: 'tag', tag: heuteTag() })}
       >
-        <Symbol name="heute" /><span class="wort">Heute</span>
+        <Symbol name="heute" /><span class="wort">{t('Heute')}</span>
       </button>
-      <button class="knopf" aria-label="Woche" aria-pressed={a.art === 'woche'} onclick={() => oeffnen({ art: 'woche' })}>
-        <Symbol name="woche" /><span class="wort">Woche</span>
+      <button class="knopf" aria-label={t('Woche')} aria-pressed={a.art === 'woche'} onclick={() => oeffnen({ art: 'woche' })}>
+        <Symbol name="woche" /><span class="wort">{t('Woche')}</span>
       </button>
       <button
         class="knopf"
-        aria-label="Kalender"
+        aria-label={t('Kalender')}
         aria-pressed={a.art === 'monat' || a.art === 'jahr'}
         onclick={() => oeffnen({ art: 'monat', jahr: jetzt.getFullYear(), monat: jetzt.getMonth() })}
       >
-        <Symbol name="kalender" /><span class="wort">Kalender</span>
+        <Symbol name="kalender" /><span class="wort">{t('Kalender')}</span>
       </button>
     </nav>
 
     {#if updateVerfuegbar()}
       <HalteKnopf
-        label="Neue Version installieren (gedrückt halten)"
+        label={t('Neue Version installieren (gedrückt halten)')}
         onhalten={() => void installieren()}
-        onkurz={() => zeigeHinweis(update.meldung && update.zustand !== 'suche' ? update.meldung : 'Neue Version: zum Installieren gedrückt halten')}
+        onkurz={() => zeigeHinweis(update.meldung && update.zustand !== 'suche' ? update.meldung : t('Neue Version: zum Installieren gedrückt halten'))}
       >
         <span class="update-punkt"><Symbol name="neu" /></span>
       </HalteKnopf>
@@ -101,7 +102,7 @@
         if (app.dialog?.art !== 'uhr') app.dialog = { art: 'uhr' }
         else uhrzeitAnsagen(new Date())
       }}
-      aria-label="Uhrzeit {uhrzeitJetzt(jetzt)} – groß zeigen und ansagen"
+      aria-label={t('Uhrzeit {zeit} – groß zeigen und ansagen', { zeit: uhrzeitJetzt(jetzt) })}
     >
       {#if (app.einst.uhrArt ?? 'digital') === 'analog'}
         <AnalogUhr zeit={jetzt} groesse={52} />
@@ -116,40 +117,40 @@
         class:fehler={abgleich.zustand === 'fehler'}
         class:laeuft={abgleich.zustand === 'laeuft'}
         onclick={() => (app.dialog = { art: 'einstellungen' })}
-        aria-label={abgleich.zustand === 'fehler' ? 'Abgleich fehlgeschlagen' : 'Plan ist abgeglichen'}
-        title={abgleich.meldung || 'Plan ist abgeglichen'}
+        aria-label={abgleich.zustand === 'fehler' ? t('Abgleich fehlgeschlagen') : t('Plan ist abgeglichen')}
+        title={abgleich.meldung || t('Plan ist abgeglichen')}
       >
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 18h10.5a4 4 0 0 0 .6-7.95A6 6 0 0 0 6.6 9.2 4.5 4.5 0 0 0 7 18z" /></svg>
       </button>
     {:else if !planer && abgleich.zustand === 'fehler'}
-      <span class="wolke fehler" title={abgleich.meldung} role="img" aria-label="Plan konnte nicht geladen werden">
+      <span class="wolke fehler" title={abgleich.meldung} role="img" aria-label={t('Plan konnte nicht geladen werden')}>
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 18h10.5a4 4 0 0 0 .6-7.95A6 6 0 0 0 6.6 9.2 4.5 4.5 0 0 0 7 18z" /></svg>
       </span>
     {/if}
 
     {#if app.bearbeiten}
-      <button class="knopf rund" onclick={() => (app.dialog = { art: 'einstellungen' })} aria-label="Einstellungen">
+      <button class="knopf rund" onclick={() => (app.dialog = { art: 'einstellungen' })} aria-label={t('Einstellungen')}>
         <Symbol name="zahnrad" />
       </button>
       <button class="knopf haupt" onclick={() => ((app.bearbeiten = false), (app.verschieben = null))}>
-        <Symbol name="haken" />Fertig
+        <Symbol name="haken" />{t('Fertig')}
       </button>
     {:else if planer}
-      <button class="knopf rund" onclick={() => (app.dialog = { art: 'einstellungen' })} aria-label="Einstellungen">
+      <button class="knopf rund" onclick={() => (app.dialog = { art: 'einstellungen' })} aria-label={t('Einstellungen')}>
         <Symbol name="zahnrad" />
       </button>
       <HalteKnopf
-        label="Plan bearbeiten (gedrückt halten)"
+        label={t('Plan bearbeiten (gedrückt halten)')}
         onhalten={() => ((app.bearbeiten = true), void holen())}
-        onkurz={() => zeigeHinweis('Zum Bearbeiten den Stift gedrückt halten')}
+        onkurz={() => zeigeHinweis(t('Zum Bearbeiten den Stift gedrückt halten'))}
       >
         <Symbol name="stift" />
       </HalteKnopf>
     {:else}
       <HalteKnopf
-        label="Einstellungen (gedrückt halten)"
+        label={t('Einstellungen (gedrückt halten)')}
         onhalten={() => (app.dialog = { art: 'einstellungen' })}
-        onkurz={() => zeigeHinweis('Für die Einstellungen gedrückt halten')}
+        onkurz={() => zeigeHinweis(t('Für die Einstellungen gedrückt halten'))}
       >
         <Symbol name="zahnrad" />
       </HalteKnopf>
@@ -160,9 +161,9 @@
 {#if app.bearbeiten}
   <div class="bearbeiten-leiste" role="status">
     {#if app.verschieben}
-      Mit den Pfeiltasten verschieben, OK legt die Aufgabe ab.
+      {t('Mit den Pfeiltasten verschieben, OK legt die Aufgabe ab.')}
     {:else}
-      Aufgaben ziehen zum Verschieben, antippen zum Ändern.
+      {t('Aufgaben ziehen zum Verschieben, antippen zum Ändern.')}
     {/if}
   </div>
 {/if}

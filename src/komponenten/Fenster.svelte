@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '../lib/i18n.svelte'
   import { onMount, tick, type Snippet } from 'svelte'
   import { ersterFokus } from '../lib/fokus'
   import { zurueck } from '../lib/speicher.svelte'
@@ -29,7 +30,7 @@
   <div class="rahmen">
     <header>
       <h2>{titel}</h2>
-      <button class="knopf rund" onclick={() => zurueck()} aria-label="Schließen"><Symbol name="kreuz" /></button>
+      <button class="knopf rund" onclick={() => zurueck()} aria-label={t('Schließen')}><Symbol name="kreuz" /></button>
     </header>
     <div class="inhalt">
       {@render children()}

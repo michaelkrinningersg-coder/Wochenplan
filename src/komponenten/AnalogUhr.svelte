@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '../lib/i18n.svelte'
   // Zeigeruhr, auf gute Lesbarkeit getrimmt: große Ziffern, kräftige Zeiger, kurzer Stundenzeiger dunkel, Minutenzeiger blau.
   let { zeit, groesse = 240, sekunden = false }: { zeit: Date; groesse?: number; sekunden?: boolean } = $props()
 
@@ -16,7 +17,7 @@
   const STRICHE = Array.from({ length: 60 }, (_, i) => i)
 </script>
 
-<svg class="analog" viewBox="0 0 100 100" width={groesse} height={groesse} role="img" aria-label="Uhr: {zeit.getHours()} Uhr {m}">
+<svg class="analog" viewBox="0 0 100 100" width={groesse} height={groesse} role="img" aria-label={t('Uhr: {h} Uhr {m}', { h: zeit.getHours(), m })}>
   <circle cx="50" cy="50" r="48" class="rand" />
   <circle cx="50" cy="50" r="45.5" class="blatt" />
   {#each STRICHE as i (i)}

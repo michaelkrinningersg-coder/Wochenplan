@@ -1,3 +1,4 @@
+import { t } from './i18n.svelte'
 // Verbindung zu Android über Capacitor (Zurück-Taste, Bildschirm anlassen, Datei teilen).
 // Im Browser greifen jeweils einfache Ersatzlösungen.
 import { Capacitor } from '@capacitor/core'
@@ -37,7 +38,7 @@ export async function dateiExportieren(dateiname: string, text: string): Promise
     a.click()
     a.remove()
     setTimeout(() => URL.revokeObjectURL(url), 2000)
-    return 'Datei wird heruntergeladen.'
+    return t('Datei wird heruntergeladen.')
   }
   const { Filesystem, Directory, Encoding } = await import('@capacitor/filesystem')
   const ergebnis = await Filesystem.writeFile({
@@ -50,8 +51,8 @@ export async function dateiExportieren(dateiname: string, text: string): Promise
     const { Share } = await import('@capacitor/share')
     const { value } = await Share.canShare()
     if (value) {
-      await Share.share({ title: 'Wochenplan', url: ergebnis.uri, dialogTitle: 'Wochenplan teilen' })
-      return 'Plan geteilt.'
+      await Share.share({ title: t('Wochenplan'), url: ergebnis.uri, dialogTitle: t('Wochenplan teilen') })
+      return t('Plan geteilt.')
     }
   } catch (e) {
     console.warn('Teilen nicht möglich', e)
@@ -63,5 +64,5 @@ export async function dateiExportieren(dateiname: string, text: string): Promise
     directory: Directory.Documents,
     encoding: Encoding.UTF8,
   })
-  return `Gespeichert unter Dokumente/${dateiname}`
+  return t('Gespeichert unter Dokumente/{datei}', { datei: dateiname })
 }

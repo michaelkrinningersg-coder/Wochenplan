@@ -3,6 +3,7 @@
   import Fenster from '../komponenten/Fenster.svelte'
   import Symbol from '../komponenten/Symbol.svelte'
   import { app, aufgabeLoeschen, finde, zeigeHinweis } from '../lib/speicher.svelte'
+  import { t } from '../lib/i18n.svelte'
   import type { TagId } from '../lib/typen'
 
   let props: { tag: TagId; id: string } = $props()
@@ -29,15 +30,15 @@
   }
 </script>
 
-<Fenster titel={fund?.aufgabe.titel ?? 'Aufgabe'}>
+<Fenster titel={fund?.aufgabe.titel ?? t('Aufgabe')}>
   <div class="liste">
-    <button class="knopf" onclick={aendern} data-autofokus><Symbol name="stift" />Ändern</button>
-    <button class="knopf" onclick={verschieben}><Symbol name="pfeile" />Verschieben</button>
-    <button class="knopf" onclick={() => (app.dialog = { art: 'aufgabeKopieren', tag, id })}><Symbol name="kopie" />Kopieren nach …</button>
+    <button class="knopf" onclick={aendern} data-autofokus><Symbol name="stift" />{t('Ändern')}</button>
+    <button class="knopf" onclick={verschieben}><Symbol name="pfeile" />{t('Verschieben')}</button>
+    <button class="knopf" onclick={() => (app.dialog = { art: 'aufgabeKopieren', tag, id })}><Symbol name="kopie" />{t('Kopieren nach …')}</button>
     {#if loeschenFragen}
-      <button class="knopf gefahr" onclick={loeschen}><Symbol name="muell" />Wirklich löschen</button>
+      <button class="knopf gefahr" onclick={loeschen}><Symbol name="muell" />{t('Wirklich löschen')}</button>
     {:else}
-      <button class="knopf gefahr" onclick={() => (loeschenFragen = true)}><Symbol name="muell" />Löschen</button>
+      <button class="knopf gefahr" onclick={() => (loeschenFragen = true)}><Symbol name="muell" />{t('Löschen')}</button>
     {/if}
   </div>
 </Fenster>

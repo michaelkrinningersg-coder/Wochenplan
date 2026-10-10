@@ -1,4 +1,5 @@
 // Countdowns: „noch 3× schlafen bis …“ für Termine, markierte Aufgaben und Geburtstage
+import { t } from './i18n.svelte'
 import { TAGE } from './konstanten'
 import { app } from './speicher.svelte'
 import { ausKey, datumKey, naechsterGeburtstag, alterAm, tageBis } from './zeit'
@@ -41,7 +42,7 @@ export function countdowns(maxTage = 60): CountdownEintrag[] {
     const d = naechsterGeburtstag(k.geburtstag, jetzt)
     const tage = tageBis(d, jetzt)
     if (tage >= 1 && tage <= 14)
-      liste.push({ titel: `${k.name} wird ${alterAm(k.geburtstag, d)}`, bild: 'geburtstag', tage, datum: datumKey(d), geburtstag: true })
+      liste.push({ titel: t('{name} wird {alter}', { name: k.name, alter: alterAm(k.geburtstag, d) }), bild: 'geburtstag', tage, datum: datumKey(d), geburtstag: true })
   }
   return liste.sort((a, b) => a.tage - b.tage)
 }

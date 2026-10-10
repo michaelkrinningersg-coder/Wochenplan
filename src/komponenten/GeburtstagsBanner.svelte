@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '../lib/i18n.svelte'
   import { onMount } from 'svelte'
   import { geburtstageHeute } from '../lib/countdown'
   import { app } from '../lib/speicher.svelte'
@@ -31,7 +32,7 @@
     <span class="torte"><Bild id="geburtstag" /></span>
     <div class="text">
       {#each kinder as k (k.name)}
-        <span class="zeile" style="--kind: {k.farbe}"><b>{k.name}</b> hat Geburtstag! <span class="alter">{k.alter} Jahre</span></span>
+        <span class="zeile" style="--kind: {k.farbe}"><b>{k.name}</b> {t('hat Geburtstag!')} <span class="alter">{t('{n} Jahre', { n: k.alter })}</span></span>
       {/each}
     </div>
     <span class="torte"><Bild id="party" /></span>

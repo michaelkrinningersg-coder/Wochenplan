@@ -1,6 +1,7 @@
 // Abgleich über eine Datei, die die Familie selbst wählt (Google Drive, Nextcloud, Gerätespeicher …).
 // Die App schreibt den verschlüsselten Plan dort hinein und liest ihn wieder; es läuft nichts über Server des Entwicklers.
 // Mehrere Geräte: Die jüngere Änderung gewinnt. Nur in der App (Android).
+import { t } from './i18n.svelte'
 import { registerPlugin } from '@capacitor/core'
 import { entschluesseln, ohneAbgleich, verschluesseln, lokalStand } from './abgleich.svelte'
 import { istApp } from './geraet'
@@ -105,7 +106,7 @@ export async function dateiAbgleichen(erster = false): Promise<void> {
   if (!istApp || !datei.gewaehlt || !datei.passwort || laeuft) {
     if (datei.gewaehlt && !datei.passwort && !laeuft) {
       datei.zustand = 'fehler'
-      datei.meldung = 'Bitte ein Familien-Passwort eintragen.'
+      datei.meldung = t('Bitte ein Familien-Passwort eintragen.')
     }
     return
   }
@@ -120,7 +121,7 @@ export async function dateiAbgleichen(erster = false): Promise<void> {
         if (p?.app === 'wochenplan') fern = p
         else throw new Error('x')
       } catch {
-        throw new Error('Die gewählte Datei ist kein Wochenplan. Bitte eine leere oder neue Datei wählen.')
+        throw new Error(t('Die gewählte Datei ist kein Wochenplan. Bitte eine leere oder neue Datei wählen.'))
       }
     }
     const lokal = lokalStand()
@@ -130,11 +131,11 @@ export async function dateiAbgleichen(erster = false): Promise<void> {
       try {
         klar = await entschluesseln(fern as never, datei.passwort)
       } catch {
-        throw new Error('Das Familien-Passwort passt nicht zur Datei.')
+        throw new Error(t('Das Familien-Passwort passt nicht zur Datei.'))
       }
       let ok = false
       ohneAbgleich(() => (ok = importDaten(klar)))
-      if (!ok) throw new Error('Der Plan in der Datei konnte nicht gelesen werden.')
+      if (!ok) throw new Error(t('Der Plan in der Datei konnte nicht gelesen werden.'))
       synchron = fern.geaendert
       merken()
     } else if (!fern || lokal > synchron || erster) {
