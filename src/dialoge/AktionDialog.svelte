@@ -33,6 +33,7 @@
   <div class="liste">
     <button class="knopf" onclick={aendern} data-autofokus><Symbol name="stift" />Ändern</button>
     <button class="knopf" onclick={verschieben}><Symbol name="pfeile" />Verschieben</button>
+    <button class="knopf" onclick={() => (app.dialog = { art: 'aufgabeKopieren', tag, id })}><Symbol name="kopie" />Kopieren nach …</button>
     {#if loeschenFragen}
       <button class="knopf gefahr" onclick={loeschen}><Symbol name="muell" />Wirklich löschen</button>
     {:else}

@@ -5,12 +5,13 @@
   import TagesAnsicht from './ansichten/TagesAnsicht.svelte'
   import WochenAnsicht from './ansichten/WochenAnsicht.svelte'
   import AktionDialog from './dialoge/AktionDialog.svelte'
+  import AufgabeKopierenDialog from './dialoge/AufgabeKopierenDialog.svelte'
   import BearbeitenDialog from './dialoge/BearbeitenDialog.svelte'
   import EinstellungenDialog from './dialoge/EinstellungenDialog.svelte'
   import KopierenDialog from './dialoge/KopierenDialog.svelte'
   import Kopfzeile from './komponenten/Kopfzeile.svelte'
   import { abgleich, abgleichStarten, lokalGeaendert } from './lib/abgleich.svelte'
-  import { gelbAb } from './lib/ampel'
+  import { gelbAb, rotAb } from './lib/ampel'
   import { bewegeFokus, ersterFokus, fokusSetzen, richtungAusTaste } from './lib/fokus'
   import { bildschirmAnlassen, zurueckTaste } from './lib/geraet'
   import { app, finde, oeffnen, schrittVerschieben, speichern, tagVerschieben, zurueck } from './lib/speicher.svelte'
@@ -86,9 +87,13 @@
     for (const [id, t] of Object.entries(app.timer)) {
       if (t.gestartet === null) continue
       const rest = t.dauerMs - (t.vergangenMs + (jetzt - t.gestartet))
-      if (!t.gelbGemeldet && rest <= gelbAb(t.dauerMs) && rest > 0) {
+      if (!t.gelbGemeldet && rest <= gelbAb(t.dauerMs) && rest > rotAb(t.dauerMs)) {
         t.gelbGemeldet = true
         if (app.einst.ton) spieleTon('gelb')
+      }
+      if (!t.rotGemeldet && rest <= rotAb(t.dauerMs) && rest > 0) {
+        t.rotGemeldet = t.gelbGemeldet = true
+        if (app.einst.ton) spieleTon('rot')
       }
       if (!t.endeGemeldet && rest <= 0) {
         t.endeGemeldet = true
@@ -210,6 +215,8 @@
     {/key}
   {:else if app.dialog?.art === 'aktion'}
     <AktionDialog tag={app.dialog.tag} id={app.dialog.id} />
+  {:else if app.dialog?.art === 'aufgabeKopieren'}
+    <AufgabeKopierenDialog tag={app.dialog.tag} id={app.dialog.id} />
   {:else if app.dialog?.art === 'kopieren'}
     <KopierenDialog tag={app.dialog.tag} />
   {:else if app.dialog?.art === 'einstellungen'}

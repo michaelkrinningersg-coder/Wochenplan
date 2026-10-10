@@ -42,6 +42,7 @@ export interface TimerZustand {
   /** bis zur letzten Pause abgelaufene Zeit */
   vergangenMs: number
   gelbGemeldet?: boolean
+  rotGemeldet?: boolean
   endeGemeldet?: boolean
 }
 
@@ -55,6 +56,7 @@ export type Dialog =
   | { art: 'bearbeiten'; tag: TagId; abschnitt: AbschnittId; aufgabe: Aufgabe; neu: boolean }
   | { art: 'aktion'; tag: TagId; id: string }
   | { art: 'kopieren'; tag: TagId }
+  | { art: 'aufgabeKopieren'; tag: TagId; id: string }
   | { art: 'einstellungen' }
 
 export interface Fundstelle {

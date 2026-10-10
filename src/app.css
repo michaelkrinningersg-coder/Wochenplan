@@ -53,6 +53,8 @@
   --abend-hell: #e6e3fa;
 
   --gruen: #2fae66;
+  --gruen-tief: #1f7a47;
+  --gruen-hell: #dcf5e6;
   --gelb: #ffc229;
   --rot: #e5484d;
   --gehaeuse: #22304f;
@@ -90,6 +92,8 @@
     --nachmittag-hell: #223a31;
     --abend-hell: #302b62;
     --gehaeuse: #0e1228;
+  --gruen-hell: #1d4636;
+  --gruen-tief: #8fe0b2;
     color-scheme: dark;
   }
 }
@@ -108,6 +112,8 @@
   --nachmittag-hell: #223a31;
   --abend-hell: #302b62;
   --gehaeuse: #0e1228;
+  --gruen-hell: #1d4636;
+  --gruen-tief: #8fe0b2;
   color-scheme: dark;
 }
 
@@ -127,6 +133,8 @@
   --nachmittag-hell: #e2f5dc;
   --abend-hell: #e6e3fa;
   --gehaeuse: #22304f;
+  --gruen-hell: #dcf5e6;
+  --gruen-tief: #1f7a47;
   color-scheme: light;
 }
 .app[data-thema='nacht'] {
@@ -144,6 +152,8 @@
   --nachmittag-hell: #223a31;
   --abend-hell: #302b62;
   --gehaeuse: #0e1228;
+  --gruen-hell: #1d4636;
+  --gruen-tief: #8fe0b2;
   color-scheme: dark;
 }
 

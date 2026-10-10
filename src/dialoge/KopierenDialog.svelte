@@ -16,6 +16,9 @@
   function umschalten(id: TagId) {
     ziele = ziele.includes(id) ? ziele.filter((z) => z !== id) : [...ziele, id]
   }
+  function auswahl(ids: TagId[]) {
+    ziele = ids.filter((z) => z !== tag)
+  }
   function kopieren() {
     if (ziele.length === 0) return
     tagKopieren(tag, ziele, ersetzen)
@@ -39,6 +42,12 @@
           {t.kurz}
         </button>
       {/each}
+    </div>
+    <div class="wahl">
+      <button class="knopf klein" onclick={() => auswahl(['mo', 'di', 'mi', 'do', 'fr'])}>Mo–Fr</button>
+      <button class="knopf klein" onclick={() => auswahl(['sa', 'so'])}>Wochenende</button>
+      <button class="knopf klein" onclick={() => auswahl(TAGE.map((t) => t.id))}>Alle Tage</button>
+      <button class="knopf klein" onclick={() => (ziele = [])}>Keine</button>
     </div>
     <div class="wahl">
       <button class="knopf" aria-pressed={ersetzen} onclick={() => (ersetzen = true)}>Vorhandenes ersetzen</button>

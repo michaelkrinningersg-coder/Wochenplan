@@ -2,10 +2,12 @@
   import Ampel from '../komponenten/Ampel.svelte'
   import Bild from '../komponenten/Bild.svelte'
   import Symbol from '../komponenten/Symbol.svelte'
+  import Konfetti from '../komponenten/Konfetti.svelte'
   import TimerScheibe from '../komponenten/TimerScheibe.svelte'
-  import { gelbAb } from '../lib/ampel'
+  import { ampelZustand } from '../lib/ampel'
   import { ICON_URL } from '../lib/bilder'
   import {
+    allesErledigt,
     app,
     finde,
     istErledigt,
@@ -17,6 +19,7 @@
     timerAendern,
     timerPause,
     timerRest,
+    timerSetzen,
     timerStart,
     timerZuruecksetzen,
   } from '../lib/speicher.svelte'
@@ -28,7 +31,8 @@
 
   let breite = $state(0)
   let hoehe = $state(0)
-  let feiern = $state(false)
+  let feiern = $state<null | 'eins' | 'alles'>(null)
+  const SCHNELL = [2, 5, 10, 15, 20, 30, 45, 60]
 
   const fund = $derived(finde(tag, id))
   const aufgabe = $derived(fund?.aufgabe)
@@ -43,9 +47,7 @@
 
   const ampel = $derived.by((): 'rot' | 'gelb' | 'gruen' | 'aus' => {
     if (!mitTimer) return 'aus'
-    if (t.restMs <= 0) return 'rot'
-    if (t.restMs <= gelbAb(dauerMs)) return 'gelb'
-    return 'gruen'
+    return ampelZustand(t.restMs, dauerMs)
   })
   const farbe = $derived(ampel === 'rot' ? 'var(--rot)' : ampel === 'gelb' ? 'var(--gelb)' : 'var(--gruen)')
 
@@ -67,12 +69,16 @@
     if (!aufgabe) return
     setzeErledigt(id, true)
     timerPause(id)
-    if (app.einst.ton) spieleTon('fertig')
-    feiern = true
-    setTimeout(() => {
-      feiern = false
-      document.querySelector<HTMLElement>('[data-fokus-id="danach"]')?.focus()
-    }, 1800)
+    const alles = allesErledigt(tag)
+    if (app.einst.ton) spieleTon(alles ? 'alles' : 'fertig')
+    feiern = alles ? 'alles' : 'eins'
+    setTimeout(
+      () => {
+        feiern = null
+        document.querySelector<HTMLElement>('[data-fokus-id="danach"]')?.focus()
+      },
+      alles ? 3800 : 2400,
+    )
   }
 
   function nochmal() {
@@ -136,6 +142,15 @@
         {/if}
       </div>
 
+      {#if !erledigt && !t.gestartet}
+        <div class="schnellwahl" role="group" aria-label="Timer einstellen">
+          <span class="schnell-text">Timer</span>
+          {#each SCHNELL as m (m)}
+            <button class="knopf klein" aria-pressed={mitTimer && dauerMs === m * 60_000} onclick={() => timerSetzen(id, m)}>{m} Min</button>
+          {/each}
+        </div>
+      {/if}
+
       {#if mitTimer && !erledigt}
         <div class="feinstellung">
           <button class="knopf klein" onclick={() => timerAendern(id, -1, aufgabe.minuten)} aria-label="Eine Minute weniger">− 1 Min</button>
@@ -162,9 +177,10 @@
     </div>
 
     {#if feiern}
-      <div class="feier" aria-live="polite">
-        <img src={ICON_URL['_leuchtstern']} alt="" />
-        <span>Super!</span>
+      <div class="feier" class:alles={feiern === 'alles'} aria-live="polite">
+        <Konfetti anzahl={feiern === 'alles' ? 60 : 36} />
+        <img src={ICON_URL[feiern === 'alles' ? 'party' : '_leuchtstern']} alt="" />
+        <span>{feiern === 'alles' ? 'Alles geschafft!' : 'Super gemacht!'}</span>
       </div>
     {/if}
   </div>
@@ -229,6 +245,18 @@
   }
   .status.geschafft {
     color: var(--gruen);
+  }
+  .schnellwahl {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+  }
+  .schnell-text {
+    font-size: var(--t-klein);
+    color: var(--tinte-leise);
+    font-weight: 700;
+    margin-right: 4px;
   }
   .knoepfe,
   .feinstellung {
@@ -297,13 +325,20 @@
     gap: 8px;
     background: var(--himmel);
     opacity: 0.96;
-    animation: feier 1.8s ease both;
+    animation: feier 2.4s ease both;
     z-index: 10;
   }
   .feier img {
     width: min(40vh, 40vw);
     height: min(40vh, 40vw);
     animation: stern 1.8s ease both;
+    position: relative;
+  }
+  .feier.alles {
+    animation-duration: 3.8s;
+  }
+  .feier span {
+    position: relative;
   }
   .feier span {
     font-family: var(--schrift-titel);

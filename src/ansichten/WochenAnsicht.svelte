@@ -16,7 +16,9 @@
   const spaltenBreite = $derived((breite - 6 * 8) / 7)
   const s = $derived(
     schmal
-      ? 40
+      ? app.bearbeiten
+        ? 48
+        : 40
       : wochenRaster(
           TAGE.map((t) => ABSCHNITTE.map((a) => app.plan.woche[t.id][a.id].length + (app.bearbeiten ? 1 : 0))),
           spaltenBreite,

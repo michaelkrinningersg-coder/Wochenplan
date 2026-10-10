@@ -1,3 +1,4 @@
+import { gelbAb, rotAb } from './ampel'
 import { ABSCHNITTE, TAGE } from './konstanten'
 import { neueId, planNormalisieren, startplan } from './startplan'
 import type {
@@ -274,6 +275,13 @@ export function tagKopieren(von: TagId, nach: TagId[], ersetzen: boolean) {
   }
 }
 
+/** Eine Aufgabe auf andere Tage kopieren (gleiche Tageszeit, hinten angehängt) */
+export function aufgabeKopieren(tag: TagId, id: string, ziele: TagId[]) {
+  const f = finde(tag, id)
+  if (!f) return
+  for (const z of ziele) app.plan.woche[z][f.abschnitt].push({ ...$state.snapshot(f.aufgabe), id: neueId() })
+}
+
 export function tagLeeren(tag: TagId) {
   for (const ab of ABSCHNITTE) app.plan.woche[tag][ab.id] = []
   fotosAufraeumen()
@@ -312,6 +320,17 @@ export function timerStart(id: string, minuten: number) {
   app.timer[id] = { datum: datumKey(), dauerMs: minuten * 60_000, gestartet: Date.now(), vergangenMs: 0 }
 }
 
+/** Timer-Dauer wählen (noch nicht starten) */
+export function timerSetzen(id: string, minuten: number) {
+  app.timer[id] = { datum: datumKey(), dauerMs: minuten * 60_000, gestartet: null, vergangenMs: 0 }
+}
+
+/** Sind heute alle Aufgaben erledigt (bzw. alle eines Abschnitts)? */
+export function allesErledigt(tag: TagId, abschnitt?: AbschnittId): boolean {
+  const liste = abschnitt ? app.plan.woche[tag][abschnitt] : tagesListe(tag).map((x) => x.aufgabe)
+  return istHeute(tag) && liste.length > 0 && liste.every((a) => istErledigt(a.id))
+}
+
 export function timerPause(id: string) {
   const t = app.timer[id]
   if (!t || t.gestartet === null) return
@@ -335,7 +354,10 @@ export function timerAendern(id: string, deltaMin: number, minutenStandard: numb
     return
   }
   t.dauerMs = Math.max(60_000, t.dauerMs + deltaMin * 60_000)
-  if (t.vergangenMs + (t.gestartet ? Date.now() - t.gestartet : 0) < t.dauerMs) t.endeGemeldet = false
+  const rest = t.dauerMs - (t.vergangenMs + (t.gestartet ? Date.now() - t.gestartet : 0))
+  if (rest > 0) t.endeGemeldet = false
+  if (rest > rotAb(t.dauerMs)) t.rotGemeldet = false
+  if (rest > gelbAb(t.dauerMs)) t.gelbGemeldet = false
 }
 
 // ---------- Export / Import ----------

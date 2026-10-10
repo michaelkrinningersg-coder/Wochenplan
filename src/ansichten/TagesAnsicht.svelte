@@ -7,6 +7,7 @@
   import { ABSCHNITTE, tagName } from '../lib/konstanten'
   import { tagesRaster } from '../lib/raster'
   import {
+    allesErledigt,
     app,
     istErledigt,
     istHeute,
@@ -96,6 +97,9 @@
             onclick={() => oeffnen({ art: 'abschnitt', tag, abschnitt: ab.id })}
           >
             <span class="kopf-bild"><Bild id={ab.bild} /></span>
+            {#if allesErledigt(tag, ab.id)}
+              <span class="kopf-haken" aria-label="alles erledigt"><Symbol name="haken" /></span>
+            {/if}
             <span class="kopf-text">
               <span class="kopf-name">{ab.name}</span>
               <span class="kopf-zeit">{spanneText(app.plan, ab.id)}</span>
@@ -174,6 +178,26 @@
   .kopf:focus-visible {
     outline-offset: -6px;
     box-shadow: none;
+  }
+  .kopf {
+    position: relative;
+  }
+  .kopf-haken {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--gruen);
+    color: #ffffff;
+  }
+  .kopf-haken :global(svg) {
+    width: 18px;
+    height: 18px;
+    stroke-width: 3.4;
   }
   .kopf-bild {
     width: 30px;

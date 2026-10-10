@@ -134,12 +134,18 @@
       0 0 0 9px var(--fokus-hof);
   }
 
+  /* Erledigt: grüne Kachel mit großem grünem Haken */
+  .erledigt {
+    background: var(--gruen-hell);
+    box-shadow:
+      0 calc(var(--s) * 0.04) 0 var(--gruen),
+      inset 0 0 0 calc(var(--s) * 0.03) var(--gruen);
+  }
   .erledigt .flaeche {
-    opacity: 0.45;
-    filter: grayscale(0.85);
+    opacity: 0.6;
   }
   .erledigt .titel {
-    color: var(--tinte-leise);
+    color: var(--gruen-tief);
   }
   .haken {
     position: absolute;
@@ -147,8 +153,8 @@
     right: -12%;
     display: grid;
     place-items: center;
-    width: 46%;
-    height: 46%;
+    width: 56%;
+    height: 56%;
     border-radius: 50%;
     background: var(--gruen);
     color: #ffffff;

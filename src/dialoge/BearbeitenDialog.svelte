@@ -175,6 +175,14 @@
         <button type="submit" class="knopf haupt" data-autofokus={neu ? true : undefined}><Symbol name="haken" />Speichern</button>
         <button type="button" class="knopf" onclick={() => (app.dialog = null)}>Abbrechen</button>
         {#if !neu}
+          <button
+            type="button"
+            class="knopf"
+            onclick={() => {
+              speichern()
+              app.dialog = { art: 'aufgabeKopieren', tag, id: entwurf.id }
+            }}><Symbol name="kopie" />Kopieren nach …</button
+          >
           {#if loeschenFragen}
             <button type="button" class="knopf gefahr" onclick={loeschen}><Symbol name="muell" />Wirklich löschen</button>
           {:else}
