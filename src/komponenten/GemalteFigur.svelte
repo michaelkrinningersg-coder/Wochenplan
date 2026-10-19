@@ -67,6 +67,46 @@
     affe: 1.1,
     loewe: 1.1,
     gespann: 1,
+    schmetterling: 0.8,
+    biene: 0.7,
+    eiswagen: 1.6,
+    hase: 1,
+    fuchs: 1,
+    marienkaefer: 0.5,
+    schlitten: 1.2,
+    tulpe: 1,
+    gaensebluemchen: 0.9,
+    kirschbluete: 0.7,
+    sonnenblume: 1.4,
+    nest: 0.6,
+    ei: 0.5,
+    kueken: 0.7,
+    frosch: 0.9,
+    loewenzahn: 1,
+    ente: 1,
+    hemd: 0.8,
+    hose: 0.8,
+    socke: 0.7,
+    kleid: 0.8,
+    raupe: 0.6,
+    segelboot: 1.3,
+    schlittschuh: 0.8,
+    regenbogen: 1,
+    spross: 0.9,
+    sonne: 1,
+    erdbeere: 0.8,
+    schwimmring: 1,
+    eimer: 1,
+    eis: 1.1,
+    melone: 0.75,
+    zelt: 1,
+    schneemann: 1.4,
+    schneeflocke: 0.8,
+    tannenbaum: 1.3,
+    plaetzchen: 0.9,
+    handschuhe: 0.9,
+    kerze: 1,
+    kakao: 0.9,
   }
 </script>
 
@@ -127,6 +167,46 @@
     affe: '0 0 64 70',
     loewe: '0 0 92 70',
     gespann: '0 0 252 70',
+    schmetterling: '0 0 60 50',
+    biene: '0 0 56 44',
+    eiswagen: '0 -26 150 116',
+    hase: '0 0 80 70',
+    fuchs: '0 0 98 64',
+    marienkaefer: '0 0 44 34',
+    schlitten: '0 -14 110 84',
+    tulpe: '0 0 30 56',
+    gaensebluemchen: '0 0 40 50',
+    kirschbluete: '0 0 40 40',
+    sonnenblume: '0 -4 50 84',
+    nest: '0 6 70 30',
+    ei: '0 0 26 32',
+    kueken: '0 0 40 42',
+    frosch: '0 0 60 52',
+    loewenzahn: '0 -4 34 60',
+    ente: '-4 0 74 56',
+    hemd: '0 0 40 40',
+    hose: '0 0 40 40',
+    socke: '0 0 32 38',
+    kleid: '0 0 40 40',
+    raupe: '0 0 70 36',
+    segelboot: '0 0 80 80',
+    schlittschuh: '0 0 60 52',
+    regenbogen: '-6 6 112 54',
+    spross: '0 0 40 52',
+    sonne: '0 0 60 60',
+    erdbeere: '0 0 40 46',
+    schwimmring: '0 0 60 60',
+    eimer: '0 0 60 56',
+    eis: '0 -6 36 70',
+    melone: '0 0 60 40',
+    zelt: '0 0 80 60',
+    schneemann: '0 -8 50 86',
+    schneeflocke: '0 0 50 50',
+    tannenbaum: '0 -2 60 82',
+    plaetzchen: '0 0 50 50',
+    handschuhe: '0 0 60 50',
+    kerze: '0 0 30 60',
+    kakao: '0 0 56 52',
   }[name] ?? '0 0 40 40'}
   aria-hidden="true"
 >
@@ -665,6 +745,392 @@
     <path d="M178 28 C178 22 202 22 202 28 L202 32 L178 32 Z" fill="#d6302a" />
     <circle cx="187" cy="13" r="1.4" fill="#1a1a1a" />
     </g>
+  {:else if name === 'schmetterling'}
+    <g class="k">
+    <g class="teil flattern-x" style="transform-origin: 30px 25px">
+      <path d="M29 22 C20 4 4 2 3 14 C2 24 16 28 29 24 Z" fill="#ff8a2a" />
+      <path d="M29 24 C18 26 8 34 12 44 C18 50 26 40 29 28 Z" fill="#ffb02e" />
+      <path d="M31 22 C40 4 56 2 57 14 C58 24 44 28 31 24 Z" fill="#e8702a" />
+      <path d="M31 24 C42 26 52 34 48 44 C42 50 34 40 31 28 Z" fill="#f29a2a" />
+      <circle cx="14" cy="13" r="4" fill="#fff" opacity=".8" /><circle cx="46" cy="13" r="4" fill="#fff" opacity=".8" />
+      <circle cx="17" cy="38" r="3" fill="#7a3a1a" /><circle cx="43" cy="38" r="3" fill="#7a3a1a" />
+    </g>
+    <ellipse cx="30" cy="27" rx="3" ry="13" fill="#4a2e22" />
+    <circle cx="30" cy="13" r="3.6" fill="#4a2e22" />
+    <path d="M29 10 q-4 -7 -8 -7 M31 10 q4 -7 8 -7" stroke="#4a2e22" stroke-width="1.4" fill="none" stroke-linecap="round" />
+    </g>
+  {:else if name === 'biene'}
+    <g class="k">
+    <path class="fluegel" d="M26 16 C20 0 34 -2 34 12 Z" fill="#dff3ff" opacity=".85" />
+    <path class="fluegel" d="M32 16 C32 2 46 2 40 16 Z" fill="#cbeaff" opacity=".85" />
+    <path d="M46 26 L54 28 L46 31 Z" fill="#3a2a1a" />
+    <ellipse cx="32" cy="27" rx="16" ry="12" fill="#ffd23a" />
+    <path d="M28 16 C26 22 26 32 28 38 L34 38 C32 32 32 22 34 16 Z M40 18 C38 24 38 31 40 36 L44 34 C43 30 43 24 44 20 Z" fill="#3a2a1a" />
+    <path d="M38 18 C46 22 48 32 40 37 C44 30 44 24 38 18 Z" fill="#e0a820" opacity=".5" />
+    <circle cx="14" cy="26" r="10" fill="#3a2a1a" />
+    <circle cx="10" cy="24" r="2.6" fill="#fff" /><circle cx="9.4" cy="24" r="1.3" fill="#1a1a1a" />
+    <path d="M8 30 q3 2 6 0" stroke="#ffd23a" stroke-width="1.4" fill="none" stroke-linecap="round" />
+    <path d="M12 17 q-3 -8 -8 -8 M16 17 q0 -8 4 -10" stroke="#3a2a1a" stroke-width="1.6" fill="none" stroke-linecap="round" />
+    </g>
+  {:else if name === 'eiswagen'}
+    <ellipse cx="78" cy="87" rx="70" ry="3" fill={SCHATTEN} opacity=".18" />
+    <g class="k">
+    <path d="M16 36 C16 26 22 22 32 22 L134 22 C142 22 146 28 146 36 L146 72 L10 72 L10 50 Z" fill="#fff0f4" />
+    <path d="M100 22 L134 22 C142 22 146 28 146 36 L146 72 L100 72 Z" fill="#f2d8e2" />
+    <path d="M10 60 L146 60 L146 72 L10 72 Z" fill="#ff8fb1" />
+    <path d="M16 36 L40 36 L40 52 L12 52 Z" fill="#bfe3ff" /><path d="M18 38 L26 38 L18 48 Z" fill="#fff" opacity=".6" />
+    <rect x="52" y="30" width="70" height="26" rx="4" fill="#7fd3ff" />
+    {#each [0, 1, 2, 3, 4, 5, 6] as i (i)}<path d="M{50 + i * 11} 26 h11 v6 a5.5 5.5 0 0 1 -11 0 Z" fill={i % 2 ? '#fff' : '#ff5d8f'} />{/each}
+    <path d="M86 -2 L80 20 L92 20 Z" fill="#e8b46a" /><circle cx="82" cy="-6" r="8" fill="#ff8fb1" /><circle cx="90" cy="-8" r="8" fill="#fff4c2" /><circle cx="86" cy="-16" r="7" fill="#9be37a" />
+    <g transform="translate(36 74)"><g class="rad"><circle r="13" fill="#3a3030" /><circle r="5" fill="#d8d8d8" /><path d="M0 -5 V5 M-5 0 H5" stroke="#9a9a9a" stroke-width="1.6" /></g></g>
+    <g transform="translate(122 74)"><g class="rad"><circle r="13" fill="#3a3030" /><circle r="5" fill="#d8d8d8" /><path d="M0 -5 V5 M-5 0 H5" stroke="#9a9a9a" stroke-width="1.6" /></g></g>
+    <circle cx="10" cy="58" r="4" fill="#ffd84a" />
+    </g>
+  {:else if name === 'hase'}
+    <ellipse cx="44" cy="66" rx="30" ry="3" fill={SCHATTEN} opacity=".2" />
+    <g class="k">
+    <ellipse class="bein a" cx="26" cy="62" rx="8" ry="5" fill="#b8a898" /><ellipse class="bein b" cx="56" cy="62" rx="12" ry="6" fill="#a89888" />
+    <ellipse cx="46" cy="46" rx="24" ry="18" fill="#c8b8a8" />
+    <path d="M58 32 C72 40 70 58 56 64 C64 54 64 42 58 32 Z" fill="#a89888" />
+    <circle cx="70" cy="42" r="7" fill="#fffaf2" />
+    <ellipse cx="44" cy="54" rx="12" ry="8" fill="#f2e8dc" />
+    <g class="teil zucken" style="transform-origin: 26px 24px">
+      <ellipse cx="22" cy="10" rx="5.4" ry="15" fill="#c8b8a8" transform="rotate(-14 22 10)" /><ellipse cx="22" cy="11" rx="2.6" ry="11" fill="#f2b8b8" transform="rotate(-14 22 11)" />
+      <ellipse cx="32" cy="9" rx="5.4" ry="15" fill="#b8a898" transform="rotate(10 32 9)" />
+    </g>
+    <circle cx="22" cy="34" r="13" fill="#c8b8a8" />
+    <circle cx="16" cy="31" r="2.6" fill="#1a1a1a" /><circle cx="15.4" cy="30.4" r=".9" fill="#fff" />
+    <ellipse cx="10" cy="37" rx="3" ry="2.4" fill="#f28aa0" />
+    <ellipse cx="18" cy="40" rx="3.6" ry="2.2" fill="#f2a08a" opacity=".6" />
+    </g>
+  {:else if name === 'fuchs'}
+    <ellipse cx="50" cy="61" rx="38" ry="3" fill={SCHATTEN} opacity=".2" />
+    <g class="k">
+    <path class="schwanz" style="transform-origin: 72px 34px" d="M72 34 C88 24 98 34 94 46 C90 54 80 50 74 44 Z" fill="#e8702a" />
+    <path d="M90 36 C96 40 96 48 92 50 C88 48 88 42 90 36 Z" fill="#fffaf2" />
+    <path class="bein a" d="M30 44 l-2 16 M62 44 l2 16" stroke="#3a2418" stroke-width="5" stroke-linecap="round" />
+    <path class="bein b" d="M38 44 l3 16 M70 42 l-2 16" stroke="#4a2e20" stroke-width="5" stroke-linecap="round" />
+    <ellipse cx="50" cy="36" rx="26" ry="13" fill="#f07a2e" />
+    <path d="M60 24 C76 28 78 44 64 48 C70 40 68 32 60 24 Z" fill="#c8561a" />
+    <path d="M26 36 C30 46 44 50 52 46 C44 44 34 40 30 30 Z" fill="#fffaf2" />
+    <path d="M30 18 L18 4 L16 20 Z M38 18 L34 2 L26 16 Z" fill="#e8702a" /><path d="M28 16 L19 8 L18 18 Z" fill="#3a2418" />
+    <path d="M36 22 C36 14 26 12 20 16 C14 20 6 24 2 30 C8 34 20 34 30 32 C36 30 38 26 36 22 Z" fill="#f07a2e" />
+    <path d="M2 30 C8 34 20 34 30 32 C24 30 16 30 10 28 Z" fill="#fffaf2" />
+    <circle cx="3" cy="30" r="2.6" fill="#1a1a1a" />
+    <path d="M18 21 q3 -3 6 0" stroke="#1a1a1a" stroke-width="2" fill="none" stroke-linecap="round" />
+    </g>
+  {:else if name === 'marienkaefer'}
+    <ellipse cx="24" cy="31" rx="16" ry="2" fill={SCHATTEN} opacity=".2" />
+    <g class="k">
+    <path class="bein a" d="M14 24 l-4 6 M24 26 l0 6 M32 24 l4 6" stroke="#2a2a2a" stroke-width="2" stroke-linecap="round" />
+    <circle cx="9" cy="17" r="7" fill="#2a2a2a" /><circle cx="6" cy="15" r="1.6" fill="#fff" />
+    <path d="M6 10 q-3 -5 -6 -5 M10 10 q0 -5 3 -7" stroke="#2a2a2a" stroke-width="1.4" fill="none" stroke-linecap="round" />
+    <path d="M12 18 C12 4 40 4 40 18 C40 26 12 26 12 18 Z" fill="#e8302a" />
+    <path d="M30 6 C40 10 42 22 34 25 C38 18 36 10 30 6 Z" fill="#b8201a" />
+    <path d="M26 5 V25" stroke="#2a2a2a" stroke-width="1.6" />
+    <circle cx="19" cy="12" r="3" fill="#2a2a2a" /><circle cx="33" cy="12" r="3" fill="#2a2a2a" /><circle cx="20" cy="20" r="2.4" fill="#2a2a2a" /><circle cx="33" cy="20" r="2.4" fill="#2a2a2a" />
+    <ellipse cx="18" cy="9" rx="3" ry="1.6" fill="#fff" opacity=".45" />
+    </g>
+  {:else if name === 'schlitten'}
+    <ellipse cx="56" cy="67" rx="50" ry="3" fill={SCHATTEN} opacity=".18" />
+    <g class="k">
+    <path d="M6 60 C2 60 2 54 8 54 L96 54 C104 54 108 60 104 66" stroke="#c0392b" stroke-width="4" fill="none" stroke-linecap="round" />
+    <path d="M20 54 V46 M84 54 V46" stroke="#8a5a36" stroke-width="4" />
+    <rect x="12" y="38" width="84" height="10" rx="4" fill="#b8783a" /><rect x="12" y="38" width="84" height="4" rx="2" fill="#d09050" />
+    <path d="M70 38 C70 24 64 18 56 18 L44 18 C38 18 34 24 34 38 Z" fill="#3b8fd6" />
+    <path d="M60 18 C68 22 70 30 70 38 L62 38 C62 30 60 24 56 20 Z" fill="#2a6ab0" />
+    <path d="M36 34 L22 36" stroke="#3b8fd6" stroke-width="6" stroke-linecap="round" /><circle cx="20" cy="36" r="4" fill="#e8302a" />
+    <circle cx="50" cy="10" r="10" fill="#f0c8a0" />
+    <path d="M39 8 C40 -2 60 -2 61 8 Z" fill="#e8302a" /><circle cx="50" cy="-3" r="4" fill="#fff" />
+    <path d="M40 18 C46 22 56 22 62 18 L62 22 C56 26 46 26 40 22 Z" fill="#ffd84a" />
+    <circle cx="45" cy="10" r="1.6" fill="#1a1a1a" /><path d="M43 14 q3 2 6 0" stroke="#b05a3a" stroke-width="1.3" fill="none" stroke-linecap="round" />
+    <ellipse cx="48" cy="13" rx="2.6" ry="1.6" fill="#f28aa0" opacity=".7" />
+    </g>
+  {:else if name === 'tulpe'}
+    <g class="k">
+    <path d="M15 54 C14 44 16 34 15 24" stroke="#4c9a3a" stroke-width="3" fill="none" />
+    <path d="M15 44 C6 40 4 30 6 24 C12 28 15 36 15 44 Z" fill="#5ea844" />
+    <path d="M5 8 L5 20 C5 28 25 28 25 20 L25 8 L20 13 L15 4 L10 13 Z" fill="#e8302a" />
+    <path d="M18 7 L20 13 L25 8 L25 20 C25 26 20 28 15 27 C20 24 21 16 18 7 Z" fill="#b8201a" />
+    <path d="M9 12 C8 16 8 20 10 22" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" opacity=".45" />
+    </g>
+  {:else if name === 'gaensebluemchen'}
+    <g class="k">
+    <path d="M20 48 C19 40 21 32 20 22" stroke="#4c9a3a" stroke-width="3" fill="none" />
+    <path d="M20 40 C12 38 8 32 9 28 C15 30 19 34 20 40 Z" fill="#5ea844" />
+    {#each Array.from({ length: 12 }) as _, i (i)}<ellipse cx="20" cy="9" rx="3.2" ry="8" fill={i % 2 ? '#fff' : '#f6eef6'} transform="rotate({i * 30} 20 17)" />{/each}
+    <circle cx="20" cy="17" r="5.6" fill="#ffc21a" /><circle cx="18.4" cy="15.4" r="2" fill="#ffe27a" />
+    </g>
+  {:else if name === 'kirschbluete'}
+    <g class="k">
+    {#each Array.from({ length: 5 }) as _, i (i)}<path d="M20 20 C12 14 12 4 18 3 L20 6 L22 3 C28 4 28 14 20 20 Z" fill={i % 2 ? '#ffc2d8' : '#ffafcc'} transform="rotate({i * 72} 20 20)" />{/each}
+    <circle cx="20" cy="20" r="4" fill="#ff7aa8" />
+    {#each Array.from({ length: 5 }) as _, i (i)}<circle cx={20 + Math.cos(i * 1.26) * 6} cy={20 + Math.sin(i * 1.26) * 6} r="1.2" fill="#ffd84a" />{/each}
+    </g>
+  {:else if name === 'sonnenblume'}
+    <g class="k">
+    <path d="M25 78 C24 60 26 44 25 30" stroke="#4c9a3a" stroke-width="4" fill="none" />
+    <path d="M25 60 C12 58 8 48 10 42 C18 46 24 52 25 60 Z M25 50 C38 48 42 38 40 32 C32 36 26 42 25 50 Z" fill="#5ea844" />
+    {#each Array.from({ length: 14 }) as _, i (i)}<ellipse cx="25" cy="7" rx="4.6" ry="10" fill={i % 2 ? '#ffc21a' : '#ffd84a'} transform="rotate({i * (360 / 14)} 25 20)" />{/each}
+    <circle cx="25" cy="20" r="10" fill="#7a4a1e" /><circle cx="22" cy="17" r="4" fill="#9a6a2e" />
+    </g>
+  {:else if name === 'nest'}
+    <g class="k">
+    <path d="M4 18 C4 36 66 36 66 18 C56 22 14 22 4 18 Z" fill="#9a6a3a" />
+    <path d="M6 18 C10 32 60 32 64 18" stroke="#7a4e2a" stroke-width="2" fill="none" />
+    <path d="M8 22 l10 6 M20 30 l12 -6 M34 30 l12 -6 M48 28 l12 -6 M14 26 l14 0 M40 26 l14 2" stroke="#c08a50" stroke-width="2" stroke-linecap="round" />
+    <path d="M2 18 C12 12 58 12 68 18" stroke="#b8804a" stroke-width="4" fill="none" stroke-linecap="round" />
+    </g>
+  {:else if name === 'ei'}
+    <g class="k">
+    <path d="M13 2 C4 2 1 16 2 22 C3 28 8 31 13 31 C18 31 23 28 24 22 C25 16 22 2 13 2 Z" fill="#9fd8ff" />
+    <path d="M2.4 16 C8 13 18 19 24 15 L24.4 20 C18 24 8 18 2.2 21 Z" fill="#ffd84a" />
+    <path d="M19 5 C24 10 26 22 20 29 C22 22 22 12 19 5 Z" fill="#6fb8e6" opacity=".6" />
+    <ellipse cx="9" cy="9" rx="2" ry="3.6" fill="#fff" opacity=".6" />
+    </g>
+  {:else if name === 'kueken'}
+    <ellipse cx="20" cy="39" rx="14" ry="2" fill={SCHATTEN} opacity=".2" />
+    <g class="k">
+    <path class="bein a" d="M18 34 l-2 5 M24 34 l1 5" stroke="#f08a2a" stroke-width="2" stroke-linecap="round" />
+    <ellipse cx="22" cy="25" rx="14" ry="11" fill="#ffd84a" />
+    <path d="M30 18 C40 22 38 34 28 35 C34 30 34 24 30 18 Z" fill="#f2b81e" />
+    <circle cx="14" cy="14" r="9" fill="#ffe25a" />
+    <path class="teil zucken" style="transform-origin: 26px 24px" d="M24 22 C32 18 36 24 32 30 C30 28 26 26 24 22 Z" fill="#f2c81e" />
+    <path d="M6 14 L0 16 L6 18 Z" fill="#f08a2a" />
+    <circle cx="11" cy="12" r="1.8" fill="#1a1a1a" /><circle cx="10.5" cy="11.5" r=".6" fill="#fff" />
+    <path d="M14 5 q1 -4 4 -4 M14 5 q-2 -4 -5 -3" stroke="#f2b81e" stroke-width="1.6" fill="none" stroke-linecap="round" />
+    </g>
+  {:else if name === 'frosch'}
+    <ellipse cx="30" cy="48" rx="26" ry="2.6" fill={SCHATTEN} opacity=".2" />
+    <g class="k">
+    <ellipse cx="18" cy="44" rx="12" ry="5" fill="#5aa83a" /><ellipse cx="44" cy="44" rx="12" ry="5" fill="#4c9a30" />
+    <ellipse cx="30" cy="32" rx="22" ry="14" fill="#6cc24a" />
+    <path d="M40 20 C54 26 54 40 42 44 C48 36 46 28 40 20 Z" fill="#4c9a30" />
+    <ellipse cx="30" cy="38" rx="14" ry="7" fill="#c8ec9a" />
+    <circle cx="18" cy="16" r="9" fill="#6cc24a" /><circle cx="40" cy="16" r="9" fill="#6cc24a" />
+    <circle cx="18" cy="15" r="5.6" fill="#fff" /><circle cx="40" cy="15" r="5.6" fill="#fff" />
+    <circle cx="17" cy="16" r="3" fill="#1a1a1a" /><circle cx="39" cy="16" r="3" fill="#1a1a1a" />
+    <path d="M18 30 Q29 38 40 30" stroke="#2f6a1e" stroke-width="2.4" fill="none" stroke-linecap="round" />
+    <ellipse cx="14" cy="30" rx="3" ry="2" fill="#f2a08a" opacity=".6" /><ellipse cx="44" cy="30" rx="3" ry="2" fill="#f2a08a" opacity=".6" />
+    </g>
+  {:else if name === 'loewenzahn'}
+    <g class="k">
+    <path d="M17 54 C16 44 18 34 17 22" stroke="#4c9a3a" stroke-width="3" fill="none" />
+    <path d="M17 46 C8 46 2 40 2 34 C8 36 12 38 17 46 Z M17 40 C26 40 32 34 32 28 C26 30 20 34 17 40 Z" fill="#5ea844" />
+    {#each Array.from({ length: 18 }) as _, i (i)}<ellipse cx="17" cy="5" rx="2.4" ry="7" fill={i % 2 ? '#ffd23a' : '#ffc21a'} transform="rotate({i * 20} 17 13)" />{/each}
+    <circle cx="17" cy="13" r="5" fill="#ffb81a" />
+    </g>
+  {:else if name === 'ente'}
+    <ellipse cx="38" cy="52" rx="28" ry="2.4" fill={SCHATTEN} opacity=".2" />
+    <g class="k">
+    <ellipse class="bein a" cx="34" cy="50" rx="6" ry="3" fill="#f08a2a" /><ellipse class="bein b" cx="44" cy="50" rx="6" ry="3" fill="#f08a2a" />
+    <path d="M24 32 C24 22 48 18 62 24 L68 22 L64 32 C62 44 50 48 38 48 C28 48 24 42 24 32 Z" fill="#c8c0b4" />
+    <path d="M52 22 C62 26 64 38 56 44 C58 36 56 28 52 22 Z" fill="#a8a094" />
+    <path d="M24 32 C24 42 30 46 38 46 C34 40 32 34 30 30 Z" fill="#8a5a3a" />
+    <path d="M40 30 C46 26 56 28 58 34 C52 34 46 34 40 30 Z" fill="#5a7ab0" />
+    <circle cx="18" cy="18" r="11" fill="#2f7a4a" />
+    <path d="M22 26 C24 30 30 32 30 32 L22 32 Z" fill="#fff" />
+    <path d="M8 18 L-2 21 C-2 24 4 25 9 23 Z" fill="#ffc21a" />
+    <circle cx="15" cy="15" r="2.2" fill="#1a1a1a" /><circle cx="14.4" cy="14.4" r=".7" fill="#fff" />
+    <ellipse cx="22" cy="12" rx="4" ry="2" fill="#4aa86a" opacity=".7" />
+    </g>
+  {:else if name === 'hemd'}
+    <g class="k">
+    <path d="M10 4 L18 2 Q20 6 22 2 L30 4 L38 12 L32 18 L30 15 L30 38 L10 38 L10 15 L8 18 L2 12 Z" fill="#3b8fd6" />
+    <path d="M26 4 L30 4 L38 12 L32 18 L30 15 L30 38 L24 38 Z" fill="#2a6ab0" opacity=".6" />
+    <path d="M14 10 h4 M14 16 h4" stroke="#fff" stroke-width="2" stroke-linecap="round" />
+    </g>
+  {:else if name === 'hose'}
+    <g class="k">
+    <path d="M8 2 L32 2 L34 38 L24 38 L20 14 L16 38 L6 38 Z" fill="#e8452b" />
+    <path d="M24 2 L32 2 L34 38 L24 38 L22 18 Z" fill="#b8301c" opacity=".55" />
+    <rect x="8" y="2" width="24" height="5" fill="#ffd84a" />
+    </g>
+  {:else if name === 'socke'}
+    <g class="k">
+    <path d="M14 2 L26 2 L26 24 C26 30 22 36 14 36 L6 36 C2 36 2 28 6 28 L14 26 Z" fill="#7fd88a" />
+    <path d="M14 2 L26 2 L26 6 L14 6 Z M14 12 L26 12 L26 16 L14 16 Z" fill="#fff" />
+    <path d="M22 24 C24 30 20 34 14 36 L18 36 C24 34 26 30 26 24 Z" fill="#4caf5a" opacity=".6" />
+    </g>
+  {:else if name === 'kleid'}
+    <g class="k">
+    <path d="M14 2 L26 2 L26 10 L36 38 L4 38 L14 10 Z" fill="#ff8fb1" />
+    <path d="M20 10 L26 10 L36 38 L24 38 Z" fill="#e86a94" opacity=".55" />
+    {#each [[12, 26], [20, 30], [28, 26], [16, 34], [26, 34]] as [x, y], i (i)}<circle cx={x} cy={y} r="1.8" fill="#fff" />{/each}
+    <path d="M14 2 q6 6 12 0" stroke="#fff" stroke-width="2" fill="none" />
+    </g>
+  {:else if name === 'raupe'}
+    <ellipse cx="38" cy="32" rx="30" ry="2" fill={SCHATTEN} opacity=".2" />
+    <g class="k">
+    {#each [58, 48, 38, 28] as x, i (i)}<circle class="teil buckel" style="transform-origin: {x}px 28px; animation-delay: {i * 0.12}s" cx={x} cy="20" r="9" fill={i % 2 ? '#7fd36a' : '#6cc24a'} />{/each}
+    {#each [58, 48, 38, 28] as x, i (i)}<path d="M{x - 2} 29 l-1 4 M{x + 2} 29 l1 4" stroke="#3a7a2a" stroke-width="1.6" stroke-linecap="round" />{/each}
+    <circle cx="16" cy="18" r="11" fill="#8fe07a" />
+    <circle cx="12" cy="15" r="2.6" fill="#fff" /><circle cx="11.4" cy="15.4" r="1.4" fill="#1a1a1a" />
+    <path d="M8 22 q4 3 8 0" stroke="#2f6a1e" stroke-width="1.6" fill="none" stroke-linecap="round" />
+    <path d="M14 8 q-3 -6 -7 -6 M18 8 q2 -6 6 -6" stroke="#3a7a2a" stroke-width="1.6" fill="none" stroke-linecap="round" /><circle cx="7" cy="2" r="2" fill="#e8302a" /><circle cx="24" cy="2" r="2" fill="#e8302a" />
+    </g>
+  {:else if name === 'segelboot'}
+    <g class="k">
+    <path d="M38 6 L38 60" stroke="#6e4126" stroke-width="3" />
+    <path d="M38 8 L70 52 L38 52 Z" fill="#fffaf2" /><path d="M54 30 L70 52 L54 52 Z" fill="#e2dccf" />
+    <path d="M36 14 L10 52 L36 52 Z" fill="#e8452b" /><path d="M36 30 L22 52 L36 52 Z" fill="#b8301c" />
+    <path d="M38 6 L50 10 L38 14 Z" fill="#ffd84a" />
+    <path d="M4 58 L76 58 L66 72 L14 72 Z" fill="#3b7fd6" /><path d="M48 58 L76 58 L66 72 L46 72 Z" fill="#2a62b0" />
+    <path d="M4 58 L76 58" stroke="#fff" stroke-width="3" />
+    <path d="M0 76 q10 -5 20 0 t20 0 t20 0 t20 0" stroke="#7fc8ff" stroke-width="3" fill="none" stroke-linecap="round" />
+    </g>
+  {:else if name === 'schlittschuh'}
+    <g class="k">
+    <path d="M14 4 L34 4 L36 26 C46 28 54 30 54 36 L54 40 L10 40 L10 26 Z" fill="#fffaf2" />
+    <path d="M30 4 L34 4 L36 26 C46 28 54 30 54 36 L54 40 L40 40 C46 34 42 30 30 28 Z" fill="#e2dccf" />
+    <path d="M18 10 l10 0 M18 16 l10 0 M18 22 l12 0" stroke="#e8452b" stroke-width="2.4" stroke-linecap="round" />
+    <path d="M8 40 L56 40" stroke="#5a5a6a" stroke-width="3" />
+    <path d="M14 42 L14 46 M48 42 L48 46 M4 48 C4 44 8 46 10 46 L58 46 C60 46 60 50 56 50 L8 50 C5 50 4 49 4 48 Z" stroke="#b8c2d0" stroke-width="2" fill="#d8e0ea" />
+    </g>
+  {:else if name === 'regenbogen'}
+    <g class="k">
+    {#each ['#e8452b', '#f08a2a', '#ffd23a', '#6cc24a', '#3b8fd6', '#8462e0'] as f, i (i)}
+      <path d="M{10 + i * 6} 50 A{40 - i * 6} {40 - i * 6} 0 0 1 {90 - i * 6} 50" stroke={f} stroke-width="6.4" fill="none" />
+    {/each}
+    <g fill="#fff"><circle cx="12" cy="50" r="9" /><circle cx="22" cy="52" r="7" /><circle cx="4" cy="54" r="5" /><circle cx="88" cy="50" r="9" /><circle cx="78" cy="52" r="7" /><circle cx="96" cy="54" r="5" /></g>
+    </g>
+  {:else if name === 'spross'}
+    <g class="k">
+    <ellipse cx="20" cy="44" rx="18" ry="6" fill="#8a5a36" /><ellipse cx="16" cy="42" rx="8" ry="2" fill="#a87a50" />
+    <path d="M20 42 C20 34 21 28 20 22" stroke="#5ea844" stroke-width="3" fill="none" />
+    <path d="M20 24 C10 24 4 16 4 10 C12 10 18 16 20 24 Z" fill="#7fc25a" />
+    <path d="M20 22 C28 20 36 12 36 6 C28 6 22 12 20 22 Z" fill="#5ea844" />
+    <path d="M8 12 C12 14 16 18 18 22" stroke="#4c9a3a" stroke-width="1.2" fill="none" />
+    </g>
+  {:else if name === 'sonne'}
+    <g class="k">
+    {#each Array.from({ length: 10 }) as _, i (i)}<ellipse cx="30" cy="7" rx="4.6" ry="7" fill={i % 2 ? '#ffad2e' : '#ff8c1a'} transform="rotate({i * 36} 30 30)" />{/each}
+    <circle cx="30" cy="30" r="17" fill="#ffd43a" />
+    <ellipse cx="24" cy="22" rx="5" ry="3" fill="#fff6c8" opacity=".7" transform="rotate(-30 24 22)" />
+    <circle cx="24" cy="29" r="2.2" fill="#3a2418" /><circle cx="36" cy="29" r="2.2" fill="#3a2418" />
+    <path d="M23 35 Q30 42 37 35" stroke="#3a2418" stroke-width="2.2" fill="none" stroke-linecap="round" />
+    <ellipse cx="20" cy="34" rx="3" ry="2" fill="#ff8a7a" opacity=".7" /><ellipse cx="40" cy="34" rx="3" ry="2" fill="#ff8a7a" opacity=".7" />
+    </g>
+  {:else if name === 'erdbeere'}
+    <g class="k">
+    <path d="M20 12 C8 10 2 18 6 28 C10 38 18 44 20 44 C22 44 30 38 34 28 C38 18 32 10 20 12 Z" fill="#e8302a" />
+    <path d="M30 13 C38 20 34 34 24 42 C28 32 32 22 30 13 Z" fill="#b8201a" />
+    {#each [[12, 20], [20, 18], [28, 20], [10, 28], [18, 27], [26, 28], [14, 35], [22, 35], [19, 41]] as [x, y], i (i)}<ellipse cx={x} cy={y} rx="1" ry="1.6" fill="#ffe27a" />{/each}
+    <path d="M20 12 L10 8 L16 6 L14 1 L20 5 L26 1 L24 6 L30 8 Z" fill="#4caf50" />
+    <ellipse cx="12" cy="18" rx="2.4" ry="4" fill="#fff" opacity=".3" />
+    </g>
+  {:else if name === 'schwimmring'}
+    <g class="k">
+    <circle cx="30" cy="30" r="26" fill="#e8302a" />
+    {#each [0, 90, 180, 270] as w (w)}<path d="M30 4 A26 26 0 0 1 48.4 11.6 L40.6 19.4 A15 15 0 0 0 30 15 Z" fill="#fff" transform="rotate({w} 30 30)" />{/each}
+    <circle cx="30" cy="30" r="13" fill="#7fc8ff" />
+    <path d="M12 18 C16 12 22 8 28 7" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" opacity=".6" />
+    </g>
+  {:else if name === 'eimer'}
+    <ellipse cx="28" cy="53" rx="22" ry="2.4" fill={SCHATTEN} opacity=".2" />
+    <g class="k">
+    <path d="M44 8 L52 2" stroke="#8a5a36" stroke-width="3" stroke-linecap="round" /><path d="M40 20 L46 4 C48 2 52 4 50 8 L46 22 Z" fill="#3b8fd6" />
+    <path d="M10 22 C10 6 46 6 46 22" stroke="#e8452b" stroke-width="3" fill="none" />
+    <path d="M6 22 L50 22 L44 52 L12 52 Z" fill="#ffd23a" />
+    <path d="M38 22 L50 22 L44 52 L36 52 Z" fill="#e0a820" opacity=".6" />
+    <path d="M6 22 L50 22 L49 27 L7 27 Z" fill="#f08a2a" />
+    <path d="M18 34 l4 4 l4 -4 l4 4" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" opacity=".7" />
+    </g>
+  {:else if name === 'eis'}
+    <g class="k">
+    <path d="M8 26 L18 62 L28 26 Z" fill="#e8b46a" />
+    <path d="M10 30 L26 46 M14 28 L26 40 M26 30 L12 46 M22 28 L10 40" stroke="#c88a3a" stroke-width="1.4" />
+    <circle cx="18" cy="22" r="11" fill="#ff8fb1" />
+    <circle cx="18" cy="10" r="9" fill="#fff4c2" />
+    <path d="M7 24 C10 30 14 26 18 30 C22 26 26 30 29 24" fill="#ff8fb1" />
+    <circle cx="20" cy="1" r="3" fill="#e8302a" /><path d="M20 -2 q2 -4 6 -4" stroke="#4a8a2a" stroke-width="1.2" fill="none" />
+    <ellipse cx="13" cy="7" rx="2.4" ry="1.6" fill="#fff" opacity=".7" />
+    </g>
+  {:else if name === 'melone'}
+    <g class="k">
+    <path d="M2 6 L58 6 C58 24 46 36 30 36 C14 36 2 24 2 6 Z" fill="#3f9b35" />
+    <path d="M5 6 L55 6 C55 22 44 32 30 32 C16 32 5 22 5 6 Z" fill="#d8f0b8" />
+    <path d="M8 6 L52 6 C52 20 42 29 30 29 C18 29 8 20 8 6 Z" fill="#ff5d6b" />
+    <path d="M38 6 L52 6 C52 20 42 29 30 29 C40 22 42 14 38 6 Z" fill="#e8404e" />
+    {#each [[18, 14], [30, 18], [42, 14], [24, 22], [36, 22]] as [x, y], i (i)}<ellipse cx={x} cy={y} rx="1.4" ry="2.4" fill="#2a1a1a" />{/each}
+    </g>
+  {:else if name === 'zelt'}
+    <g class="k">
+    <path d="M40 2 L40 8" stroke="#6e4126" stroke-width="2.4" /><path d="M40 2 L52 5 L40 8 Z" fill="#e8302a" />
+    <path d="M40 8 L76 56 L4 56 Z" fill="#f08a2a" />
+    <path d="M40 8 L76 56 L52 56 Z" fill="#c8661a" />
+    <path d="M40 22 L30 56 L50 56 Z" fill="#7a3a1a" />
+    <path d="M40 22 L36 56 L44 56 Z" fill="#ffd36a" opacity=".5" />
+    <path d="M0 56 L80 56" stroke="#5ea844" stroke-width="3" stroke-linecap="round" />
+    </g>
+  {:else if name === 'schneemann'}
+    <ellipse cx="26" cy="74" rx="22" ry="2.6" fill="#9fb8d6" opacity=".4" />
+    <g class="k">
+    <circle cx="25" cy="58" r="17" fill="#ffffff" /><path d="M34 44 C44 52 42 68 30 74 C36 64 38 54 34 44 Z" fill="#dfe9f5" />
+    <circle cx="25" cy="32" r="12" fill="#ffffff" /><path d="M32 22 C38 28 38 38 31 43 C34 36 35 28 32 22 Z" fill="#dfe9f5" />
+    <circle cx="25" cy="13" r="9" fill="#ffffff" />
+    <path d="M23 13 L12 15 L23 16 Z" fill="#f08a24" />
+    <circle cx="21" cy="10" r="1.4" fill="#2a2a2a" /><circle cx="28" cy="10" r="1.4" fill="#2a2a2a" />
+    <circle cx="25" cy="30" r="1.6" fill="#2a2a2a" /><circle cx="25" cy="36" r="1.6" fill="#2a2a2a" /><circle cx="25" cy="56" r="1.6" fill="#2a2a2a" />
+    <path d="M16 22 C21 25 29 25 34 22 L35 26 C29 28 21 28 16 26 Z" fill="#e8302a" /><path d="M30 25 l4 10 l-4 1 l-3 -10 Z" fill="#c8241e" />
+    <path d="M14 32 L2 24 M36 32 L48 24" stroke="#6e4126" stroke-width="2.4" stroke-linecap="round" />
+    <path d="M16 6 L34 6 L33 4 L31 -6 L19 -6 L17 4 Z" fill="#2a2a3a" /><rect x="19" y="0" width="12" height="2.6" fill="#e8302a" />
+    </g>
+  {:else if name === 'schneeflocke'}
+    <g class="k">
+    <g stroke="#9fd2ff" stroke-width="3.4" stroke-linecap="round" fill="none">
+      {#each [0, 60, 120] as w (w)}<path d="M25 4 V46" transform="rotate({w} 25 25)" />{/each}
+      {#each [0, 60, 120, 180, 240, 300] as w (w)}<path d="M25 10 l-5 -4 M25 10 l5 -4 M25 17 l-6 -4 M25 17 l6 -4" transform="rotate({w} 25 25)" />{/each}
+    </g>
+    <circle cx="25" cy="25" r="4" fill="#dff1ff" />
+    </g>
+  {:else if name === 'tannenbaum'}
+    <g class="k">
+    <rect x="25" y="66" width="10" height="12" fill="#7a4a2a" />
+    <path d="M30 6 L56 68 L4 68 Z" fill="#2f7a46" />
+    <path d="M30 6 L56 68 L36 68 Z" fill="#245e36" />
+    <path d="M30 6 L48 44 L12 44 Z" fill="#3a8a52" />
+    <path d="M12 44 Q30 52 48 44 M8 58 Q30 66 52 58" stroke="#ffd84a" stroke-width="2" fill="none" />
+    {#each [[22, 36, '#e8302a'], [38, 40, '#3b8fd6'], [18, 56, '#ffd84a'], [32, 52, '#e8302a'], [44, 60, '#b07cff'], [28, 26, '#ffd84a']] as [x, y, f], i (i)}<circle class="teil glut" cx={x} cy={y} r="3.4" fill={String(f)} style="animation-delay: {i * 0.3}s" />{/each}
+    <path d="M30 0 l2.4 5 l5.4 .6 l-4 3.6 l1.2 5.4 l-5 -2.8 l-5 2.8 l1.2 -5.4 l-4 -3.6 l5.4 -.6 Z" fill="#ffd23a" />
+    </g>
+  {:else if name === 'plaetzchen'}
+    <g class="k">
+    <circle cx="34" cy="32" r="14" fill="#d9a05a" /><circle cx="34" cy="32" r="10" fill="#e8b46a" />
+    {#each [[30, 28], [38, 30], [33, 37]] as [x, y], i (i)}<circle cx={x} cy={y} r="2" fill="#6a3a1e" />{/each}
+    <path d="M16 4 l4 9 l10 1 l-7 7 l2 10 l-9 -5 l-9 5 l2 -10 l-7 -7 l10 -1 Z" fill="#e8b46a" />
+    <path d="M16 9 l2.6 6 l6.4 .6 l-4.6 4.4 l1.4 6.4 l-5.8 -3.2 l-5.8 3.2 l1.4 -6.4 l-4.6 -4.4 l6.4 -.6 Z" fill="#fff4f8" />
+    <circle cx="16" cy="18" r="1.6" fill="#e8302a" />
+    </g>
+  {:else if name === 'handschuhe'}
+    <g class="k">
+    <g transform="rotate(-12 18 26)">
+      <path d="M8 14 C8 4 26 4 26 14 L26 38 L8 38 Z" fill="#e8302a" /><path d="M8 20 C2 18 0 26 6 30 L8 30 Z" fill="#e8302a" />
+      <rect x="6" y="36" width="22" height="9" rx="3" fill="#fffaf2" /><path d="M12 20 l4 4 l4 -4 l4 4" stroke="#fff" stroke-width="1.8" fill="none" opacity=".7" />
+    </g>
+    <g transform="rotate(12 42 26)">
+      <path d="M34 14 C34 4 52 4 52 14 L52 38 L34 38 Z" fill="#3b8fd6" /><path d="M52 20 C58 18 60 26 54 30 L52 30 Z" fill="#3b8fd6" />
+      <rect x="32" y="36" width="22" height="9" rx="3" fill="#fffaf2" /><path d="M38 20 l4 4 l4 -4 l4 4" stroke="#fff" stroke-width="1.8" fill="none" opacity=".7" />
+    </g>
+    </g>
+  {:else if name === 'kerze'}
+    <g class="k">
+    <circle class="teil glut" cx="15" cy="12" r="12" fill="#ffd36a" opacity=".35" />
+    <path class="teil flamme-k" style="transform-origin: 15px 22px" d="M15 2 C20 10 20 16 15 20 C10 16 10 10 15 2 Z" fill="#ffb02e" />
+    <path d="M15 8 C17 12 17 15 15 17 C13 15 13 12 15 8 Z" fill="#fff4c2" />
+    <path d="M15 20 V24" stroke="#3a2a1a" stroke-width="1.4" />
+    <rect x="7" y="24" width="16" height="34" rx="3" fill="#fffaf2" /><rect x="17" y="24" width="6" height="34" rx="3" fill="#e2dccf" />
+    <path d="M9 24 C9 30 13 30 13 26" stroke="#fffaf2" stroke-width="3" fill="none" />
+    </g>
+  {:else if name === 'kakao'}
+    <g class="k">
+    <path class="teil dampf" style="transform-origin: 20px 12px" d="M16 14 q-4 -6 0 -10 M26 14 q-4 -6 0 -10" stroke="#e8e2dc" stroke-width="2.6" fill="none" stroke-linecap="round" />
+    <path d="M42 24 C54 24 54 40 40 40" stroke="#e8302a" stroke-width="5" fill="none" />
+    <path d="M6 18 L44 18 L40 46 C40 48 38 50 36 50 L14 50 C12 50 10 48 10 46 Z" fill="#e8302a" />
+    <path d="M32 18 L44 18 L40 46 C40 48 38 50 36 50 L30 50 C36 44 36 30 32 18 Z" fill="#b8201a" />
+    <ellipse cx="25" cy="18" rx="19" ry="4" fill="#6a3a1e" /><ellipse cx="20" cy="17" rx="6" ry="2" fill="#fff" opacity=".7" />
+    <path d="M16 30 l4 6 l4 -6 l4 6" stroke="#fff" stroke-width="2" fill="none" opacity=".7" />
+    </g>
   {/if}
 </svg>
 
@@ -744,10 +1210,15 @@
   [data-n='eichhoernchen'] .k,
   [data-n='kastanienmann'] .k,
   [data-n='gespann'] .k,
-  [data-n='radler'] .k {
+  [data-n='radler'] .k,
+  [data-n='hase'] .k,
+  [data-n='fuchs'] .k,
+  [data-n='marienkaefer'] .k,
+  [data-n='kueken'] .k {
     animation: gehen var(--d, 1s) ease-in-out infinite alternate;
   }
-  [data-n='pinguin'] .k {
+  [data-n='pinguin'] .k,
+  [data-n='ente'] .k {
     animation: watscheln var(--d, 1s) ease-in-out infinite alternate;
   }
   [data-n='fliegenpilz'] .k,
@@ -760,7 +1231,23 @@
   [data-n='giraffe'] .k,
   [data-n='eule'] .k,
   [data-n='hahn'] .k,
-  [data-n='specht'] .k {
+  [data-n='specht'] .k,
+  [data-n='tulpe'] .k,
+  [data-n='gaensebluemchen'] .k,
+  [data-n='sonnenblume'] .k,
+  [data-n='loewenzahn'] .k,
+  [data-n='spross'] .k,
+  [data-n='nest'] .k,
+  [data-n='ei'] .k,
+  [data-n='schneemann'] .k,
+  [data-n='tannenbaum'] .k,
+  [data-n='zelt'] .k,
+  [data-n='eimer'] .k,
+  [data-n='kakao'] .k,
+  [data-n='kerze'] .k,
+  [data-n='segelboot'] .k,
+  [data-n='kirschbluete'] .k,
+  [data-n='regenbogen'] .k {
     animation: wackeln var(--d, 1s) ease-in-out infinite alternate;
   }
   [data-n='apfel'] .k,
@@ -774,26 +1261,44 @@
   [data-n='laterne'] .k,
   [data-n='drachen'] .k,
   [data-n='regenschirm'] .k,
-  [data-n='blatt'] .k {
+  [data-n='blatt'] .k,
+  [data-n='hemd'] .k,
+  [data-n='hose'] .k,
+  [data-n='socke'] .k,
+  [data-n='kleid'] .k,
+  [data-n='erdbeere'] .k,
+  [data-n='eis'] .k,
+  [data-n='plaetzchen'] .k,
+  [data-n='handschuhe'] .k,
+  [data-n='schwimmring'] .k,
+  [data-n='schlittschuh'] .k,
+  [data-n='melone'] .k {
     animation: baumeln var(--d, 1s) ease-in-out infinite alternate;
   }
-  [data-n='herz'] .k {
+  [data-n='herz'] .k,
+  [data-n='sonne'] .k {
     animation: pochen var(--d, 1s) ease-in-out infinite alternate;
   }
   [data-n='note'] .k,
   [data-n='noten'] .k,
-  [data-n='spinne'] .k {
+  [data-n='spinne'] .k,
+  [data-n='frosch'] .k {
     animation: huepfen var(--d, 1s) ease-in-out infinite alternate;
   }
-  [data-n='traktor'] .k {
+  [data-n='traktor'] .k,
+  [data-n='eiswagen'] .k,
+  [data-n='schlitten'] .k {
     animation: rattern var(--d, 1s) ease-in-out infinite alternate;
   }
   [data-n='gans'] .k,
   [data-n='vogel'] .k,
-  [data-n='flugzeug'] .k {
+  [data-n='flugzeug'] .k,
+  [data-n='schmetterling'] .k,
+  [data-n='biene'] .k {
     animation: schweben var(--d, 1s) ease-in-out infinite alternate;
   }
-  [data-n='schnecke'] .k {
+  [data-n='schnecke'] .k,
+  [data-n='raupe'] .k {
     animation: kriechen var(--d, 1s) ease-in-out infinite alternate;
   }
   [data-n='fliegenpilz'] .k {
@@ -873,6 +1378,155 @@
   }
   [data-n='schnecke'] .k {
     transform-origin: 60px 44px;
+  }
+  [data-n='schneeflocke'] .k {
+    animation: drehen-l var(--d, 1s) linear infinite;
+  }
+  [data-n='tulpe'] .k {
+    transform-origin: 15px 54px;
+  }
+  [data-n='gaensebluemchen'] .k {
+    transform-origin: 20px 48px;
+  }
+  [data-n='sonnenblume'] .k {
+    transform-origin: 25px 78px;
+  }
+  [data-n='loewenzahn'] .k {
+    transform-origin: 17px 54px;
+  }
+  [data-n='spross'] .k {
+    transform-origin: 20px 46px;
+  }
+  [data-n='nest'] .k {
+    transform-origin: 35px 30px;
+  }
+  [data-n='ei'] .k {
+    transform-origin: 13px 31px;
+  }
+  [data-n='schneemann'] .k {
+    transform-origin: 25px 74px;
+  }
+  [data-n='tannenbaum'] .k {
+    transform-origin: 30px 78px;
+  }
+  [data-n='zelt'] .k {
+    transform-origin: 40px 56px;
+  }
+  [data-n='eimer'] .k {
+    transform-origin: 28px 52px;
+  }
+  [data-n='kakao'] .k {
+    transform-origin: 25px 50px;
+  }
+  [data-n='kerze'] .k {
+    transform-origin: 15px 58px;
+  }
+  [data-n='segelboot'] .k {
+    transform-origin: 40px 72px;
+  }
+  [data-n='kirschbluete'] .k {
+    transform-origin: 20px 20px;
+  }
+  [data-n='regenbogen'] .k {
+    transform-origin: 50px 54px;
+  }
+  [data-n='hemd'] .k {
+    transform-origin: 20px 2px;
+  }
+  [data-n='hose'] .k {
+    transform-origin: 20px 2px;
+  }
+  [data-n='socke'] .k {
+    transform-origin: 20px 2px;
+  }
+  [data-n='kleid'] .k {
+    transform-origin: 20px 2px;
+  }
+  [data-n='erdbeere'] .k {
+    transform-origin: 20px 6px;
+  }
+  [data-n='eis'] .k {
+    transform-origin: 18px 62px;
+  }
+  [data-n='plaetzchen'] .k {
+    transform-origin: 25px 25px;
+  }
+  [data-n='handschuhe'] .k {
+    transform-origin: 30px 10px;
+  }
+  [data-n='schwimmring'] .k {
+    transform-origin: 30px 30px;
+  }
+  [data-n='schlittschuh'] .k {
+    transform-origin: 30px 6px;
+  }
+  [data-n='melone'] .k {
+    transform-origin: 30px 20px;
+  }
+  [data-n='sonne'] .k {
+    transform-origin: 30px 30px;
+  }
+  [data-n='schneeflocke'] .k {
+    transform-origin: 25px 25px;
+  }
+  [data-n='raupe'] .k {
+    transform-origin: 60px 30px;
+  }
+  [data-n='ente'] .k {
+    transform-origin: 38px 52px;
+  }
+  [data-n='hase'] .k, [data-n='fuchs'] .k, [data-n='kueken'] .k, [data-n='marienkaefer'] .k {
+    --d: 0.25s;
+  }
+  [data-n='ente'] .k {
+    --d: 0.4s;
+  }
+  [data-n='eiswagen'] .k, [data-n='schlitten'] .k {
+    --d: 0.16s;
+  }
+  [data-n='schmetterling'] .k, [data-n='biene'] .k {
+    --d: 0.6s;
+  }
+  [data-n='sonne'] .k {
+    --d: 1.4s;
+  }
+  [data-n='frosch'] .k {
+    --d: 0.5s;
+  }
+  [data-n='schneeflocke'] .k {
+    --d: 12s;
+  }
+  .flattern-x {
+    animation: flattern-x 0.28s ease-in-out infinite alternate;
+  }
+  .buckel {
+    animation: buckel 0.6s ease-in-out infinite alternate;
+  }
+  .flamme-k {
+    animation: flamme-k 0.5s ease-in-out infinite alternate;
+  }
+  .dampf {
+    animation: dampf 2s ease-in-out infinite;
+  }
+  @keyframes drehen-l {
+    to { transform: rotate(360deg); }
+  }
+  @keyframes flattern-x {
+    from { transform: scaleX(1); }
+    to { transform: scaleX(0.25); }
+  }
+  @keyframes buckel {
+    from { transform: translateY(0); }
+    to { transform: translateY(-3px); }
+  }
+  @keyframes flamme-k {
+    from { transform: scale(1, 1) rotate(-3deg); }
+    to { transform: scale(0.9, 1.1) rotate(3deg); }
+  }
+  @keyframes dampf {
+    0% { opacity: 0; transform: translateY(4px); }
+    40% { opacity: 1; }
+    100% { opacity: 0; transform: translateY(-6px); }
   }
   .k,
   .teil {

@@ -22,6 +22,30 @@
     Igel: 'igel',
     'Äpfel ernten': 'apfel',
     Regenwetter: 'regenschirm',
+    'Tulpen blühen': 'tulpe',
+    'Küken schlüpfen': 'kueken',
+    'Bienen summen': 'biene',
+    Schmetterlinge: 'schmetterling',
+    Regenbogen: 'regenbogen',
+    Marienkäfer: 'marienkaefer',
+    Osterhase: 'hase',
+    'Alles wächst': 'spross',
+    Sonne: 'sonne',
+    'Eis essen': 'eis',
+    Strand: 'eimer',
+    'Baden gehen': 'schwimmring',
+    Erdbeeren: 'erdbeere',
+    Sonnenblumen: 'sonnenblume',
+    Melone: 'melone',
+    Zelten: 'zelt',
+    'Schneemann bauen': 'schneemann',
+    Schneeflocken: 'schneeflocke',
+    'Schlitten fahren': 'schlitten',
+    Tannenbaum: 'tannenbaum',
+    'Plätzchen backen': 'plaetzchen',
+    'Handschuhe an': 'handschuhe',
+    Kerzen: 'kerze',
+    'Kakao trinken': 'kakao',
   }
 
   let { onwecken }: { onwecken: () => void } = $props()
@@ -130,7 +154,7 @@
       <div class="dinge">
         {#each dinge as d (d.t)}
           <div class="ding">
-            {#if GEMALT[d.t]}<span class="emoji"><GemalteFigur name={GEMALT[d.t]} groesse={GEMALT[d.t] === 'drachen' ? 1.2 : 1} /></span>{:else}<span class="emoji">{d.e}</span>{/if}
+            {#if GEMALT[d.t]}<span class="emoji"><GemalteFigur name={GEMALT[d.t]} groesse={GEMALT[d.t] === 'drachen' || GEMALT[d.t] === 'schneemann' || GEMALT[d.t] === 'tannenbaum' || GEMALT[d.t] === 'sonnenblume' ? 1.2 : 1} /></span>{:else}<span class="emoji">{d.e}</span>{/if}
             {#if app.einst.ruheNamen}<span class="ding-text">{t(d.t)}</span>{/if}
           </div>
         {/each}

@@ -392,11 +392,11 @@
       <!-- ================= Flieger ================= -->
       {#if e.id === 'schmetterling' || e.id === 'biene' || e.id === 'vogel'}
         <div class="ding" data-spiel="hops" use:animiere={{ k: flug(e, e.id === 'vogel' ? [10, 40] : [18, 58], e.id === 'biene' ? 3 : 7, 10), dauer: zufall(11000, 17000) }}>
-          {#if e.id === 'vogel'}<span class="figur emoji"><GemalteFigur name="vogel" /></span>{:else}<span class="figur emoji">{e.id === 'schmetterling' ? '🦋' : '🐝'}</span>{/if}
+          {#if e.id === 'vogel'}<span class="figur emoji"><GemalteFigur name="vogel" /></span>{:else}<span class="figur emoji"><GemalteFigur name={e.id} /></span>{/if}
         </div>
       {:else if e.id === 'flugzeug'}
         <div class="ding" data-spiel="hops" use:animiere={{ k: flug(e, [5, 16], 1, 4, 2), dauer: zufall(12000, 16000) }}>
-          <span class="figur emoji">✈️</span>
+          <span class="figur emoji"><GemalteFigur name="flugzeug" /></span>
         </div>
       {:else if e.id === 'drachen'}
         <div class="ding drachen" data-spiel="hops" use:animiere={{ k: flug(e, [6, 34], 8, 8, 20).map((f) => ({ ...f, transform: String(f.transform).replace(/scaleX\([^)]*\) /, '') })), dauer: zufall(14000, 20000) }}>
@@ -511,9 +511,9 @@
           }}
         >
           {#if e.id === 'eiswagen'}
-            <span class="figur emoji reihe eiswagen"><span class="schild">🍦</span>🚐</span>
+            <span class="figur emoji"><GemalteFigur name="eiswagen" /></span>
           {:else}
-            {#if e.id === 'igel'}<span class="figur emoji"><GemalteFigur name="igel" /></span>{:else}<span class="figur emoji">{e.id === 'hase' ? '🐇' : e.id === 'fuchs' ? '🦊' : '🐞'}</span>{/if}
+            {#if e.id === 'igel'}<span class="figur emoji"><GemalteFigur name="igel" /></span>{:else}<span class="figur emoji"><GemalteFigur name={e.id} /></span>{/if}
           {/if}
         </div>
       {:else if e.id === 'schlitten'}
@@ -529,7 +529,7 @@
             easing: 'ease-in',
           }}
         >
-          <span class="figur emoji">🛷</span>
+          <span class="figur emoji"><GemalteFigur name="schlitten" /></span>
         </div>
       {:else if e.id === 'rotkehlchen'}
         <div class="flaeche" use:animiere={{ k: [{ opacity: 1 }, { opacity: 1 }], dauer: 16000 }}>
@@ -570,7 +570,7 @@
                   <circle cx="10" cy="28" r="2" fill="#fff" /><circle cx="20" cy="28" r="2" fill="#fff" />
                 </svg>
               {:else}
-                <span class="figur emoji">{['🌷', '🌼', '🌸', '🌻'][i % 4]}</span>
+                <span class="figur emoji"><GemalteFigur name={['tulpe', 'gaensebluemchen', 'kirschbluete', 'sonnenblume'][i % 4]} groesse={0.9} /></span>
               {/if}
             </div>
           {/each}
@@ -585,16 +585,16 @@
               style="left: {orte.krone.x + Math.cos(w) * 5}%; top: {orte.krone.y + Math.sin(w) * 7}%"
               use:animiere={{ k: wachsen(i, 0.88), dauer: 12000, ende: false }}
             >
-              <span class="figur emoji">🌸</span>
+              <span class="figur emoji"><GemalteFigur name="kirschbluete" /></span>
             </div>
           {/each}
         </div>
       {:else if e.id === 'nest'}
         <div class="ding nest" data-spiel="hops" style="left: {orte.krone.x + 3}%; top: {orte.krone.y + 4}%" use:animiere={{ k: sichtbar(0.02, 0.92), dauer: 12000 }}>
           <span class="figur stapel">
-            <span class="emoji">🪺</span>
-            <span class="emoji obenauf" use:animiere={{ k: sichtbar(0.2, 0.5), dauer: 12000, ende: false }}>🥚</span>
-            <span class="emoji obenauf" use:animiere={{ k: sichtbar(0.5, 0.92), dauer: 12000, ende: false }}>🐣</span>
+            <span class="emoji"><GemalteFigur name="nest" groesse={0.8} /></span>
+            <span class="emoji obenauf" use:animiere={{ k: sichtbar(0.2, 0.5), dauer: 12000, ende: false }}><GemalteFigur name="ei" /></span>
+            <span class="emoji obenauf" use:animiere={{ k: sichtbar(0.5, 0.92), dauer: 12000, ende: false }}><GemalteFigur name="kueken" /></span>
           </span>
         </div>
       {:else if e.id === 'schneemann'}
@@ -773,7 +773,7 @@
               ende: false,
             }}
           >
-            <span class="figur emoji">🐸</span>
+            <span class="figur emoji"><GemalteFigur name="frosch" /></span>
           </div>
           <span class="spritzer" style="left: {ziel}%; top: {orte.boden[1]}%">
             {#each Array.from({ length: 10 }) as _, i (i)}<i style="--w: {i * 36}deg"></i>{/each}
@@ -784,7 +784,7 @@
         <div class="flaeche" use:animiere={{ k: [{ opacity: 1 }, { opacity: 1 }], dauer: 12000 }}>
           <div class="ding wachsend" data-spiel="hops" style="left: {x}%; top: {orte.boden[1]}%" use:animiere={{ k: wachsen(0, 0.95), dauer: 12000, ende: false }}>
             <span class="figur stapel">
-              <span class="emoji" use:animiere={{ k: sichtbar(0, 0.35), dauer: 12000, ende: false }}>🌼</span>
+              <span class="emoji" use:animiere={{ k: sichtbar(0, 0.35), dauer: 12000, ende: false }}><GemalteFigur name="loewenzahn" /></span>
               <span class="puste obenauf2" use:animiere={{ k: sichtbar(0.35, 0.55), dauer: 12000, ende: false }}></span>
             </span>
           </div>
@@ -807,18 +807,18 @@
         </div>
       {:else if e.id === 'enten'}
         <div class="flaeche" use:animiere={{ k: [{ opacity: 1 }, { opacity: 1 }], dauer: 21000 }}>
-          {#each ['🦆', '🐥', '🐥', '🐥'] as z, i (i)}
+          {#each ['ente', 'kueken', 'kueken', 'kueken'] as z, i (i)}
             <div class="ding" class:klein={i > 0} data-spiel="hops" use:animiere={{ k: boden(e, 1.5, 24), dauer: 18000, verz: i * 900, ende: false }}>
-              <span class="figur emoji">{z}</span>
+              <span class="figur emoji"><GemalteFigur name={z} groesse={i > 0 ? 1.2 : 1} /></span>
             </div>
           {/each}
         </div>
       {:else if e.id === 'waesche'}
         <div class="flaeche waesche-leine" use:animiere={{ k: sichtbar(0.03, 0.93), dauer: 13000 }} style="--x0: {orte.dach[0].x - 22}%; --x1: {orte.dach[0].x}%; --y: {orte.dach[0].y + 3}%">
           <span class="leine"></span>
-          {#each ['👕', '👖', '🧦', '👗'] as z, i (i)}
+          {#each ['hemd', 'hose', 'socke', 'kleid'] as z, i (i)}
             <span class="ding klein" data-spiel="hops" style="left: calc(var(--x0) + {(i + 0.6) * 5}%); top: calc(var(--y) + 3%)">
-              <span class="figur emoji pendel" style="animation-delay: {i * 0.2}s">{z}</span>
+              <span class="figur emoji pendel" style="animation-delay: {i * 0.2}s"><GemalteFigur name={z} /></span>
             </span>
           {/each}
         </div>
@@ -826,10 +826,10 @@
         {@const ziel = orte.stamm.x}
         <div class="flaeche" use:animiere={{ k: [{ opacity: 1 }, { opacity: 1 }], dauer: 18000 }}>
           <div class="ding klein" data-spiel="hops" use:animiere={{ k: [pos(e.links ? -4 : 104, orte.boden[1], `scaleX(${e.links ? -1 : 1})`), { ...pos(ziel, orte.boden[1], `scaleX(${e.links ? -1 : 1})`), offset: 0.55, opacity: 1 }, { ...pos(ziel, orte.boden[1], 'scale(0.4)'), opacity: 0 }], dauer: 11000, ende: false }}>
-            <span class="figur emoji">🐛</span>
+            <span class="figur emoji"><GemalteFigur name="raupe" /></span>
           </div>
           <div class="ding" data-spiel="hops" use:animiere={{ k: [{ ...pos(ziel, orte.boden[1]), opacity: 0 }, { ...pos(ziel + 4, orte.boden[1] - 15), opacity: 1 }, { ...pos(ziel + 30, orte.boden[0] - 45), opacity: 1 }, { ...pos(e.links ? 115 : -15, 10), opacity: 1 }], dauer: 7000, verz: 11000, ende: false }}>
-            <span class="figur emoji">🦋</span>
+            <span class="figur emoji"><GemalteFigur name="schmetterling" /></span>
           </div>
         </div>
       {:else if e.id === 'giesskanne'}
@@ -837,7 +837,7 @@
         <div class="flaeche" use:animiere={{ k: [{ opacity: 1 }, { opacity: 1 }], dauer: 11000 }}>
           {#each [0, 1, 2] as i (i)}
             <div class="ding wachsend" data-spiel="hops" style="left: {x + i * 4}%; top: {orte.boden[1]}%" use:animiere={{ k: [{ transform: 'scale(0.45)', opacity: 1 }, { transform: 'scale(0.45)', offset: 0.3 }, { transform: 'scale(1.15)', offset: 0.8 }, { transform: 'scale(1.15)', opacity: 1, offset: 0.92 }, { transform: 'scale(1.15)', opacity: 0 }], dauer: 11000, ende: false }}>
-              <span class="figur emoji">{['🌷', '🌼', '🌸'][i]}</span>
+              <span class="figur emoji"><GemalteFigur name={['tulpe', 'gaensebluemchen', 'kirschbluete'][i]} /></span>
             </div>
           {/each}
           <div class="ding giess" style="left: {x + 7}%; top: {orte.boden[1] - 20}%" use:animiere={{ k: [{ transform: 'rotate(0deg)', opacity: 0 }, { transform: 'rotate(0deg)', opacity: 1, offset: 0.1 }, { transform: 'rotate(-35deg)', offset: 0.25 }, { transform: 'rotate(-35deg)', offset: 0.8 }, { transform: 'rotate(0deg)', opacity: 1, offset: 0.9 }, { transform: 'rotate(0deg)', opacity: 0 }], dauer: 11000, ende: false }}>
@@ -917,7 +917,7 @@
         <div class="ding wachsend hoch" data-spiel="hops" style="left: {x}%; top: {orte.boden[1]}%" use:animiere={{ k: wachsen(0, 0.9), dauer: 13000 }}>
           <span class="figur stapel">
             <span class="stiel"></span>
-            <span class="emoji dreh">🌻</span>
+            <span class="emoji dreh"><GemalteFigur name="sonnenblume" /></span>
           </span>
         </div>
       {:else if e.id === 'libelle'}
@@ -960,7 +960,7 @@
         {@const x = 22 + e.zufall[0] * 50}
         <div class="flaeche" use:animiere={{ k: sichtbar(0.03, 0.94), dauer: 16000 }}>
           <span class="decke" style="left: {x}%; top: {orte.boden[1] - 1}%"></span>
-          <span class="ding" style="left: {x + 3}%; top: {orte.boden[1] - 3}%" data-spiel="hops"><span class="figur emoji">🧺</span></span>
+          <span class="ding" style="left: {x + 3}%; top: {orte.boden[1] - 3}%" data-spiel="hops"><span class="figur emoji"><GemalteFigur name="korb" /></span></span>
           {#each Array.from({ length: 6 }) as _, i (i)}
             <span class="ameise" style="top: {orte.boden[1] + 3}%" use:animiere={{ k: [{ left: `${x + 4}%` }, { left: `${e.links ? 105 : -5}%` }], dauer: 9000, verz: 2500 + i * 700, ende: false }}>{#if i % 2 === 0}<b></b>{/if}</span>
           {/each}
@@ -970,7 +970,7 @@
         <div class="flaeche" use:animiere={{ k: sichtbar(0.02, 0.94), dauer: 16000 }}>
           <span class="see" style="left: {x}%; top: {orte.boden[0] + 2}%"></span>
           <div class="ding" data-spiel="hops" use:animiere={{ k: [pos(x - 9, orte.boden[0]), { ...pos(x + 9, orte.boden[0]), offset: 0.5 }, pos(x - 9, orte.boden[0])], dauer: 16000, ende: false }}>
-            <span class="figur emoji schaukeln">⛵</span>
+            <span class="figur emoji schaukeln"><GemalteFigur name="segelboot" /></span>
           </div>
         </div>
 
@@ -1069,7 +1069,7 @@
         <div class="flaeche" use:animiere={{ k: sichtbar(0.02, 0.94), dauer: 16000 }}>
           <span class="see eis" style="left: {x}%; top: {orte.boden[0] + 2}%"></span>
           <div class="ding" data-spiel="hops" use:animiere={{ k: Array.from({ length: 17 }, (_, i) => pos(x + Math.cos((i / 16) * Math.PI * 4) * 9, orte.boden[0] + 1 + Math.sin((i / 16) * Math.PI * 4) * 2.5, `scaleX(${Math.sin((i / 16) * Math.PI * 4) > 0 ? -1 : 1})`)), dauer: 16000, ende: false }}>
-            <span class="figur emoji">⛸️</span>
+            <span class="figur emoji"><GemalteFigur name="schlittschuh" /></span>
           </div>
         </div>
       {:else if e.id === 'iglu'}
@@ -1090,11 +1090,11 @@
           <svg class="figur" viewBox="0 0 60 50" width="100%" height="100%">
             <path d="M30 6 C22 6 22 16 30 16 C38 16 38 6 30 6 Z M30 16 C10 4 2 18 12 26 C6 34 18 46 30 40 C42 46 54 34 48 26 C58 18 50 4 30 16 Z" fill="#dce8f2" stroke="#b6cbe0" stroke-width="1.5" />
           </svg>
-          <span class="glitzer-fix">✨</span>
+          <span class="glitzer-fix"></span>
         </div>
       {:else if e.id === 'pinguin'}
         <div class="ding" data-spiel="hops" use:animiere={{ k: boden(e, 0, 6).map((f) => ({ ...f, transform: `${f.transform} rotate(${e.links ? 80 : -80}deg)` })), dauer: 6000, easing: 'ease-in' }}>
-          <span class="figur emoji">🐧</span>
+          <span class="figur emoji"><GemalteFigur name="pinguin" /></span>
         </div>
       {:else if e.id === 'kaminrauch'}
         <div class="flaeche" use:animiere={{ k: sichtbar(0.02, 0.94), dauer: 14000 }}>
@@ -1138,7 +1138,7 @@
             <span class="hasenspur" style="left: {x}%; top: {orte.boden[1] + 2}%" use:animiere={{ k: sichtbar(i / 11, 0.95), dauer: 14000, ende: false }}><i></i><i></i><b></b><b></b></span>
           {/each}
           <div class="ding" data-spiel="hops" use:animiere={{ k: boden(e, 4, 20).map((f) => ({ ...f, top: `${orte.boden[1] - 2}%` })), dauer: 14000, ende: false }}>
-            <span class="figur emoji">🐇</span>
+            <span class="figur emoji"><GemalteFigur name="hase" /></span>
           </div>
         </div>
 
@@ -1311,17 +1311,6 @@
     height: 16px;
     border-radius: 3px;
     animation: konfetti 4s linear infinite;
-  }
-  .eiswagen {
-    position: relative;
-    font-size: clamp(40px, 8vh, 84px);
-  }
-  .schild {
-    position: absolute;
-    left: 30%;
-    top: -55%;
-    font-size: 0.5em;
-    animation: wackeln 0.6s ease-in-out infinite alternate;
   }
   .spur {
     position: absolute;
@@ -1825,7 +1814,10 @@
     position: absolute;
     right: -10%;
     top: -20%;
-    font-size: 28px;
+    width: 28px;
+    height: 28px;
+    background: radial-gradient(circle, #fffbe0 20%, #ffd84a 60%);
+    clip-path: polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%);
     animation: blinken 0.8s ease-in-out infinite alternate;
   }
   .kamin {
