@@ -11,6 +11,18 @@
   import AnalogUhr from './AnalogUhr.svelte'
   import AufgabenBild from './AufgabenBild.svelte'
   import JahreszeitSzene from './JahreszeitSzene.svelte'
+  import GemalteFigur from './GemalteFigur.svelte'
+  /** Typische Dinge, die es schon gemalt gibt (passend zur bewegten Szene) */
+  const GEMALT: Record<string, string> = {
+    'Bunte Blätter': 'blatt',
+    'Kastanien sammeln': 'kastanie',
+    Kürbisse: 'kuerbis',
+    Pilze: 'fliegenpilz',
+    'Drachen steigen': 'drachen',
+    Igel: 'igel',
+    'Äpfel ernten': 'apfel',
+    Regenwetter: 'regenschirm',
+  }
 
   let { onwecken }: { onwecken: () => void } = $props()
 
@@ -118,7 +130,7 @@
       <div class="dinge">
         {#each dinge as d (d.t)}
           <div class="ding">
-            <span class="emoji">{d.e}</span>
+            {#if GEMALT[d.t]}<span class="emoji"><GemalteFigur name={GEMALT[d.t]} groesse={GEMALT[d.t] === 'drachen' ? 1.2 : 1} /></span>{:else}<span class="emoji">{d.e}</span>{/if}
             {#if app.einst.ruheNamen}<span class="ding-text">{t(d.t)}</span>{/if}
           </div>
         {/each}

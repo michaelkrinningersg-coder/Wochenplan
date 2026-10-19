@@ -4,6 +4,8 @@
   import type { Jahreszeit, Orte } from '../lib/jahreszeit'
   import Figuren from './Figuren.svelte'
   import SzenenEreignisse from './SzenenEreignisse.svelte'
+  import HerbstLandschaft from './HerbstLandschaft.svelte'
+  import { ausschnitt, prozent } from '../lib/szene.svelte'
   import { onDestroy } from 'svelte'
 
   import type { WetterArt } from '../lib/wetter.svelte'
@@ -24,7 +26,18 @@
   // Lage von Baum, Haus und Boden auf dem Bildschirm (Bild 160×90, „slice“ = füllt und beschneidet)
   const baumDx = $derived(hoch ? 30 : 0)
   const hausX = $derived(hoch ? 82 : 110)
+  const aus = $derived(ausschnitt(breite, hoehe))
   const orte = $derived.by((): Orte => {
+    if (jz === 'herbst') {
+      const q = (x: number, y: number) => prozent(aus, breite, hoehe, x, y)
+      const dx = aus.hoch ? aus.x0 + aus.w - 175 - 1120 : 0
+      return {
+        krone: q(380, 385),
+        stamm: q(382, 560),
+        dach: [q(1104 + dx, 571), q(1190 + dx, 501), q(1276 + dx, 571)],
+        boden: [q(0, 612).y, q(0, 652).y],
+      }
+    }
     const s = Math.max(breite / 160, hoehe / 90)
     const ox = (breite - 160 * s) / 2
     const oy = (hoehe - 90 * s) / 2
@@ -102,6 +115,9 @@
 </script>
 
 <div class="szene" bind:clientWidth={breite} bind:clientHeight={hoehe}>
+  {#if jz === 'herbst'}
+    <HerbstLandschaft {stunde} {dunkel} {daemm} {art} {aus} />
+  {:else}
   <svg viewBox="0 0 160 90" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
     <defs>
       <linearGradient id="himmel" x1="0" y1="0" x2="0" y2="1">
@@ -140,9 +156,6 @@
     <circle cx="33" cy="44" r="7.5" fill={f.krone[1]} />
     <circle cx="47" cy="44" r="7.5" fill={f.krone[2]} />
     <circle cx="40" cy="33" r="7" fill={f.krone[1]} />
-    {#if jz === 'herbst'}
-      <circle cx="37" cy="38" r="1.6" fill="#c94a2a" /><circle cx="44" cy="42" r="1.6" fill="#c94a2a" />
-    {/if}
     </g>
     </g>
     <!-- kleines Haus -->
@@ -159,10 +172,6 @@
         <circle cx={x} cy={76 + (i % 3) * 3} r="1.4" fill={['#ff5d8f', '#ffd84a', '#ffffff', '#b07cff'][i % 4]} />
       {/each}
     {/if}
-    {#if jz === 'herbst'}
-      <ellipse cx="66" cy="80" rx="4" ry="3.2" fill="#f08a24" /><rect x="65.5" y="76" width="1" height="2" fill="#5a3a1a" />
-      <ellipse cx="74" cy="82" rx="3" ry="2.4" fill="#f2a03d" />
-    {/if}
     {#if jz === 'winter'}
       <path d="M0 84 Q14 80.5 30 83 T62 82 T96 83.5 T130 81.5 T160 83 V90 H0 Z" fill="#fff" />
       <path d="M0 87 Q22 84.5 46 86.5 T100 86 T160 86.5 V90 H0 Z" fill="#e6eff8" />
@@ -170,6 +179,7 @@
       <circle cx="70" cy="78" r="4.5" fill="#fff" /><circle cx="70" cy="71" r="3.2" fill="#fff" /><path d="M70 71 l3 0.6 -3 0.6 z" fill="#f08a24" />
     {/if}
   </svg>
+  {/if}
 
   <Figuren {jz} {orte} nacht={istNacht} regen={art === 'regen' || art === 'gewitter'} />
   <SzenenEreignisse {jz} {orte} />
@@ -191,7 +201,7 @@
     <div class="wetter-nebel">{#each [30, 52, 70] as y, i (i)}<span style="top: {y}%; animation-delay: {-i * 12}s"></span>{/each}</div>
   {/if}
 
-  {#if f.teilchen.length}
+  {#if f.teilchen.length && jz !== 'herbst'}
     <div class="teilchen" class:schnee={jz === 'winter'}>
       {#each teile.slice(0, jz === 'winter' ? 40 : 26) as t (t.i)}
         <span
