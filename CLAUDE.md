@@ -32,7 +32,7 @@ Jedes Motiv wird als eigene SVG-Figur in `src/komponenten/GemalteFigur.svelte` g
 - **Prüfen:** Galerie aller Figuren kurz per Playwright rendern (temporäre Seite, danach löschen) und als Bild ansehen.
 
 ## Szenen mit Motion Graphics
-- Je Jahreszeit eine Landschaft (Vorbild `src/komponenten/HerbstLandschaft.svelte`): Bild 1600×900,
+- Je Jahreszeit eine Landschaft (`src/komponenten/Landschaft.svelte`, Ausstattung je Jahreszeit in `SAISON`): Bild 1600×900,
   Ebenen mit leichter Parallaxe (`.ebene`, `--tiefe`), Nebel, ziehende Wolken, Baumkrone aus Büscheln,
   Teilchen im Canvas (Blätter/Schnee/Blüten), Böen über `windboe()` aus `src/lib/szene.svelte.ts`.
 - Tageslauf (Himmel, Sonne, Mond, Tönung, Fensterlicht) kommt aus `JahreszeitSzene.svelte` (`stunde`, `dunkel`, `daemm`, `art`).
