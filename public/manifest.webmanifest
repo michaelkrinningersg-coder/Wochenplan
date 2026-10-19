@@ -1,6 +1,6 @@
 {
-  "name": "Wochenplan",
-  "short_name": "Wochenplan",
+  "name": "Tagolino",
+  "short_name": "Tagolino",
   "description": "Was ist heute dran? Tagesplan mit Bildern, Timer und Ampel.",
   "lang": "de",
   "start_url": "./",

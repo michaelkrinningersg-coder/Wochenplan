@@ -1,5 +1,5 @@
 <script lang="ts">
-  // Wochenplan Pro: Vergleich Kostenlos / Pro und Kauf über Google Play (hinter einer Erwachsenen-Frage)
+  // Tagolino Pro: Vergleich Kostenlos / Pro und Kauf über Google Play (hinter einer Erwachsenen-Frage)
   import Fenster from '../komponenten/Fenster.svelte'
   import { t } from '../lib/i18n.svelte'
   import { FREI_MAX_KACHELN, kaeufeWiederherstellen, lizenz, proKaufen } from '../lib/lizenz.svelte'
@@ -19,7 +19,7 @@
   ]
 </script>
 
-<Fenster titel={t('Wochenplan Pro')}>
+<Fenster titel={t('Tagolino Pro')}>
   {#if lizenz.pro}
     <p class="gross">✓ {t('Pro ist freigeschaltet. Vielen Dank!')}</p>
   {:else}

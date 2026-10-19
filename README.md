@@ -1,4 +1,4 @@
-# Wochenplan
+# Tagolino (Repo „Wochenplan“)
 
 Tages- und Wochenplan für Kinder: Was ist heute dran, was kommt als Nächstes?
 Mit großen Bildern, Timer-Scheibe und Ampel. Läuft auf dem Fernseher (Google TV), auf dem Tablet und im Browser.

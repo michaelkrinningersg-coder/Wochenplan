@@ -21,7 +21,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Einmaliger Kauf „Wochenplan Pro“ über Google Play Abrechnung.
+ * Einmaliger Kauf „Tagolino Pro“ über Google Play Abrechnung.
  * Produkt-ID in der Play Console: wochenplan_pro (Einmalprodukt, nicht Abo).
  * Die Bestätigung (acknowledge) erfolgt hier; ohne sie erstattet Google den Kauf nach 3 Tagen.
  */

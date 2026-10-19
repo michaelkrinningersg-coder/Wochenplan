@@ -81,8 +81,8 @@ export async function installieren() {
       r.status === 'gestartet'
         ? t('Bitte im Android-Fenster auf „Aktualisieren“ bzw. „Installieren“ drücken.')
         : r.status === 'erlaubnis'
-          ? t('Einmalig erlauben: „Wochenplan“ darf Apps installieren. Danach noch einmal auf „Aktualisieren“ drücken.')
-          : t('Bitte in den Android-Einstellungen erlauben, dass „Wochenplan“ Apps installieren darf, dann noch einmal versuchen.')
+          ? t('Einmalig erlauben: „Tagolino“ darf Apps installieren. Danach noch einmal auf „Aktualisieren“ drücken.')
+          : t('Bitte in den Android-Einstellungen erlauben, dass „Tagolino“ Apps installieren darf, dann noch einmal versuchen.')
   } catch (e) {
     update.zustand = 'fehler'
     update.meldung = e instanceof Error ? e.message : String(e)

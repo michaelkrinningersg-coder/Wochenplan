@@ -73,7 +73,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v1.0.${{ github.run_number }}
-          name: Wochenplan 1.0.${{ github.run_number }}
+          name: Tagolino 1.0.${{ github.run_number }}
           body: |
             Installation auf Google TV mit der App „Downloader“:
             https://github.com/${{ github.repository }}/releases/latest/download/wochenplan.apk

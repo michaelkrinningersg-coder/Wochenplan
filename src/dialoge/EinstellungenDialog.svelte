@@ -341,7 +341,7 @@ import { FREI_MAX_KACHELN, istPro } from '../lib/lizenz.svelte'
     {:else if !istPro() && (reiter === 'sprache' || reiter === 'ruhe' || reiter === 'tag')}
     <section>
       <h3>{t('Nur in Pro')}</h3>
-      <p class="hilfe">{reiter === 'sprache' ? t('Die Sprachausgabe gehört zu Wochenplan Pro.') : reiter === 'ruhe' ? t('Das Ruhebild mit Jahreszeiten, Wetter und Figuren gehört zu Wochenplan Pro.') : t('Weitere Tageszeiten und Tagesabläufe gehören zu Wochenplan Pro.')}</p>
+      <p class="hilfe">{reiter === 'sprache' ? t('Die Sprachausgabe gehört zu Tagolino Pro.') : reiter === 'ruhe' ? t('Das Ruhebild mit Jahreszeiten, Wetter und Figuren gehört zu Tagolino Pro.') : t('Weitere Tageszeiten und Tagesabläufe gehören zu Tagolino Pro.')}</p>
       <div class="reihe"><button class="knopf" onclick={proHinweis}>{t('Pro ansehen')}</button></div>
     </section>
     {:else if reiter === 'sprache'}
@@ -566,7 +566,7 @@ import { FREI_MAX_KACHELN, istPro } from '../lib/lizenz.svelte'
     {:else if reiter === 'abgleich'}
     {#if __STORE__}
     <section>
-      <h3>{t('Wochenplan Pro')}</h3>
+      <h3>{t('Tagolino Pro')}</h3>
       <p class="hilfe">{istPro() ? t('Pro ist freigeschaltet. Vielen Dank!') : t('Du nutzt die kostenlose Version: Morgenroutine mit bis zu {n} Kacheln.', { n: FREI_MAX_KACHELN })}</p>
       {#if !istPro()}<div class="reihe"><button class="knopf" onclick={proHinweis}>{t('Pro ansehen')}</button></div>{/if}
     </section>
@@ -705,7 +705,7 @@ import { FREI_MAX_KACHELN, istPro } from '../lib/lizenz.svelte'
     {/if}
 
     <p class="info">
-      {istApp ? t('Wochenplan App') : t('Wochenplan im Browser')}{update.aktuell ? ' · ' + t('Version 1.0.{nr}', { nr: update.aktuell }) : ''}.
+      {istApp ? t('Tagolino App') : t('Tagolino im Browser')}{update.aktuell ? ' · ' + t('Version 1.0.{nr}', { nr: update.aktuell }) : ''}.
     </p>
   </div>
 </Fenster>
