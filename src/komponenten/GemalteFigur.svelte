@@ -47,6 +47,26 @@
     blatt: 1,
     kastanie: 0.9,
     drachen: 1.6,
+    hahn: 1.3,
+    radler: 1.6,
+    stiefel: 1.2,
+    schokolade: 0.5,
+    orange: 0.5,
+    bonbon: 0.4,
+    flugzeug: 1,
+    schaf: 1,
+    note: 0.6,
+    noten: 0.6,
+    herz: 1,
+    ranzen: 1.1,
+    baer: 1.1,
+    schildkroete: 0.8,
+    pinguin: 1.1,
+    elefant: 1.3,
+    giraffe: 1.9,
+    affe: 1.1,
+    loewe: 1.1,
+    gespann: 1,
   }
 </script>
 
@@ -86,6 +106,26 @@
     blatt: '0 0 56 56',
     kastanie: '0 0 52 44',
     drachen: '0 0 64 104',
+    hahn: '0 0 80 84',
+    radler: '0 0 120 100',
+    stiefel: '0 0 60 70',
+    schokolade: '0 0 30 26',
+    orange: '0 0 28 28',
+    bonbon: '0 0 36 20',
+    flugzeug: '0 0 120 60',
+    schaf: '0 0 80 64',
+    note: '0 0 26 34',
+    noten: '0 0 34 34',
+    herz: '0 0 60 54',
+    ranzen: '0 0 60 70',
+    baer: '0 0 80 70',
+    schildkroete: '0 0 90 56',
+    pinguin: '0 0 50 70',
+    elefant: '0 0 100 78',
+    giraffe: '0 0 70 110',
+    affe: '0 0 64 70',
+    loewe: '0 0 92 70',
+    gespann: '0 0 252 70',
   }[name] ?? '0 0 40 40'}
   aria-hidden="true"
 >
@@ -356,6 +396,185 @@
     <path d="M32 2 L58 32 L32 66 Z" fill="#000" opacity=".12" />
     <path d="M32 2 V66 M6 32 H58" stroke="#fff" stroke-width="1.4" opacity=".55" />
     <path d="M14 26 L30 8" stroke="#fff" stroke-width="2.4" stroke-linecap="round" opacity=".4" />
+  {:else if name === 'hahn'}
+    <ellipse cx="40" cy="81" rx="26" ry="3" fill={SCHATTEN} opacity=".2" />
+    <path d="M50 44 C56 20 72 12 78 22 C72 22 66 30 64 42 Z" fill="#1f3a34" />
+    <path d="M54 46 C64 26 78 26 78 36 C72 34 66 40 62 48 Z" fill="#2c5a4c" />
+    <path d="M56 48 C66 38 76 42 74 50 C70 46 64 48 60 52 Z" fill="#b8301c" />
+    <path d="M40 74 L38 80 M34 80 h8 M50 74 L52 80 M48 80 h8" stroke="#e8a23a" stroke-width="2.6" stroke-linecap="round" />
+    <ellipse cx="44" cy="58" rx="20" ry="17" fill="#b85a24" />
+    <path d="M56 46 C66 56 62 72 46 75 C56 66 58 56 56 46 Z" fill="#8a3c16" />
+    <path d="M36 54 C42 48 54 50 56 58 C50 56 42 58 38 62 Z" fill="#7a3414" />
+    <path d="M26 54 C22 44 24 34 28 28 L38 30 C36 38 36 46 40 52 Z" fill="#e8a23a" />
+    <circle cx="28" cy="26" r="9" fill="#e8a23a" />
+    <path d="M22 18 q2 -8 6 -4 q2 -7 6 -2 q4 -5 5 2 q-8 2 -17 4 Z" fill="#e23a28" />
+    <path d="M20 26 L10 28 L20 31 Z" fill="#f2c23a" />
+    <path d="M22 31 q-2 7 3 8 q3 -4 0 -8 Z" fill="#e23a28" />
+    <circle cx="26" cy="24" r="1.8" fill="#1a1a1a" /><circle cx="25.5" cy="23.5" r=".6" fill="#fff" />
+  {:else if name === 'radler'}
+    <ellipse cx="62" cy="97" rx="54" ry="3" fill={SCHATTEN} opacity=".18" />
+    <g transform="translate(26 76)"><g class="rad"><circle r="19" fill="none" stroke="#2e2a2a" stroke-width="5" />{#each [0, 45, 90, 135] as w (w)}<path d="M-17 0 H17" stroke="#9a9a9a" stroke-width="1.2" transform="rotate({w})" />{/each}<circle r="3" fill="#9a9a9a" /></g></g>
+    <g transform="translate(96 76)"><g class="rad"><circle r="19" fill="none" stroke="#2e2a2a" stroke-width="5" />{#each [0, 45, 90, 135] as w (w)}<path d="M-17 0 H17" stroke="#9a9a9a" stroke-width="1.2" transform="rotate({w})" />{/each}<circle r="3" fill="#9a9a9a" /></g></g>
+    <path d="M26 76 L44 46 L82 50 L96 76 M44 46 L62 78 L82 50 M62 78 L96 76 M40 40 L44 46 M34 40 h10 M82 50 L80 42 M74 42 h12" stroke="#e8452b" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+    <g class="pedal"><path d="M62 78 l0 -9 M62 78 l0 9" stroke="#3a3a3a" stroke-width="3" stroke-linecap="round" /></g>
+    <path d="M76 40 C70 52 66 64 62 70" stroke="#2f5fa8" stroke-width="7" fill="none" stroke-linecap="round" />
+    <path d="M78 38 C64 30 52 26 42 30" stroke="#f2b33d" stroke-width="9" fill="none" stroke-linecap="round" />
+    <path d="M58 30 C50 34 44 38 40 40" stroke="#f0c8a0" stroke-width="4.5" fill="none" stroke-linecap="round" />
+    <circle cx="44" cy="18" r="11" fill="#f0c8a0" />
+    <path d="M32 16 C32 4 56 2 56 16 Z" fill="#3b8fd6" /><path d="M44 5 C50 6 54 10 56 16 L50 16 C50 12 48 8 44 5 Z" fill="#2a6ab0" />
+    <circle cx="38" cy="20" r="1.6" fill="#1a1a1a" /><path d="M34 25 q3 2 6 0" stroke="#b05a3a" stroke-width="1.4" fill="none" stroke-linecap="round" />
+    <ellipse cx="41" cy="24" rx="2.4" ry="1.6" fill="#f2a08a" opacity=".7" />
+  {:else if name === 'stiefel'}
+    <ellipse cx="30" cy="67" rx="24" ry="3" fill={SCHATTEN} opacity=".2" />
+    <path d="M18 14 L44 14 L44 46 C56 48 58 64 50 66 L10 66 C6 66 6 58 14 54 L18 50 Z" fill="#d6302a" />
+    <path d="M36 14 L44 14 L44 46 C56 48 58 64 50 66 L36 66 C50 60 46 50 36 48 Z" fill="#a8221c" />
+    <path d="M10 62 L52 62 L50 66 L10 66 Z" fill="#5a2a1a" />
+    <rect x="14" y="6" width="34" height="12" rx="6" fill="#fffaf2" />
+    <path d="M18 9 C24 8 30 8 34 9" stroke="#e8ded0" stroke-width="3" stroke-linecap="round" />
+    <path d="M24 26 C26 22 30 22 30 26" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round" opacity=".4" />
+  {:else if name === 'schokolade'}
+    <rect x="2" y="4" width="26" height="18" rx="2" fill="#6a3a1e" />
+    <path d="M10 4 V22 M19 4 V22 M2 13 H28" stroke="#4e2810" stroke-width="1.4" />
+    <path d="M2 4 L16 4 L10 22 L2 22 Z" fill="#3b8fd6" /><path d="M5 9 h6" stroke="#fff" stroke-width="1.6" stroke-linecap="round" />
+  {:else if name === 'orange'}
+    <circle cx="14" cy="15" r="12" fill="#f28a1e" /><path d="M22 7 C28 16 24 26 14 27 C22 22 24 14 22 7 Z" fill="#d06a12" />
+    <ellipse cx="10" cy="11" rx="3" ry="4" fill="#fff" opacity=".35" /><path d="M14 3 q5 -4 9 0 q-5 3 -9 0" fill="#5aa83a" />
+  {:else if name === 'bonbon'}
+    <path d="M10 10 L2 3 L2 17 Z M26 10 L34 3 L34 17 Z" fill="#ff8fb1" />
+    <ellipse cx="18" cy="10" rx="9" ry="7" fill="#ff5d8f" /><path d="M13 5 L17 15 M19 4 L23 14" stroke="#fff" stroke-width="2" opacity=".7" />
+  {:else if name === 'flugzeug'}
+    <path d="M92 26 L112 8 L118 8 L108 30 Z" fill="#3b8fd6" />
+    <path d="M14 30 C14 22 24 20 34 20 L104 24 C112 26 112 34 104 36 L34 40 C24 40 14 38 14 30 Z" fill="#f4f1ec" />
+    <path d="M14 30 C14 36 24 40 34 40 L104 36 C110 35 112 32 110 30 Z" fill="#d6d0c6" />
+    <path d="M50 30 L80 30 L64 56 L56 56 Z" fill="#e8452b" /><path d="M54 24 L74 25 L62 8 L56 8 Z" fill="#c8361e" opacity=".8" />
+    {#each [32, 42, 52, 62, 72, 82] as x (x)}<circle cx={x} cy="27" r="2.4" fill="#7fb8e6" />{/each}
+    <path d="M18 26 C20 23 24 22 26 22 L26 30 L18 30 Z" fill="#7fb8e6" />
+    <g transform="translate(12 30)"><ellipse class="propeller" rx="2.4" ry="12" fill="#5a5a5a" opacity=".7" /></g>
+  {:else if name === 'schaf'}
+    <ellipse cx="40" cy="61" rx="28" ry="3" fill={SCHATTEN} opacity=".2" />
+    <path d="M26 46 v12 M34 48 v11 M52 48 v11 M60 46 v12" stroke="#3a3a3a" stroke-width="4" stroke-linecap="round" />
+    <ellipse cx="44" cy="36" rx="28" ry="17" fill="#d9cfba" />
+    {#each [[30, 30, 12], [44, 24, 13], [58, 30, 12], [36, 42, 12], [52, 42, 12], [64, 38, 9], [24, 38, 9]] as [x, y, r], i (i)}<circle cx={x} cy={y} r={r} fill="#f6f1e6" />{/each}
+    {#each [[50, 46, 10], [64, 40, 7]] as [x, y, r], i (i)}<circle cx={x} cy={y} r={r} fill="#ddd4c2" />{/each}
+    <circle cx="38" cy="22" r="5" fill="#fff" opacity=".8" />
+    <ellipse cx="16" cy="32" rx="10" ry="12" fill="#4a4448" />
+    <ellipse cx="22" cy="24" rx="6" ry="3" fill="#3a3438" transform="rotate(30 22 24)" />
+    <circle cx="12" cy="30" r="2" fill="#fff" /><circle cx="12" cy="30" r="1" fill="#1a1a1a" />
+    <circle cx="20" cy="22" r="5" fill="#f6f1e6" />
+  {:else if name === 'note'}
+    <ellipse cx="9" cy="28" rx="7" ry="5" fill="#3a2a5a" transform="rotate(-20 9 28)" /><path d="M15 26 V3 C19 8 24 10 22 18" stroke="#3a2a5a" stroke-width="2.6" fill="none" stroke-linecap="round" />
+  {:else if name === 'noten'}
+    <ellipse cx="8" cy="28" rx="6" ry="4.4" fill="#3a2a5a" transform="rotate(-20 8 28)" /><ellipse cx="26" cy="24" rx="6" ry="4.4" fill="#3a2a5a" transform="rotate(-20 26 24)" />
+    <path d="M13 27 V6 L31 2 V23" stroke="#3a2a5a" stroke-width="2.6" fill="none" stroke-linejoin="round" /><path d="M13 6 L31 2 L31 7 L13 11 Z" fill="#3a2a5a" />
+  {:else if name === 'herz'}
+    <path d="M30 50 C10 36 2 26 4 16 C6 6 20 2 30 14 C40 2 54 6 56 16 C58 26 50 36 30 50 Z" fill="#e8304a" />
+    <path d="M44 6 C54 10 58 22 50 32 C44 40 36 46 30 50 C40 40 50 28 44 6 Z" fill="#b81e34" />
+    <ellipse cx="16" cy="16" rx="5" ry="7" fill="#fff" opacity=".35" transform="rotate(-30 16 16)" />
+  {:else if name === 'ranzen'}
+    <ellipse cx="30" cy="67" rx="24" ry="3" fill={SCHATTEN} opacity=".2" />
+    <path d="M20 10 C20 2 40 2 40 10" stroke="#2a4a7a" stroke-width="4" fill="none" />
+    <rect x="8" y="10" width="44" height="54" rx="8" fill="#3b7fd6" />
+    <path d="M44 10 C50 10 52 14 52 18 L52 56 C52 62 48 64 44 64 Z" fill="#2a62b0" />
+    <path d="M8 18 C8 12 12 10 18 10 L42 10 C48 10 52 12 52 18 L52 34 L8 34 Z" fill="#f2b33d" />
+    <rect x="26" y="30" width="8" height="8" rx="2" fill="#c8c8c8" />
+    <circle cx="16" cy="52" r="4" fill="#ffe25a" /><circle cx="44" cy="52" r="4" fill="#ffe25a" />
+    <path d="M14 20 h18" stroke="#fff" stroke-width="2.4" stroke-linecap="round" opacity=".45" />
+  {:else if name === 'baer'}
+    <ellipse cx="42" cy="67" rx="34" ry="3" fill={SCHATTEN} opacity=".2" />
+    <ellipse class="bein a" cx="24" cy="58" rx="7" ry="9" fill="#6a4228" /><ellipse class="bein b" cx="60" cy="58" rx="7" ry="9" fill="#6a4228" />
+    <ellipse cx="46" cy="42" rx="30" ry="20" fill="#8a5a36" />
+    <path d="M62 26 C78 34 78 52 62 60 C70 50 70 36 62 26 Z" fill="#6a4228" />
+    <circle cx="18" cy="32" r="14" fill="#8a5a36" />
+    <circle cx="20" cy="18" r="5" fill="#8a5a36" /><circle cx="20" cy="18" r="2.6" fill="#c89870" />
+    <ellipse cx="9" cy="36" rx="7" ry="5.4" fill="#d9b48a" /><ellipse cx="5" cy="34" rx="2.6" ry="2" fill="#2a1a12" />
+    <circle cx="14" cy="28" r="2" fill="#1a1a1a" /><circle cx="13.4" cy="27.4" r=".7" fill="#fff" />
+    <ellipse cx="38" cy="32" rx="10" ry="5" fill="#a87a50" opacity=".6" />
+  {:else if name === 'schildkroete'}
+    <ellipse cx="46" cy="53" rx="38" ry="3" fill={SCHATTEN} opacity=".2" />
+    <ellipse class="bein a" cx="26" cy="46" rx="6" ry="6" fill="#8ab84a" /><ellipse class="bein b" cx="66" cy="46" rx="6" ry="6" fill="#8ab84a" />
+    <path d="M78 40 L88 44 L78 46 Z" fill="#8ab84a" />
+    <ellipse cx="14" cy="34" rx="10" ry="8" fill="#9ac85a" /><circle cx="10" cy="31" r="1.8" fill="#1a1a1a" /><path d="M5 37 q3 2 6 0" stroke="#4a7a2a" stroke-width="1.2" fill="none" />
+    <path d="M18 44 C18 16 40 8 52 8 C66 8 82 20 80 44 Z" fill="#3e8a3a" />
+    <path d="M60 10 C76 16 82 30 80 44 L66 44 C70 30 68 18 60 10 Z" fill="#2c6a2a" />
+    <path d="M36 22 l8 -6 l10 0 l6 8 l-6 8 l-12 0 Z M24 40 l6 -10 l8 2 l2 12 Z M64 36 l4 -10 l8 6 l0 12 Z" fill="#6aaa4a" />
+    <rect x="16" y="42" width="66" height="5" rx="2.5" fill="#d9c47a" />
+  {:else if name === 'pinguin'}
+    <ellipse cx="25" cy="67" rx="16" ry="2.6" fill={SCHATTEN} opacity=".2" />
+    <path d="M14 64 l-4 3 h10 Z M30 64 l-2 3 h10 Z" fill="#f08a2a" />
+    <ellipse cx="25" cy="40" rx="17" ry="25" fill="#2a2e3a" />
+    <ellipse cx="22" cy="44" rx="11" ry="19" fill="#fffaf2" />
+    <path d="M38 30 C46 40 44 52 38 56 C40 46 40 38 38 30 Z" fill="#1a1e28" />
+    <path d="M8 32 C2 40 4 48 8 50 Z" fill="#1a1e28" />
+    <circle cx="16" cy="22" r="2.2" fill="#fff" /><circle cx="15.6" cy="22" r="1.2" fill="#1a1a1a" />
+    <path d="M10 26 L2 28 L10 30 Z" fill="#f08a2a" />
+    <ellipse cx="14" cy="30" rx="2.6" ry="1.6" fill="#f2a08a" opacity=".6" />
+  {:else if name === 'elefant'}
+    <ellipse cx="54" cy="75" rx="42" ry="3" fill={SCHATTEN} opacity=".2" />
+    <rect class="bein a" x="28" y="50" width="12" height="24" rx="5" fill="#8a94a4" /><rect class="bein b" x="68" y="50" width="12" height="24" rx="5" fill="#8a94a4" />
+    <ellipse cx="60" cy="42" rx="34" ry="24" fill="#a3adbd" />
+    <path d="M80 22 C98 30 98 56 80 64 C88 54 88 34 80 22 Z" fill="#8a94a4" />
+    <path d="M94 38 q8 4 6 14" stroke="#8a94a4" stroke-width="3" fill="none" stroke-linecap="round" />
+    <circle cx="26" cy="34" r="16" fill="#a3adbd" />
+    <path d="M14 38 C8 48 6 60 12 68 C14 70 18 68 16 64 C12 58 16 50 20 44 Z" fill="#a3adbd" />
+    <ellipse cx="36" cy="34" rx="12" ry="16" fill="#8a94a4" /><ellipse cx="36" cy="34" rx="8" ry="11" fill="#e8b4b4" opacity=".6" />
+    <circle cx="20" cy="30" r="2.2" fill="#1a1a1a" /><circle cx="19.4" cy="29.4" r=".7" fill="#fff" />
+    <path d="M18 44 l-5 6" stroke="#fffaf2" stroke-width="3" stroke-linecap="round" />
+  {:else if name === 'giraffe'}
+    <ellipse cx="40" cy="107" rx="26" ry="3" fill={SCHATTEN} opacity=".2" />
+    <rect class="bein a" x="26" y="74" width="6" height="32" rx="3" fill="#e0a848" /><rect class="bein b" x="50" y="74" width="6" height="32" rx="3" fill="#e0a848" />
+    <ellipse cx="42" cy="70" rx="22" ry="14" fill="#f2c25a" />
+    <path d="M28 64 C24 46 20 30 16 18 L26 16 C30 30 34 46 38 62 Z" fill="#f2c25a" />
+    {#each [[36, 68, 5], [48, 64, 4], [52, 74, 4], [30, 74, 3.6], [24, 40, 3.4], [22, 28, 3], [28, 54, 3.4]] as [x, y, r], i (i)}<circle cx={x} cy={y} r={r} fill="#b8702a" />{/each}
+    <path d="M56 60 C64 66 64 76 54 82 C58 74 58 66 56 60 Z" fill="#d9a43a" />
+    <ellipse cx="16" cy="16" rx="11" ry="7" fill="#f2c25a" transform="rotate(-20 16 16)" />
+    <path d="M18 8 v-6 M24 9 v-6" stroke="#b8702a" stroke-width="2.4" stroke-linecap="round" /><circle cx="18" cy="2" r="2" fill="#7a4a1a" /><circle cx="24" cy="3" r="2" fill="#7a4a1a" />
+    <circle cx="14" cy="13" r="1.8" fill="#1a1a1a" /><ellipse cx="7" cy="19" rx="4" ry="3" fill="#e8b46a" />
+    <path d="M28 18 C34 30 36 46 40 62" stroke="#b8702a" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-dasharray="3 3" />
+  {:else if name === 'affe'}
+    <ellipse cx="30" cy="67" rx="20" ry="2.6" fill={SCHATTEN} opacity=".2" />
+    <path class="schwanz" d="M44 54 C60 54 62 36 52 32 C46 30 44 38 50 40" stroke="#7a4a2a" stroke-width="4" fill="none" stroke-linecap="round" />
+    <ellipse class="bein a" cx="22" cy="60" rx="5" ry="7" fill="#7a4a2a" /><ellipse class="bein b" cx="38" cy="60" rx="5" ry="7" fill="#7a4a2a" />
+    <ellipse cx="30" cy="44" rx="15" ry="16" fill="#8a5632" /><ellipse cx="28" cy="48" rx="9" ry="10" fill="#e8c49a" />
+    <circle cx="10" cy="20" r="6" fill="#8a5632" /><circle cx="10" cy="20" r="3.4" fill="#e8b48a" />
+    <circle cx="40" cy="20" r="6" fill="#8a5632" /><circle cx="40" cy="20" r="3.4" fill="#e8b48a" />
+    <circle cx="25" cy="22" r="14" fill="#8a5632" />
+    <path d="M14 22 C14 14 24 14 25 20 C26 14 36 14 36 22 C36 32 30 34 25 34 C20 34 14 32 14 22 Z" fill="#e8c49a" />
+    <circle cx="20" cy="21" r="2" fill="#1a1a1a" /><circle cx="30" cy="21" r="2" fill="#1a1a1a" />
+    <path d="M20 29 q5 4 10 0" stroke="#7a4a2a" stroke-width="1.6" fill="none" stroke-linecap="round" />
+  {:else if name === 'loewe'}
+    <ellipse cx="46" cy="67" rx="36" ry="3" fill={SCHATTEN} opacity=".2" />
+    <path class="schwanz" d="M76 40 C88 40 90 26 84 22" stroke="#d9963a" stroke-width="3.4" fill="none" stroke-linecap="round" /><circle cx="84" cy="22" r="4" fill="#9a5a1e" />
+    <rect class="bein a" x="30" y="46" width="9" height="20" rx="4" fill="#d9963a" /><rect class="bein b" x="62" y="46" width="9" height="20" rx="4" fill="#d9963a" />
+    <ellipse cx="54" cy="42" rx="26" ry="15" fill="#eab04e" />
+    <path d="M68 30 C82 36 80 52 68 56 C74 48 74 38 68 30 Z" fill="#d9963a" />
+    {#each Array.from({ length: 12 }) as _, i (i)}<ellipse cx={24 + Math.cos(i * 0.52) * 15} cy={30 + Math.sin(i * 0.52) * 15} rx="8" ry="6" fill={i % 2 ? '#b8641e' : '#9a5a1e'} transform="rotate({i * 30} {24 + Math.cos(i * 0.52) * 15} {30 + Math.sin(i * 0.52) * 15})" />{/each}
+    <circle cx="24" cy="30" r="13" fill="#eab04e" />
+    <ellipse cx="17" cy="35" rx="7" ry="5" fill="#f6d39a" /><path d="M12 31 l4 2 l-4 2 Z" fill="#6a3a1a" />
+    <circle cx="20" cy="26" r="2" fill="#1a1a1a" /><circle cx="19.4" cy="25.4" r=".7" fill="#fff" />
+  {:else if name === 'gespann'}
+    <path d="M70 40 C100 44 130 44 162 46" stroke="#7a4a2a" stroke-width="1.6" fill="none" />
+    {#each [0, 64] as dx (dx)}
+      <g transform="translate({dx} 0)">
+        <path d="M22 14 l-6 -10 M22 14 l-2 -12 M26 14 l4 -10 M26 14 l8 -8" stroke="#7a4a2a" stroke-width="2.2" stroke-linecap="round" />
+        <path class="bein a" d="M30 44 l-6 14 M50 44 l-2 14" stroke="#6a3e22" stroke-width="3.4" stroke-linecap="round" />
+        <path class="bein b" d="M36 44 l4 14 M56 44 l6 14" stroke="#6a3e22" stroke-width="3.4" stroke-linecap="round" />
+        <ellipse cx="44" cy="38" rx="18" ry="9" fill="#a8703e" />
+        <path d="M30 36 C26 28 24 22 22 18" stroke="#a8703e" stroke-width="7" stroke-linecap="round" />
+        <ellipse cx="20" cy="18" rx="8" ry="6" fill="#a8703e" /><circle cx="13" cy="19" r={dx === 0 ? 3 : 2.4} fill={dx === 0 ? '#e8302a' : '#2a1a12'} />
+        <circle cx="19" cy="15" r="1.4" fill="#1a1a1a" />
+        <ellipse cx="44" cy="42" rx="12" ry="4" fill="#e8d4b4" opacity=".7" />
+        <path d="M30 34 C36 40 52 40 58 34" stroke="#c8302a" stroke-width="2.6" fill="none" /><circle cx="44" cy="39" r="2" fill="#f2c23a" />
+      </g>
+    {/each}
+    <path d="M160 58 C170 64 230 64 248 54" stroke="#c89a3a" stroke-width="3" fill="none" stroke-linecap="round" />
+    <path d="M160 30 L232 30 C244 30 248 42 240 52 L172 52 C164 52 160 44 160 30 Z" fill="#c8302a" />
+    <path d="M200 30 L232 30 C244 30 248 42 240 52 L212 52 C224 46 222 36 200 30 Z" fill="#9a2018" />
+    <path d="M164 34 L236 34" stroke="#f2c23a" stroke-width="2.4" />
+    <path d="M226 30 C224 18 232 10 244 16 C246 22 242 30 238 30 Z" fill="#7a4a2a" />
+    <circle cx="190" cy="14" r="9" fill="#f0c8a0" /><path d="M180 12 C180 0 200 -2 202 10 Z" fill="#d6302a" /><circle cx="203" cy="10" r="3" fill="#fff" />
+    <path d="M182 18 C184 30 196 30 198 18 Z" fill="#fffaf2" />
+    <path d="M178 28 C178 22 202 22 202 28 L202 32 L178 32 Z" fill="#d6302a" />
+    <circle cx="187" cy="13" r="1.4" fill="#1a1a1a" />
   {/if}
 </svg>
 
@@ -380,6 +599,24 @@
   }
   .rad {
     animation: rollen 1.6s linear infinite;
+  }
+  .pedal {
+    transform-box: view-box;
+    transform-origin: 62px 78px;
+    animation: rollen 1.6s linear infinite;
+  }
+  .propeller {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: propeller 0.18s linear infinite alternate;
+  }
+  @keyframes propeller {
+    from {
+      transform: scaleY(1);
+    }
+    to {
+      transform: scaleY(0.15);
+    }
   }
   .puff {
     transform-box: fill-box;

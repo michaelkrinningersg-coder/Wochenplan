@@ -35,7 +35,7 @@
         krone: q(380, 385),
         stamm: q(382, 560),
         dach: [q(1104 + dx, 571), q(1190 + dx, 501), q(1276 + dx, 571)],
-        boden: [q(0, 612).y, q(0, 652).y],
+        boden: [q(0, 650).y, q(0, 672).y],
       }
     }
     const s = Math.max(breite / 160, hoehe / 90)

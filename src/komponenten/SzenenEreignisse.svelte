@@ -287,8 +287,28 @@
   ]
   /** Bodenstellen für Wachsendes (gleichmäßig verteilt, leicht zufällig) */
   function stellen(e: Ereignis, n: number) {
+    // Baumstamm und Haus aussparen, damit nichts auf dem Haus wächst
+    const sperren = [
+      [orte.stamm.x - 4, orte.stamm.x + 4],
+      [Math.min(...orte.dach.map((d) => d.x)) - 3, Math.max(...orte.dach.map((d) => d.x)) + 3],
+    ].sort((a, b) => a[0] - b[0])
+    const frei: [number, number][] = []
+    let start = 6
+    for (const [von, bis] of sperren) {
+      if (von > start) frei.push([start, Math.min(von, 94)])
+      start = Math.max(start, bis)
+    }
+    if (start < 94) frei.push([start, 94])
+    const laenge = frei.reduce((summe, [a, b]) => summe + (b - a), 0)
+    const aufX = (d: number) => {
+      for (const [a, b] of frei) {
+        if (d <= b - a) return a + d
+        d -= b - a
+      }
+      return frei[frei.length - 1][1]
+    }
     return Array.from({ length: n }, (_, i) => ({
-      x: 8 + (i + e.zufall[i % 12] * 0.8) * (84 / n),
+      x: aufX(((i + 0.2 + e.zufall[i % 12] * 0.6) / n) * laenge),
       y: orte.boden[0] + ((i * 7) % 5) * ((orte.boden[1] - orte.boden[0]) / 4),
     }))
   }
@@ -324,8 +344,7 @@
     const flaeche = ev.currentTarget as HTMLElement
     const r = flaeche.getBoundingClientRect()
     const glitzer = document.createElement('span')
-    glitzer.className = 'glitzer'
-    glitzer.textContent = art === 'platzen' ? '💥' : '✨'
+    glitzer.className = art === 'platzen' ? 'glitzer knall' : 'glitzer'
     glitzer.style.left = `${ev.clientX - r.left}px`
     glitzer.style.top = `${ev.clientY - r.top}px`
     flaeche.appendChild(glitzer)
@@ -337,7 +356,7 @@
 
   const BALLON_FARBEN = ['#e8452b', '#3b8fd6', '#f2b33d', '#4caf50', '#b07cff', '#ff5d8f']
   const EIER = ['#ff8fb1', '#7fd3ff', '#ffd84a', '#9be37a', '#c7a2ff']
-  const WOCHENTIERE = ['🐻', '🐢', '🐧', '🐘', '🦒', '🐒', '🦁'] // So, Mo, Di, …
+  const WOCHENTIERE = ['baer', 'schildkroete', 'pinguin', 'elefant', 'giraffe', 'affe', 'loewe'] // So, Mo, Di, …
   const FEUER = ['#ff5d5d', '#ffd84a', '#5dd6ff', '#7dff7a', '#ff8fe0', '#ffffff']
   /** Bogenflug (Wurf) von der Seite zu einem Ziel */
   function wurf(e: Ereignis, zielX: number, zielY: number, hoehe = 30): Keyframe[] {
@@ -420,7 +439,7 @@
         </div>
       {:else if e.id === 'rentiere'}
         <div class="ding gespann" data-spiel="hops" use:animiere={{ k: flug(e, [6, 24], 4, 8, 6), dauer: zufall(14000, 18000) }}>
-          <span class="figur emoji reihe">🦌🦌🛷🎅</span>
+          <span class="figur emoji"><GemalteFigur name="gespann" groesse={1.5} /></span>
         </div>
 
       <!-- ================= Aufsteigen ================= -->
@@ -533,7 +552,7 @@
       {:else if e.id === 'hahn'}
         {@const x = 12 + e.zufall[0] * 70}
         <div class="ding" data-spiel="hops" style="left: {x}%; top: {orte.boden[0]}%" use:animiere={{ k: sichtbar(0.05, 0.9), dauer: 9000 }}>
-          <span class="figur emoji">🐓</span>
+          <span class="figur emoji"><GemalteFigur name="hahn" /></span>
           <span class="blase-text" style="animation-delay: 1.4s">{t('Kikeriki!')}</span>
         </div>
 
@@ -933,8 +952,8 @@
           <div class="flash"></div>
         </div>
       {:else if e.id === 'fahrrad'}
-        <div class="ding" data-spiel="hops" use:animiere={{ k: boden(e, 0, 8), dauer: 9000 }}>
-          <span class="figur emoji gross">🚴</span>
+        <div class="ding" data-spiel="hops" use:animiere={{ k: boden(e, 0, 8).map((f) => ({ ...f, transform: 'none' })), dauer: 9000 }}>
+          <span class="figur emoji" style="transform: scaleX({e.links ? -1 : 1})"><GemalteFigur name="radler" /></span>
           <span class="blase-text" style="animation-delay: 2s">{t('Kling kling!')}</span>
         </div>
       {:else if e.id === 'picknick'}
@@ -1100,8 +1119,8 @@
       {:else if e.id === 'nikolaus'}
         <div class="ding stiefel" data-spiel="hops" style="left: {orte.dach[1].x}%; top: {orte.boden[0] + 1}%" use:animiere={{ k: sichtbar(0.03, 0.92), dauer: 11000 }}>
           <span class="figur stapel">
-            <span class="emoji gross">👢</span>
-            {#each ['🍫', '🍊', '🍬', '🥜'] as z, i (i)}<span class="emoji klein huepfend" style="animation-delay: {1 + i * 0.6}s; --dx: {(i - 1.5) * 18}px">{z}</span>{/each}
+            <span class="emoji gross"><GemalteFigur name="stiefel" /></span>
+            {#each ['schokolade', 'orange', 'bonbon', 'nuss'] as z, i (i)}<span class="emoji klein huepfend" style="animation-delay: {1 + i * 0.6}s; --dx: {(i - 1.5) * 18}px"><GemalteFigur name={z} groesse={1} /></span>{/each}
           </span>
         </div>
       {:else if e.id === 'feuerwerk'}
@@ -1144,13 +1163,13 @@
         {@const c = countdowns(14)[0]}
         <div class="ding banner" data-spiel="hops" use:animiere={{ k: flug(e, [8, 22], 2, 6, 2).map((f) => ({ ...f, transform: 'none' })), dauer: 16000 }}>
           <span class="figur reihe banner-zug">
-            {#if e.links}<span class="banner-tuch">{t('Noch {n}× schlafen: {titel}', { n: c?.tage ?? 0, titel: c?.titel ?? '' })}</span><span class="emoji" style="transform: scaleX(-1)">✈️</span>
-            {:else}<span class="emoji">✈️</span><span class="banner-tuch">{t('Noch {n}× schlafen: {titel}', { n: c?.tage ?? 0, titel: c?.titel ?? '' })}</span>{/if}
+            {#if e.links}<span class="banner-tuch">{t('Noch {n}× schlafen: {titel}', { n: c?.tage ?? 0, titel: c?.titel ?? '' })}</span><span class="emoji" style="transform: scaleX(-1)"><GemalteFigur name="flugzeug" /></span>
+            {:else}<span class="emoji"><GemalteFigur name="flugzeug" /></span><span class="banner-tuch">{t('Noch {n}× schlafen: {titel}', { n: c?.tage ?? 0, titel: c?.titel ?? '' })}</span>{/if}
           </span>
         </div>
       {:else if e.id === 'wochentier'}
         <div class="ding" data-spiel="hops" use:animiere={{ k: boden(e, 2, 18), dauer: 16000 }}>
-          <span class="figur emoji gross">{WOCHENTIERE[new Date(app.jetzt).getDay()]}</span>
+          <span class="figur emoji gross"><GemalteFigur name={WOCHENTIERE[new Date(app.jetzt).getDay()]} /></span>
         </div>
       {:else if e.id === 'schaefchen'}
         {@const x = 30 + e.zufall[0] * 40}
@@ -1158,18 +1177,18 @@
           <span class="zaun" style="left: {x}%; top: {orte.boden[1] - 1}%"></span>
           {#each [0, 1, 2, 3] as i (i)}
             <div class="ding" data-spiel="hops" use:animiere={{ k: [pos(e.links ? -8 : 108, orte.boden[1] - 2), { ...pos(x - (e.links ? 6 : -6), orte.boden[1] - 2), offset: 0.4 }, { ...pos(x, orte.boden[1] - 16), offset: 0.5 }, { ...pos(x + (e.links ? 6 : -6), orte.boden[1] - 2), offset: 0.6 }, pos(e.links ? 108 : -8, orte.boden[1] - 2)], dauer: 9000, verz: i * 2000, ende: false }}>
-              <span class="figur emoji">🐑</span>
+              <span class="figur emoji"><GemalteFigur name="schaf" /></span>
             </div>
           {/each}
-          <span class="zzz" style="left: {x}%; top: {orte.boden[0] - 22}%">1, 2, 3 … 💤</span>
+          <span class="zzz" style="left: {x}%; top: {orte.boden[0] - 22}%">1, 2, 3 … Zzz</span>
         </div>
       {:else if e.id === 'sonnenaufgang'}
         <div class="flaeche" use:animiere={{ k: [{ opacity: 1 }, { opacity: 1 }], dauer: 14000 }}>
           <div class="ding aufgehen" data-spiel="hops" use:animiere={{ k: [{ ...pos(e.links ? 22 : 78, orte.boden[0] + 4), opacity: 0 }, { ...pos(e.links ? 22 : 78, orte.boden[0] + 2), opacity: 1, offset: 0.1 }, { ...pos(e.links ? 24 : 76, orte.boden[0] - 30), opacity: 1, offset: 0.85 }, { ...pos(e.links ? 24 : 76, orte.boden[0] - 30), opacity: 0 }], dauer: 14000, easing: 'ease-out', ende: false }}>
             <span class="figur sonne-gross"></span>
           </div>
-          {#each ['🎵', '🎶', '🐦', '🎵'] as z, i (i)}
-            <span class="note" style="left: {orte.krone.x + (i - 1.5) * 4}%; top: {orte.krone.y - 6}%; animation-delay: {3 + i * 1.2}s">{z}</span>
+          {#each ['note', 'noten', 'vogel', 'note'] as z, i (i)}
+            <span class="note" style="left: {orte.krone.x + (i - 1.5) * 4}%; top: {orte.krone.y - 6}%; animation-delay: {3 + i * 1.2}s"><GemalteFigur name={z} groesse={z === 'vogel' ? 0.9 : 1} /></span>
           {/each}
         </div>
       {:else if e.id === 'fensterfoto'}
@@ -1183,24 +1202,24 @@
             {#each Array.from({ length: 18 }) as _, i (i)}
               <span class="luftschlange" style="left: {(i * 23) % 100}%; background: {BALLON_FARBEN[i % 6]}; animation-delay: {(i % 9) * 0.5}s"></span>
             {/each}
-            <span class="feier-text">{t('Helau! Alaaf! 🎭')}</span>
+            <span class="feier-text">{t('Helau! Alaaf!')}</span>
           {:else if heuteFeiertag === 'muttertag' || heuteFeiertag === 'vatertag'}
             <div class="ding" data-spiel="platzen" use:animiere={{ k: Array.from({ length: 7 }, (_, j) => ({ left: `${50 + Math.sin(j) * 6}%`, top: `${108 - (j / 6) * 125}%` })), dauer: 14000, ende: false }}>
-              <span class="figur emoji riesig">❤️</span>
+              <span class="figur emoji riesig"><GemalteFigur name="herz" /></span>
             </div>
             <span class="feier-text">{heuteFeiertag === 'muttertag' ? t('Alles Liebe zum Muttertag!') : t('Alles Liebe zum Vatertag!')}</span>
           {:else if heuteFeiertag === 'einschulung'}
             <div class="ding" data-spiel="hops" style="left: 50%; top: {orte.boden[0] - 8}%" use:animiere={{ k: wachsen(0, 0.92), dauer: 14000, ende: false }}>
-              <span class="figur emoji riesig">🎒</span>
+              <span class="figur emoji riesig"><GemalteFigur name="ranzen" /></span>
             </div>
-            <span class="feier-text">{t('Hurra, Schulanfang! 🎉')}</span>
+            <span class="feier-text">{t('Hurra, Schulanfang!')}</span>
           {:else}
             {#each [0, 1, 2, 3] as i (i)}
               <div class="ding laterne" data-spiel="hops" use:animiere={{ k: boden(e, 0, 10).map((f) => ({ ...f, top: `${orte.boden[0] - 6}%`, transform: 'none' })), dauer: 13000, verz: i * 1200, ende: false }}>
-                <span class="figur pendel"><span class="stab"></span><span class="emoji">🏮</span></span>
+                <span class="figur pendel"><span class="stab"></span><span class="emoji"><GemalteFigur name="laterne" /></span></span>
               </div>
             {/each}
-            <span class="feier-text">{t('Laterne, Laterne … 🏮')}</span>
+            <span class="feier-text">{t('Laterne, Laterne …')}</span>
           {/if}
         </div>
       {/if}
@@ -2272,9 +2291,18 @@
   :global(.ereignisse .glitzer) {
     position: absolute;
     translate: -50% -50%;
-    font-size: 40px;
+    width: 46px;
+    height: 46px;
+    background: radial-gradient(circle, #fffbe0 20%, #ffd84a 60%);
+    clip-path: polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%);
     pointer-events: none;
     animation: glitzer 0.9s ease-out forwards;
+  }
+  :global(.ereignisse .glitzer.knall) {
+    width: 60px;
+    height: 60px;
+    background: radial-gradient(circle, #fff3c0 15%, #ffb02e 50%, #e8452b 75%);
+    clip-path: polygon(50% 0, 58% 30%, 85% 15%, 70% 42%, 100% 50%, 70% 58%, 85% 85%, 58% 70%, 50% 100%, 42% 70%, 15% 85%, 30% 58%, 0 50%, 30% 42%, 15% 15%, 42% 30%);
   }
 
   @keyframes hops {
