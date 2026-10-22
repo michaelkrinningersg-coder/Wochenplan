@@ -31,6 +31,12 @@ Jedes Motiv wird als eigene SVG-Figur in `src/komponenten/GemalteFigur.svelte` g
   (füllende Boxen: `fuellen`); Karten in `Ruhebild.svelte` über die Zuordnung `GEMALT`.
 - **Prüfen:** Galerie aller Figuren kurz per Playwright rendern (temporäre Seite, danach löschen) und als Bild ansehen.
 
+## Bildauswahl (Kategorien)
+- Selbst gezeichnete, leicht bewegte Bilder liegen als SVG in `src/assets/gemalt/` (Kennung `g-…`),
+  erzeugt aus `tools/gemalt/b1.py`–`b4.py` mit `python3 tools/gemalt/erzeugen.py` (schreibt auch `src/lib/gemaltliste.ts`).
+- Gleiche Stilregeln wie oben; Bild 100×100, Boden bei y ≈ 92, Bewegung über die Art (`wackeln`, `atmen`, `schweben` …).
+- Namen in `src/lib/i18n/woerter-gemalt.ts` übersetzen; sie erscheinen in jeder Kategorie vor den älteren Fluent-Symbolen.
+
 ## Szenen mit Motion Graphics
 - Je Jahreszeit eine Landschaft (`src/komponenten/Landschaft.svelte`, Ausstattung je Jahreszeit in `SAISON`): Bild 1600×900,
   Ebenen mit leichter Parallaxe (`.ebene`, `--tiefe`), Nebel, ziehende Wolken, Baumkrone aus Büscheln,

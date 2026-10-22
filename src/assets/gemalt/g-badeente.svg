@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><style>.k{animation:s 2.2s ease-in-out infinite alternate}@keyframes s{from{transform:translateY(2px)}to{transform:translateY(-3px)}}.schein{animation:sch 1.8s ease-in-out infinite alternate}@keyframes sch{from{opacity:.15}to{opacity:.45}}.schwing{animation:sw 1.8s ease-in-out infinite alternate}@keyframes sw{from{transform:rotate(-14deg)}to{transform:rotate(14deg)}}.dreh{animation:dr 2s ease-in-out infinite alternate}@keyframes dr{from{transform:scaleX(1)}to{transform:scaleX(-1)}}.flamme{animation:fl .5s ease-in-out infinite alternate}@keyframes fl{to{transform:scale(.9,1.1) rotate(3deg)}}.funkel{animation:fu 1.4s ease-in-out infinite alternate}@keyframes fu{from{opacity:.4}}@media (prefers-reduced-motion:reduce){*{animation:none!important}}</style><ellipse cx="50" cy="94" rx="34" ry="3.6" fill="#3a2414" opacity=".13"/><g class="k"><path d="M14 84 Q50 96 88 84" stroke="#9fd8ff" stroke-width="5" fill="none" stroke-linecap="round"/>
+ <path d="M24 62 C22 80 40 88 58 86 C78 84 86 72 84 60 C70 66 54 64 46 58 Z" fill="#ffd23a"/>
+ <path d="M66 62 C78 64 84 60 84 60 C86 72 78 84 58 86 C70 80 72 70 66 62 Z" fill="#e8b020"/>
+ <path d="M76 60 C82 54 90 54 92 58 C88 62 82 64 78 64 Z" fill="#ffd23a"/>
+ <circle cx="38" cy="40" r="18" fill="#ffd23a"/><path d="M48 26 C58 34 56 50 44 56 C50 46 50 36 48 26 Z" fill="#e8b020"/>
+ <path d="M18 42 C12 42 8 46 10 50 C16 50 20 48 22 46 Z" fill="#f08a2a"/>
+ <circle cx="31" cy="36" r="3.4" fill="#2a1a12"/><circle cx="30" cy="35" r="1.2" fill="#fff"/>
+ <ellipse cx="28" cy="44" rx="4" ry="2.4" fill="#ff8a7a" opacity=".6"/><ellipse cx="34" cy="28" rx="6" ry="3.6" fill="#fff4b8" opacity=".7"/>
+ <circle cx="80" cy="30" r="5" fill="#fff" stroke="#bfe3ff" stroke-width="1.5"/><circle cx="88" cy="20" r="3" fill="#fff" stroke="#bfe3ff" stroke-width="1.2"/><circle cx="72" cy="18" r="2.4" fill="#fff" stroke="#bfe3ff" stroke-width="1"/></g></svg>

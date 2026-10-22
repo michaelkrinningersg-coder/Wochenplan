@@ -6,6 +6,13 @@ const dateien = import.meta.glob('../assets/icons/*.svg', {
   import: 'default',
 }) as Record<string, string>
 
+// Selbst gezeichnete, leicht bewegte Bilder (SVG)
+const gemalt = import.meta.glob('../assets/gemalt/*.svg', {
+  eager: true,
+  query: '?url',
+  import: 'default',
+}) as Record<string, string>
+
 // Gemalte Bildkarten (WebP) ersetzen gleichnamige Symbole
 const karten = import.meta.glob('../assets/karten/*.webp', {
   eager: true,
@@ -27,6 +34,9 @@ for (const [pfad, url] of Object.entries(kartenM)) {
 export const ICON_URL: Record<string, string> = {}
 export const IST_KARTE = new Set<string>()
 for (const [pfad, url] of Object.entries(dateien)) {
+  ICON_URL[pfad.split('/').pop()!.replace(/\.svg$/, '')] = url
+}
+for (const [pfad, url] of Object.entries(gemalt)) {
   ICON_URL[pfad.split('/').pop()!.replace(/\.svg$/, '')] = url
 }
 for (const [pfad, url] of Object.entries(karten)) {

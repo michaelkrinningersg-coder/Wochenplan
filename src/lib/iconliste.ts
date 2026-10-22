@@ -1,10 +1,14 @@
 // Automatisch erzeugt: Auswahl aus Microsoft Fluent Emoji (Flat), MIT-Lizenz – siehe src/assets/icons/LICENSE-fluentui-emoji.txt
 
+import { GEMALT_LIST } from './gemaltliste'
+
 export interface IconInfo { id: string; name: string; group: string }
 
 export const ICON_GROUPS: string[] = ["Bad", "Anziehen", "Essen", "Spielen", "Abend", "Unterwegs", "Einkaufen", "Leute"];
 
 export const ICON_LIST: IconInfo[] = [
+  // selbst gezeichnete Bilder zuerst
+  ...GEMALT_LIST,
   { id: "zaehne", name: "Zähne putzen", group: "Bad" },
   { id: "zahn", name: "Zahn", group: "Bad" },
   { id: "waschen", name: "Hände waschen", group: "Bad" },
