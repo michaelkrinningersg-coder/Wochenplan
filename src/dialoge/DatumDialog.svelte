@@ -70,7 +70,7 @@
           {/each}
         </div>
         {#if app.plan.vorlagen.length === 0}
-          <p class="leise">{t('Tagesvorlagen (z. B. Ferien, Krank) legst du in der Wochenansicht über das Kopier-Symbol eines Tages an.')}</p>
+          <p class="leise">{t('Vorlagen wie „Ferien“ legst du in der Wochenansicht über das Kopier-Symbol eines Tages an.')}</p>
         {/if}
       </section>
     {/if}

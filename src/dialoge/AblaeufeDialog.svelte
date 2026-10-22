@@ -124,7 +124,7 @@
   <div class="inhalt">
     <section>
       <h3>{t('Gespeicherte Abläufe')}</h3>
-      <p class="hilfe">{t('Ein Ablauf ist ein ganzer Tag (z. B. „Kita-Tag“, „Ferien“, „Wochenende“, „Krank“).')}</p>
+      <p class="hilfe">{t('Ein Ablauf ist ein ganzer Tag, z. B. „Kita-Tag“ oder „Ferien“.')}</p>
       {#if app.plan.vorlagen.length}
         <ul class="liste">
           {#each app.plan.vorlagen as v (v.id)}
@@ -142,12 +142,17 @@
       {:else}
         <p class="hilfe">{t('Noch keine Abläufe gespeichert.')}</p>
       {/if}
-      <div class="reihe neu">
-        <input type="text" bind:value={neuName} placeholder={t('Name, z. B. Ferien')} maxlength="40" aria-label={t('Name des neuen Ablaufs')} />
-        <span class="name zeile">{t('aus')}</span>
-        <select bind:value={neuAus} aria-label={t('Ablauf übernehmen von')}>
-          {#each TAGE as tg (tg.id)}<option value={tg.id}>{t(tg.lang)}</option>{/each}
-        </select>
+      <div class="formular neu">
+        <label class="feld">
+          <span class="name">{t('Neuer Ablauf')}</span>
+          <input type="text" bind:value={neuName} placeholder={t('Name, z. B. Ferien')} maxlength="40" />
+        </label>
+        <label class="feld">
+          <span class="name">{t('Aufgaben von')}</span>
+          <select bind:value={neuAus}>
+            {#each TAGE as tg (tg.id)}<option value={tg.id}>{t(tg.lang)}</option>{/each}
+          </select>
+        </label>
         <button class="knopf haupt" onclick={speichernAus} disabled={!neuName.trim()}><Symbol name="plus" />{t('Speichern')}</button>
       </div>
     </section>
@@ -185,12 +190,18 @@
 
     <section>
       <h3>{t('Einzelnes Datum')}</h3>
-      <div class="reihe">
-        <input type="date" bind:value={datum} aria-label={t('Datum')} />
-        <select bind:value={datumWahl} aria-label={t('Ablauf für dieses Datum')}>
-          <option value="">{t('Normaler Wochentag')}</option>
-          {#each app.plan.vorlagen as v (v.id)}<option value={v.id}>{v.name}</option>{/each}
-        </select>
+      <div class="formular">
+        <label class="feld">
+          <span class="name">{t('Datum')}</span>
+          <input type="date" bind:value={datum} />
+        </label>
+        <label class="feld">
+          <span class="name">{t('Ablauf')}</span>
+          <select bind:value={datumWahl}>
+            <option value="">{t('Normaler Wochentag')}</option>
+            {#each app.plan.vorlagen as v (v.id)}<option value={v.id}>{v.name}</option>{/each}
+          </select>
+        </label>
         <button class="knopf haupt" onclick={datumUebernehmen}><Symbol name="haken" />{t('Übernehmen')}</button>
       </div>
       {#if zuordnungen.length}
@@ -272,8 +283,24 @@
     color: var(--tinte-leise);
     white-space: nowrap;
   }
-  .neu input {
-    flex: 1 1 12em;
+  .formular {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1.3fr) auto;
+    align-items: end;
+    gap: 10px;
+  }
+  .formular input,
+  .formular select {
+    width: 100%;
+  }
+  @media (max-width: 560px) {
+    .formular {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .formular .knopf {
+      grid-column: 1 / -1;
+      justify-self: start;
+    }
   }
   input[type='text'],
   input[type='date'],

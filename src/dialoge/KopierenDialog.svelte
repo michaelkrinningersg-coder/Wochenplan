@@ -100,7 +100,7 @@
 
     <section class="vorlagen">
       <h3>{t('Tagesvorlagen')}</h3>
-      <p class="erklaerung">{t('Z. B. „Kita-Tag“, „Wochenende“, „Ferien“ oder „Krank“. Speichere den Ablauf von {tag} als Vorlage oder übernimm eine Vorlage für {tag}. Im Kalender kannst du eine Vorlage auch für ein einzelnes Datum wählen.', { tag: t(tagName(tag)) })}</p>
+      <p class="erklaerung">{t('Den Ablauf von {tag} als Vorlage speichern, z. B. „Kita-Tag“ oder „Ferien“, oder eine Vorlage übernehmen.', { tag: t(tagName(tag)) })}</p>
       <div class="wahl">
         <input id="vorlage-name" type="text" bind:value={vorlageName} placeholder={t('Name der Vorlage')} maxlength="40" autocomplete="off" />
         <button class="knopf" disabled={!vorlageName.trim()} onclick={alsVorlageSpeichern}><Symbol name="plus" />{t('Als Vorlage speichern')}</button>

@@ -77,20 +77,24 @@
     <div class="kopf">
       <span class="vorschau"><Bild id={vorschau} /></span>
       <label class="feld">
-        <span class="name">{t('Name (Standard: {name})', { name: t(info.grundName) })}</span>
+        <span class="name">{t('Name')}</span>
         <input id="abschnitt-name" type="text" bind:value={name} placeholder={t(info.grundName)} maxlength="30" autocomplete="off" />
       </label>
     </div>
 
     <div class="reihe zeiten">
-      <span class="name zeile">{t('von')}</span>
-      <ZeitWahl bind:wert={app.plan.zeiten[abId]} label={t('{name} von', { name: t(info.name) })} />
-      <span class="name zeile">{t('bis')}</span>
-      {#if naechster}
-        <ZeitWahl bind:wert={app.plan.zeiten[naechster.id]} label={t('{name} bis', { name: t(info.name) })} />
-      {:else}
-        <span class="name">{t('Aufstehen am nächsten Tag')}</span>
-      {/if}
+      <div class="zeitfeld">
+        <span class="name">{t('von')}</span>
+        <ZeitWahl bind:wert={app.plan.zeiten[abId]} label={t('{name} von', { name: t(info.name) })} />
+      </div>
+      <div class="zeitfeld">
+        <span class="name">{t('bis')}</span>
+        {#if naechster}
+          <ZeitWahl bind:wert={app.plan.zeiten[naechster.id]} label={t('{name} bis', { name: t(info.name) })} />
+        {:else}
+          <span class="bis-auto">{t('Aufstehen am nächsten Tag')}</span>
+        {/if}
+      </div>
     </div>
 
     <div class="feld">
@@ -193,6 +197,21 @@
     background: var(--himmel);
     color: var(--tinte);
     font: inherit;
+  }
+  .zeiten {
+    gap: 12px 28px;
+  }
+  .zeitfeld {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .bis-auto {
+    display: flex;
+    align-items: center;
+    min-height: 2.6em;
+    font-weight: 700;
+    color: var(--tinte-leise);
   }
   .bildwahl {
     display: grid;

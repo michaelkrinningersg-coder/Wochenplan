@@ -5,7 +5,8 @@
   import { zurueck } from '../lib/speicher.svelte'
   import Symbol from './Symbol.svelte'
 
-  let { titel, breit = false, children }: { titel: string; breit?: boolean; children: Snippet } = $props()
+  /** hoch: feste Höhe, damit der Dialog beim Wechsel von Reitern nicht springt */
+  let { titel, breit = false, hoch = false, children }: { titel: string; breit?: boolean; hoch?: boolean; children: Snippet } = $props()
 
   let el: HTMLDialogElement
 
@@ -18,6 +19,7 @@
 <dialog
   bind:this={el}
   class:breit
+  class:hoch
   aria-label={titel}
   oncancel={(e) => {
     e.preventDefault()
@@ -52,6 +54,12 @@
   }
   dialog.breit {
     width: min(980px, calc(100vw - 24px));
+  }
+  dialog.hoch {
+    height: min(860px, calc(100vh - 24px));
+  }
+  dialog.hoch .rahmen {
+    height: 100%;
   }
   dialog::backdrop {
     background: rgba(20, 26, 50, 0.55);

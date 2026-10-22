@@ -55,7 +55,7 @@
   }
 </script>
 
-<header class="kopfzeile">
+<header class="kopfzeile" class:bearbeiten={app.bearbeiten}>
   <div class="links">
     {#if !istStart}
       <button class="knopf rund zurueck" onclick={() => zurueck()} aria-label={t('Zurück')}><Symbol name="zurueck" /></button>
@@ -146,8 +146,8 @@
       <button class="knopf rund" onclick={() => (app.dialog = { art: 'einstellungen' })} aria-label={t('Einstellungen')}>
         <Symbol name="zahnrad" />
       </button>
-      <button class="knopf haupt" onclick={() => ((app.bearbeiten = false), (app.verschieben = null))}>
-        <Symbol name="haken" />{t('Fertig')}
+      <button class="knopf haupt fertig" onclick={() => ((app.bearbeiten = false), (app.verschieben = null))} aria-label={t('Fertig')}>
+        <Symbol name="haken" /><span class="fertig-wort">{t('Fertig')}</span>
       </button>
     {:else if planer}
       <button class="knopf rund" onclick={() => (app.dialog = { art: 'einstellungen' })} aria-label={t('Einstellungen')}>
@@ -302,10 +302,42 @@
       font-size: var(--t-gross);
     }
   }
+  /* im Bearbeiten-Modus ist es enger: Wörter der Ansichtsknöpfe früher ausblenden, damit der Titel ganz bleibt */
+  @media (max-width: 1440px) {
+    .kopfzeile.bearbeiten .wort {
+      display: none;
+    }
+    .kopfzeile.bearbeiten .wechsel .knopf {
+      padding: 0;
+      width: 2.6em;
+    }
+  }
   @media (max-width: 480px) {
     .kopfzeile {
       flex-wrap: wrap;
+      row-gap: 6px;
       padding-block: 8px;
+    }
+    .rechts {
+      width: 100%;
+      justify-content: space-between;
+      gap: 4px;
+    }
+    .rechts :global(.knopf.rund),
+    .wechsel .knopf {
+      width: 2.3em;
+      height: 2.3em;
+      min-height: 0;
+    }
+    .uhr {
+      min-width: 0;
+      padding: 2px 4px;
+    }
+    .fertig {
+      padding-inline: 0.7em;
+    }
+    .fertig-wort {
+      display: none;
     }
   }
 </style>

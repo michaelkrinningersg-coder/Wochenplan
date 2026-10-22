@@ -32,6 +32,11 @@ import { FREI_MAX_KACHELN, istPro } from '../lib/lizenz.svelte'
   })
   let ruheUnter = $state<'wann' | 'bild'>('wann')
 
+  /** gewählten Reiter beim Öffnen in die Mitte der (auf dem Handy scrollbaren) Reiterleiste holen */
+  function aktivenReiterZeigen(el: HTMLElement) {
+    const k = el.querySelector<HTMLElement>('[aria-selected="true"]')
+    if (k) el.scrollLeft = k.offsetLeft - (el.clientWidth - k.offsetWidth) / 2
+  }
   // Reiter
   const REITER = [
     { id: 'geraet', name: 'Gerät' },
@@ -180,11 +185,19 @@ import { FREI_MAX_KACHELN, istPro } from '../lib/lizenz.svelte'
   <button class="knopf klein" aria-pressed={!wert} onclick={() => setze(false)}>{t('Aus')}</button>
 {/snippet}
 
-<Fenster titel={t('Einstellungen')} breit>
+<Fenster titel={t('Einstellungen')} breit hoch>
   <div class="einstellungen">
-    <div class="reiter" role="tablist" aria-label={t('Bereiche der Einstellungen')}>
+    <div class="reiter" role="tablist" aria-label={t('Bereiche der Einstellungen')} use:aktivenReiterZeigen>
       {#each REITER as r (r.id)}
-        <button class="reiter-knopf" role="tab" aria-selected={reiter === r.id} onclick={() => (reiter = r.id)}>{t(r.name)}</button>
+        <button
+          class="reiter-knopf"
+          role="tab"
+          aria-selected={reiter === r.id}
+          onclick={(ev) => {
+            reiter = r.id
+            ;(ev.currentTarget as HTMLElement).scrollIntoView({ block: 'nearest', inline: 'center' })
+          }}>{t(r.name)}</button
+        >
       {/each}
     </div>
     {#if reiter === 'geraet'}
@@ -326,7 +339,7 @@ import { FREI_MAX_KACHELN, istPro } from '../lib/lizenz.svelte'
         </div>
       </div>
       <div class="z">
-        <span class="zl">{t('Töne (inkl. Countdown-Piepen)')}</span>
+        <span class="zl">{t('Töne')}</span>
         <div class="zr">{@render schalter(app.einst.ton, (v) => (app.einst.ton = v))}</div>
       </div>
       <div class="z">
@@ -353,8 +366,9 @@ import { FREI_MAX_KACHELN, istPro } from '../lib/lizenz.svelte'
         <div class="zr">{@render schalter(app.einst.vorlesen, (v) => (app.einst.vorlesen = v))}</div>
       </div>
       <div class="z">
-        <span class="zl">{t('Zeit ansagen (10 / 5 / 1 Min)')}</span>
+        <span class="zl">{t('Restzeit ansagen')}</span>
         <div class="zr">{@render schalter(app.einst.zeitAnsagen !== false, (v) => (app.einst.zeitAnsagen = v))}</div>
+        <p class="zh">{t('10, 5 und 1 Minute vor Ablauf des Timers.')}</p>
       </div>
     </section>
 
@@ -375,8 +389,11 @@ import { FREI_MAX_KACHELN, istPro } from '../lib/lizenz.svelte'
             </div>
           </div>
         {:else if stimmenGeladen}
-          <p class="zh">{t('Auf diesem Gerät ist keine deutsche Stimme installiert. In den Android-Einstellungen unter „Sprachausgabe“ die Google-Sprachausgabe mit Deutsch installieren.')}</p>
-          <div class="zr"><button class="knopf klein" onclick={probeSprechen}><Symbol name="lautsprecher" />{t('Probe hören')}</button></div>
+          <div class="z">
+            <span class="zl">{t('Stimme')}</span>
+            <div class="zr"><button class="knopf klein" onclick={probeSprechen}><Symbol name="lautsprecher" />{t('Probe hören')}</button></div>
+            <p class="zh">{t('Keine deutsche Stimme gefunden. In Android unter „Sprachausgabe“ die Google-Sprachausgabe mit Deutsch installieren.')}</p>
+          </div>
         {/if}
         <div class="z">
           <span class="zl">{t('Tempo')}</span>
@@ -391,7 +408,7 @@ import { FREI_MAX_KACHELN, istPro } from '../lib/lizenz.svelte'
     {:else if reiter === 'tag'}
     <section>
       <h3>{t('Tagesabläufe')}</h3>
-      <p class="hilfe">{t('Abläufe wie „Kita-Tag“, „Ferien“ oder „Wochenende“ speichern und einer Woche (Mo–Fr, Sa, So getrennt) oder einem Datum zuordnen. Tage kopieren.')}</p>
+      <p class="hilfe">{t('Ganze Tage wie „Kita-Tag“ oder „Ferien“ speichern und Wochen oder einzelnen Tagen zuordnen.')}</p>
       <div class="reihe">
         <button class="knopf haupt" onclick={() => (app.dialog = { art: 'ablaeufe' })}><Symbol name="kalender" />{t('Tagesabläufe und Wochen')}</button>
       </div>
@@ -399,7 +416,7 @@ import { FREI_MAX_KACHELN, istPro } from '../lib/lizenz.svelte'
 
     <section>
       <h3>{t('Tageszeiten')}</h3>
-      <p class="hilfe">{t('Tippe auf Bild oder Namen, um eine Tageszeit umzubenennen, ihr ein Bild oder eine Farbe zu geben. Jeder Abschnitt endet, wenn der nächste beginnt. Änderst du ein „bis“, verschiebt sich der Beginn des nächsten Abschnitts mit. Die letzte Tageszeit dauert bis zum Aufstehen am nächsten Tag.')}</p>
+      <p class="hilfe">{t('Tippe auf eine Tageszeit, um Name, Bild oder Farbe zu ändern. Jede Tageszeit endet, wenn die nächste beginnt.')}</p>
       <div class="reihe">
         <button class="knopf haupt klein" onclick={() => {
             const neu = abschnittAnlegen()
@@ -410,11 +427,16 @@ import { FREI_MAX_KACHELN, istPro } from '../lib/lizenz.svelte'
         {#each ABSCHNITTE as ab, i (ab.id)}
           {@const naechster = ABSCHNITTE[i + 1]}
           <div class="zeit" data-seg={segVon(ab.id)}>
-            <button class="zeit-name" onclick={() => (app.dialog = { art: 'abschnittBild', id: ab.id })} aria-label={t('{name}: Name und Bild ändern', { name: t(ab.name) })}>
-              <span class="zeit-bild"><Bild id={ab.bild} /></span>
-              <span>{t(ab.name)}</span>
-              <Symbol name="stift" />
-            </button>
+            <div class="zeit-kopf">
+              <button class="zeit-name" onclick={() => (app.dialog = { art: 'abschnittBild', id: ab.id })} aria-label={t('{name}: Name und Bild ändern', { name: t(ab.name) })}>
+                <span class="zeit-bild"><Bild id={ab.bild} /></span>
+                <span>{t(ab.name)}</span>
+                <Symbol name="stift" />
+              </button>
+              {#if ABSCHNITTE.length > 1 && loeschenFragen !== ab.id}
+                <button class="knopf rund klein loeschen" onclick={() => (loeschenFragen = ab.id)} aria-label={t('{name} löschen', { name: t(ab.name) })} title={t('Löschen')}><Symbol name="muell" /></button>
+              {/if}
+            </div>
             <div class="von-bis">
               <span class="name">{t('von')}</span>
               <ZeitWahl bind:wert={app.plan.zeiten[ab.id]} label={t('{name} von', { name: t(ab.name) })} />
@@ -424,19 +446,15 @@ import { FREI_MAX_KACHELN, istPro } from '../lib/lizenz.svelte'
               {#if naechster}
                 <ZeitWahl bind:wert={app.plan.zeiten[naechster.id]} label={t('{name} bis', { name: t(ab.name) })} />
               {:else}
-                <span class="bis-auto">{t('bis Aufstehen')}</span>
+                <span class="bis-auto" title={t('Aufstehen (nächster Tag)')}>{t('Aufstehen')}</span>
               {/if}
             </div>
-            {#if ABSCHNITTE.length > 1}
-              {#if loeschenFragen === ab.id}
-                <div class="reihe">
-                  <button class="knopf klein gefahr" onclick={() => (abschnittLoeschen(ab.id), (loeschenFragen = null))}>{t('Ja, löschen')}</button>
-                  <button class="knopf klein" onclick={() => (loeschenFragen = null)}>{t('Nein')}</button>
-                </div>
-                <span class="hilfe">{t('Die Aufgaben wandern in {name}.', { name: ABSCHNITTE[Math.max(0, i === 0 ? 1 : i - 1)].name })}</span>
-              {:else}
-                <button class="knopf klein loeschen" onclick={() => (loeschenFragen = ab.id)} aria-label={t('{name} löschen', { name: t(ab.name) })}><Symbol name="muell" />{t('Löschen')}</button>
-              {/if}
+            {#if ABSCHNITTE.length > 1 && loeschenFragen === ab.id}
+              <span class="hilfe">{t('Löschen? Die Aufgaben wandern in {name}.', { name: t(ABSCHNITTE[Math.max(0, i === 0 ? 1 : i - 1)].name) })}</span>
+              <div class="reihe">
+                <button class="knopf klein gefahr" onclick={() => (abschnittLoeschen(ab.id), (loeschenFragen = null))}>{t('Ja, löschen')}</button>
+                <button class="knopf klein" onclick={() => (loeschenFragen = null)}>{t('Nein')}</button>
+              </div>
             {/if}
             {#if naechster && minutenVon(app.plan.zeiten[ab.id]) >= minutenVon(app.plan.zeiten[naechster.id])}
               <span class="warnung">{t('„bis“ muss nach „von“ liegen')}</span>
@@ -454,8 +472,7 @@ import { FREI_MAX_KACHELN, istPro } from '../lib/lizenz.svelte'
     <section>
       <h3>{t('Wann erscheint das Ruhebild?')}</h3>
       <p class="zh">
-        {t('Nach einer Weile ohne Bedienung erscheint ein Ruhebild, wenn gerade kein Timer läuft. Hat eine Aufgabe eine feste Zeit (von–bis), wird sie in dieser Zeit groß gezeigt.')}
-        {t('Eine Taste auf der Fernbedienung oder Antippen führt zurück.')}
+        {t('Erscheint nach einer Weile ohne Bedienung, wenn kein Timer läuft. Aufgaben mit fester Uhrzeit werden dann groß gezeigt. Antippen oder eine Taste führt zurück.')}
       </p>
       <div class="z">
         <span class="zl">{t('Für alle Geräte')}</span>
@@ -483,8 +500,9 @@ import { FREI_MAX_KACHELN, istPro } from '../lib/lizenz.svelte'
         </p>
       </div>
       <div class="z">
-        <span class="zl">{t('Nachts schwarz (Schlafen bis Aufstehen)')}</span>
+        <span class="zl">{t('Nachts schwarz')}</span>
         <div class="zr">{@render schalter(!!app.einst.ruheNacht, (v) => (app.einst.ruheNacht = v))}</div>
+        <p class="zh">{t('Von Schlafen bis Aufstehen.')}</p>
       </div>
       <div class="z">
         <span class="zl">{t('Mini-Countdown in der Ecke')}</span>
@@ -500,9 +518,12 @@ import { FREI_MAX_KACHELN, istPro } from '../lib/lizenz.svelte'
           <button class="knopf klein" aria-pressed={(app.einst.ruheArt ?? 'jahreszeit') === 'jahreszeit'} onclick={() => (app.einst.ruheArt = 'jahreszeit')}>{t('Jahreszeit')}</button>
           <button class="knopf klein" aria-pressed={app.einst.ruheArt === 'fotos'} onclick={() => (app.einst.ruheArt = 'fotos')}>{t('Eigene Fotos')}</button>
           <button class="knopf klein" aria-pressed={app.einst.ruheArt === 'schwarz'} onclick={() => (app.einst.ruheArt = 'schwarz')}>{t('Schwarz')}</button>
-          <button class="knopf klein" onclick={() => ((app.dialog = null), (app.ruheVorschau = true))}>{t('Vorschau zeigen')}</button>
         </div>
         {#if app.einst.ruheArt === 'schwarz'}<p class="zh">{t('„Schwarz“ macht den Bildschirm ganz dunkel. Bewegen, Antippen oder eine Taste holt die App zurück.')}</p>{/if}
+      </div>
+      <div class="z">
+        <span class="zl">{t('Vorschau')}</span>
+        <div class="zr"><button class="knopf klein" onclick={() => ((app.dialog = null), (app.ruheVorschau = true))}>{t('Ruhebild jetzt zeigen')}</button></div>
       </div>
     </section>
     {#if (app.einst.ruheArt ?? 'jahreszeit') === 'jahreszeit'}
@@ -515,7 +536,7 @@ import { FREI_MAX_KACHELN, istPro } from '../lib/lizenz.svelte'
         {#if !__STORE__}
         <div class="feld">
           <span class="name">{wetterName ? t('Echtes Wetter im Bild (jetzt: {ort})', { ort: wetterName }) : t('Echtes Wetter im Bild')}</span>
-          <div class="reihe">
+          <div class="mit-knopf">
             <input type="text" bind:value={ortEingabe} placeholder={t('Ort, z. B. Göttingen')} aria-label={t('Ort für das Wetter')} onkeydown={(ev) => ev.key === 'Enter' && void ortSuche()} />
             <button class="knopf klein" onclick={() => void ortSuche()}>{t('Suchen')}</button>
             {#if app.einst.wetterOrt}<button class="knopf klein" onclick={() => (app.einst.wetterOrt = undefined)}>{t('Kein Wetter')}</button>{/if}
@@ -575,7 +596,7 @@ import { FREI_MAX_KACHELN, istPro } from '../lib/lizenz.svelte'
     <section>
       <h3>{t('Abgleich')}</h3>
       <label class="feld">
-        <span class="name">{t('Familien-Passwort (auf allen Geräten gleich)')}</span>
+        <span class="name">{t('Familien-Passwort')}</span>
         <span class="mit-knopf">
           <input
             id="abgleich-passwort"
@@ -590,10 +611,10 @@ import { FREI_MAX_KACHELN, istPro } from '../lib/lizenz.svelte'
       </label>
       {#if e.rolle === 'planer'}
         <label class="feld">
-          <span class="name">{t('GitHub-Token (nur zum Hochladen nötig)')}</span>
+          <span class="name">{t('GitHub-Token')}</span>
           <input id="abgleich-token" type="password" bind:value={e.token} onchange={aenderung} autocomplete="off" placeholder="github_pat_…" />
         </label>
-        <p class="hilfe">{t('Der Token wird verschlüsselt mit dem Plan übertragen. So kann auch der Fernseher melden, was die Kinder abgehakt haben, und du siehst es hier.')}</p>
+        <p class="hilfe">{t('Nur zum Hochladen nötig. Er wird verschlüsselt mitgeschickt, damit auch der Fernseher Abgehaktes melden kann.')}</p>
       {:else if istEingerichtet()}
         <p class="hilfe">
           {e.token ? t('Abgehakte Aufgaben werden an Handy und PC gemeldet.') : t('Abhaken wird gemeldet, sobald der Plan einmal vom Planer-Gerät hochgeladen wurde.')}
@@ -632,10 +653,10 @@ import { FREI_MAX_KACHELN, istPro } from '../lib/lizenz.svelte'
     <section>
       <h3>{t('Gemeinsame Datei (eigener Speicher)')}{__STORE__ ? '' : ' – ' + t('Test')}</h3>
       <p class="zh">
-        {t('Du wählst selbst, wo der Plan liegt – zum Beispiel in Google Drive, Nextcloud oder auf dem Gerät. Die App legt dort eine verschlüsselte Datei ab und gleicht sie auf allen Geräten ab, die dieselbe Datei und dasselbe Passwort nutzen. Die jüngere Änderung gewinnt. Es läuft nichts über Server des App-Anbieters.')}
+        {t('Der Plan liegt verschlüsselt in einer Datei deiner Wahl, z. B. in Google Drive oder Nextcloud. Alle Geräte mit derselben Datei und demselben Passwort gleichen sich ab. Es läuft nichts über Server des Anbieters.')}
       </p>
       <label class="feld">
-        <span class="name">{t('Familien-Passwort (auf allen Geräten gleich)')}</span>
+        <span class="name">{t('Familien-Passwort')}</span>
         <input id="datei-passwort" type="password" bind:value={datei.passwort} onchange={passwortSpeichern} autocomplete="off" placeholder={t('z. B. hase-sonne-blau-17')} />
       </label>
       <div class="reihe">
@@ -658,7 +679,7 @@ import { FREI_MAX_KACHELN, istPro } from '../lib/lizenz.svelte'
     <section>
       <h3>{__STORE__ ? t('Plan sichern und teilen') : t('Sichern')}</h3>
       {#if __STORE__}
-        <p class="zh">{t('Alle Daten bleiben auf diesem Gerät. Um den Plan auf ein anderes Gerät zu bringen (Partner, Tablet, Fernseher), speicherst du ihn als Datei, schickst ihn per Nachricht oder E-Mail und lädst ihn dort wieder.')}</p>
+        <p class="zh">{t('Alle Daten bleiben auf diesem Gerät. Für ein zweites Gerät den Plan als Datei sichern, verschicken und dort laden.')}</p>
       {/if}
       <div class="reihe">
         <button class="knopf" onclick={exportieren}>{t('Plan als Datei sichern')}</button>
@@ -702,11 +723,10 @@ import { FREI_MAX_KACHELN, istPro } from '../lib/lizenz.svelte'
       <h3>{t('Info und Datenschutz')}</h3>
       <Lizenzen />
     </section>
-    {/if}
-
     <p class="info">
-      {istApp ? t('Tagolino App') : t('Tagolino im Browser')}{update.aktuell ? ' · ' + t('Version 1.0.{nr}', { nr: update.aktuell }) : ''}.
+      {istApp ? t('Tagolino App') : t('Tagolino im Browser')}{update.aktuell ? ' · ' + t('Version 1.0.{nr}', { nr: update.aktuell }) : ''}
     </p>
+    {/if}
   </div>
 </Fenster>
 
@@ -716,13 +736,20 @@ import { FREI_MAX_KACHELN, istPro } from '../lib/lizenz.svelte'
     top: -2px;
     z-index: 2;
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
     gap: 6px;
     padding: 4px 0 10px;
     background: var(--tafel);
     border-bottom: 2px solid var(--linie);
   }
+  .reiter::-webkit-scrollbar {
+    display: none;
+  }
   .reiter-knopf {
+    flex: none;
+    white-space: nowrap;
     padding: 0.45em 0.9em;
     border: 2px solid var(--linie);
     border-radius: 999px;
@@ -780,6 +807,24 @@ import { FREI_MAX_KACHELN, istPro } from '../lib/lizenz.svelte'
     background: var(--himmel);
     color: var(--tinte);
     font: inherit;
+  }
+  .zeit-kopf {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    /* Zeiten unten bündig, auch wenn ein Name zweizeilig ist */
+    margin-bottom: auto;
+  }
+  .zeit-kopf .zeit-name {
+    flex: 1;
+    min-width: 0;
+  }
+  .loeschen {
+    flex: none;
+    width: 40px;
+    height: 40px;
+    min-height: 0;
+    padding: 0;
   }
   .zeit-name {
     display: flex;
@@ -844,6 +889,7 @@ import { FREI_MAX_KACHELN, istPro } from '../lib/lizenz.svelte'
   .zr {
     display: flex;
     flex-wrap: wrap;
+    align-items: center;
     gap: 8px;
     min-width: 0;
   }
@@ -878,6 +924,10 @@ import { FREI_MAX_KACHELN, istPro } from '../lib/lizenz.svelte'
   @media (max-width: 560px) {
     .z {
       grid-template-columns: 1fr;
+    }
+    /* Auswahlknöpfe füllen die Zeile gleichmäßig, keine einzelnen Knöpfe in einer neuen Zeile */
+    .zr > .knopf {
+      flex: 1 1 auto;
     }
   }
   h3 {
@@ -977,6 +1027,9 @@ import { FREI_MAX_KACHELN, istPro } from '../lib/lizenz.svelte'
     line-height: 1.1;
   }
   .bis-auto {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
     font-weight: 700;
     color: var(--tinte-leise);
   }

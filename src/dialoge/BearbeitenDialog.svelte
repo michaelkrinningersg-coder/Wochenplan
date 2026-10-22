@@ -185,20 +185,18 @@
 
       <div class="feld zwei">
         <div>
-          <span class="name">{t('Countdown')}</span>
+          <span class="name">{t('Countdown „noch X× schlafen“')}</span>
           <div class="reihe">
-            <button type="button" class="knopf klein" aria-pressed={!!entwurf.countdown} onclick={() => (entwurf.countdown = !entwurf.countdown)}>
-              {entwurf.countdown ? t('Ja: „noch X× schlafen“') : t('Nein')}
-            </button>
+            <button type="button" class="knopf klein" aria-pressed={!!entwurf.countdown} onclick={() => (entwurf.countdown = true)}>{t('An')}</button>
+            <button type="button" class="knopf klein" aria-pressed={!entwurf.countdown} onclick={() => (entwurf.countdown = false)}>{t('Aus')}</button>
           </div>
         </div>
         {#if app.einst.sternenregen === 'auswahl'}
           <div>
             <span class="name">{t('Sternenregen')}</span>
             <div class="reihe">
-              <button type="button" class="knopf klein" aria-pressed={!!entwurf.sternenregen} onclick={() => (entwurf.sternenregen = !entwurf.sternenregen)}>
-                {entwurf.sternenregen ? t('Ja ★') : t('Nein')}
-              </button>
+              <button type="button" class="knopf klein" aria-pressed={!!entwurf.sternenregen} onclick={() => (entwurf.sternenregen = true)}>{t('An')}</button>
+              <button type="button" class="knopf klein" aria-pressed={!entwurf.sternenregen} onclick={() => (entwurf.sternenregen = false)}>{t('Aus')}</button>
             </div>
           </div>
         {/if}
@@ -312,9 +310,9 @@
         {/if}
         {#if !neu}
           {#if loeschenFragen}
-            <button type="button" class="knopf gefahr" onclick={loeschen}><Symbol name="muell" />{t('Wirklich löschen')}</button>
+            <button type="button" class="knopf gefahr rechts" onclick={loeschen}><Symbol name="muell" />{t('Wirklich löschen')}</button>
           {:else}
-            <button type="button" class="knopf gefahr" onclick={() => (loeschenFragen = true)}><Symbol name="muell" />{t('Löschen')}</button>
+            <button type="button" class="knopf gefahr rechts" onclick={() => (loeschenFragen = true)}><Symbol name="muell" />{t('Löschen')}</button>
           {/if}
         {/if}
       </div>
@@ -500,6 +498,9 @@
     flex-wrap: wrap;
     gap: 10px;
     padding-top: 6px;
+  }
+  .aktionen .rechts {
+    margin-left: auto;
   }
   @media (max-width: 640px) {
     .formular {
