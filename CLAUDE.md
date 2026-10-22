@@ -36,6 +36,8 @@ Jedes Motiv wird als eigene SVG-Figur in `src/komponenten/GemalteFigur.svelte` g
   erzeugt aus `tools/gemalt/b1.py`–`b4.py` mit `python3 tools/gemalt/erzeugen.py` (schreibt auch `src/lib/gemaltliste.ts`).
 - Gleiche Stilregeln wie oben; Bild 100×100, Boden bei y ≈ 92, Bewegung über die Art (`wackeln`, `atmen`, `schweben` …).
 - Namen in `src/lib/i18n/woerter-gemalt.ts` übersetzen; sie erscheinen in jeder Kategorie vor den älteren Fluent-Symbolen.
+- Personen (Kategorie „Leute“) gibt es je in drei Hautfarben (`PERSONEN` in `b4.py`, Varianten `w`/`l`/`s`); neue Personen ebenso anlegen.
+- Schriften: Fredoka (Überschriften) und Lexend (Text), beide OFL, Lizenztexte in `Lizenzen.svelte`.
 
 ## Szenen mit Motion Graphics
 - Je Jahreszeit eine Landschaft (`src/komponenten/Landschaft.svelte`, Ausstattung je Jahreszeit in `SAISON`): Bild 1600×900,

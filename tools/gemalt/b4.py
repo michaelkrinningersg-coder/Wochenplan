@@ -11,7 +11,7 @@ def kopf(haut, haut_s, haar_hinten, haar_vorn, kleid, kleid_s, extra='', wangen=
  {haar_vorn}{extra}'''
 H1, H1s = '#f6d2b0', '#e8b890'
 H2, H2s = '#d9a06e', '#c08250'
-H3, H3s = '#8a5a3a', '#6e4428'
+H3, H3s = '#7a4a2c', '#5e3820'
 B = [
 ("g-einkaufswagen","Einkaufen","Einkaufen","rattern","""
  <path d="M6 18 L18 18 L28 66 L80 66" stroke="#5a6478" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
@@ -79,38 +79,72 @@ B = [
  <g fill="#2a62b0"><rect x="58" y="52" width="6" height="5" rx="1"/><rect x="66" y="52" width="6" height="5" rx="1"/><rect x="74" y="52" width="6" height="5" rx="1"/><rect x="58" y="59" width="6" height="5" rx="1"/><rect x="66" y="59" width="6" height="5" rx="1"/><rect x="74" y="59" width="6" height="5" rx="1"/></g>
  <circle cx="20" cy="60" r="9" fill="#e8302a"/><rect x="32" y="50" width="12" height="20" rx="2" fill="#fffaf2"/><rect x="32" y="50" width="12" height="6" rx="2" fill="#7fd88a"/>"""),
 # --- Leute ---
-("g-mama","Mama","Leute","wackeln", kopf(H1,H1s,
- '<path d="M24 46 C22 28 34 20 50 20 C66 20 78 28 76 46 L78 80 C70 84 30 84 22 80 Z" fill="#8a4a24"/>',
- '<path d="M30 42 C30 26 42 22 52 22 C64 22 72 30 70 42 C62 34 48 32 30 42 Z" fill="#a85a2a"/>',
- '#e8452b','#b8301c','<circle cx="30" cy="56" r="2" fill="#ffd23a"/><circle cx="70" cy="56" r="2" fill="#ffd23a"/>')),
-("g-papa","Papa","Leute","wackeln", kopf(H2,H2s,'',
- '<path d="M30 40 C28 22 44 18 54 20 C66 22 74 30 70 42 C66 34 56 30 44 32 C38 34 32 38 30 40 Z" fill="#3a2a1a"/><path d="M36 60 C40 68 60 68 64 60 C64 64 60 70 50 70 C40 70 36 64 36 60 Z" fill="#3a2a1a"/>',
- '#3b8fd6','#2a62b0','<path d="M44 74 L50 82 L56 74" stroke="#fffaf2" stroke-width="3" fill="none"/>')),
-("g-oma","Oma","Leute","wackeln", kopf(H1,H1s,
- '<circle cx="50" cy="20" r="10" fill="#d8dce6"/>',
- '<path d="M30 44 C28 26 40 22 50 22 C62 22 72 28 70 44 C64 34 54 30 30 44 Z" fill="#e8ecf2"/>',
- '#8462e0','#6a48c8','<g fill="none" stroke="#5a5a6a" stroke-width="2"><circle cx="42" cy="48" r="6"/><circle cx="58" cy="48" r="6"/><path d="M48 48 h4"/></g><path d="M40 72 C44 78 56 78 60 72" stroke="#fffaf2" stroke-width="3" fill="none"/>')),
-("g-opa","Opa","Leute","wackeln", kopf(H2,H2s,
- '<path d="M28 50 C26 40 30 34 34 32 L34 52 Z M72 50 C74 40 70 34 66 32 L66 52 Z" fill="#e8ecf2"/>',
- '<path d="M40 58 C44 54 56 54 60 58 C56 60 44 60 40 58 Z" fill="#e8ecf2"/><path d="M36 38 q6 -4 10 0 M54 38 q6 -4 10 0" stroke="#e8ecf2" stroke-width="3" fill="none"/>',
- '#5ea844','#4a8a30','<g fill="none" stroke="#5a5a6a" stroke-width="2"><rect x="35" y="43" width="12" height="9" rx="3"/><rect x="53" y="43" width="12" height="9" rx="3"/><path d="M47 47 h6"/></g><path d="M40 26 C44 24 56 24 60 26" stroke="#e8b890" stroke-width="2" fill="none"/>')),
-("g-baby","Baby","Leute","wackeln", kopf(H1,H1s,'',
- '<path d="M48 26 C44 18 54 14 56 22 C52 20 50 22 52 26" stroke="#c88a52" stroke-width="2.4" fill="none" stroke-linecap="round"/>',
- '#ffd23a','#e0a820','<circle cx="50" cy="60" r="6" fill="#ff8fb1"/><circle cx="50" cy="60" r="3" fill="#fff4f8"/><rect x="47" y="54" width="6" height="4" rx="1.6" fill="#7fc8ff"/>', augen='zu')),
-("g-bruder","Bruder","Leute","wackeln", kopf(H3,H3s,'',
- '<path d="M30 42 C28 24 42 20 52 22 C62 20 74 28 70 42 C64 30 54 34 46 30 C40 34 34 36 30 42 Z" fill="#1d1a1a"/>',
- '#f08a24','#c8661a','<rect x="36" y="80" width="28" height="6" rx="3" fill="#fffaf2" opacity=".6"/>')),
-("g-schwester","Schwester","Leute","wackeln", kopf(H1,H1s,
- '<path d="M22 50 C16 58 18 70 24 74 C28 66 28 56 26 48 Z M78 50 C84 58 82 70 76 74 C72 66 72 56 74 48 Z" fill="#e0a83c"/>',
- '<path d="M30 44 C28 26 40 22 50 22 C62 22 72 28 70 44 C66 34 58 30 48 32 C40 34 34 38 30 44 Z" fill="#f2c25a"/><circle cx="24" cy="46" r="4" fill="#ff5d8f"/><circle cx="76" cy="46" r="4" fill="#ff5d8f"/>',
- '#ff8fb1','#e86a94','')),
-("g-freunde","Freunde treffen","Leute","wackeln", '<g transform="translate(-16 6) scale(.8)">'+kopf(H3,H3s,'<path d="M24 44 C20 26 34 18 50 18 C66 18 80 26 76 44 C76 56 70 62 66 62 L34 62 C30 62 24 56 24 44 Z" fill="#1d1a1a"/>','','#7fd88a','#5cbf6a','')+'</g><g transform="translate(36 6) scale(.8)">'+kopf(H1,H1s,'','<path d="M30 42 C28 24 42 20 52 22 C62 20 74 28 70 42 C64 32 52 28 30 42 Z" fill="#c8561a"/>','#3b8fd6','#2a62b0','')+'</g><path d="M42 82 C48 76 52 76 58 82" stroke="#f6d2b0" stroke-width="6" fill="none" stroke-linecap="round"/>'),
-("g-erzieherin","Erzieherin","Leute","wackeln", kopf(H2,H2s,
- '<path d="M24 46 C22 26 36 18 50 18 C64 18 78 26 76 46 C76 56 72 60 68 60 L32 60 C28 60 24 56 24 46 Z" fill="#3a2418"/>',
- '<path d="M30 40 C32 26 44 22 52 22 C62 22 70 30 70 40 C60 34 44 32 30 40 Z" fill="#4a2e1e"/>',
- '#7fd3ff','#4fb4e6','<rect x="38" y="78" width="24" height="16" rx="3" fill="#fffaf2"/><circle cx="46" cy="86" r="3" fill="#ffd23a"/><circle cx="54" cy="86" r="3" fill="#e8452b"/>')),
-("g-aerztin","Kinderärztin","Leute","wackeln", kopf(H1,H1s,
- '<path d="M24 46 C22 28 34 20 50 20 C66 20 78 28 76 46 L76 62 L24 62 Z" fill="#c8561a"/>',
- '<path d="M30 42 C30 26 42 22 52 22 C64 22 72 30 70 42 C62 34 48 32 30 42 Z" fill="#e0702a"/>',
- '#fffaf2','#e2dccf','<path d="M38 74 C34 84 40 90 46 88 M62 74 C66 84 60 90 54 88" stroke="#5a6478" stroke-width="2.4" fill="none"/><circle cx="50" cy="88" r="4" fill="#9aa2ae"/><path d="M66 80 h8 M70 76 v8" stroke="#e8452b" stroke-width="3"/>')),
 ]
+# Leute: jede Person in drei Varianten (hell, mittel, dunkel). Die bisherige Kennung behält ihre Hautfarbe.
+HAUT = {'w': (H1, H1s), 'l': (H2, H2s), 's': (H3, H3s)}
+# Haarfarben je Variante: (hinten, vorn)
+HAAR = {'w': None, 'l': ('#3a2418', '#4a2e1e'), 's': ('#1d1a1a', '#2e2622')}
+def _haar(v, hinten, vorn):
+    return (hinten, vorn) if HAAR[v] is None else HAAR[v]
+def mama(v):
+    h, hs = HAUT[v]; a, b = _haar(v, '#8a4a24', '#a85a2a')
+    return kopf(h, hs, f'<path d="M24 46 C22 28 34 20 50 20 C66 20 78 28 76 46 L78 80 C70 84 30 84 22 80 Z" fill="{a}"/>',
+        f'<path d="M30 42 C30 26 42 22 52 22 C64 22 72 30 70 42 C62 34 48 32 30 42 Z" fill="{b}"/>',
+        '#e8452b','#b8301c','<circle cx="30" cy="56" r="2" fill="#ffd23a"/><circle cx="70" cy="56" r="2" fill="#ffd23a"/>')
+def papa(v, bart=False):
+    h, hs = HAUT[v]; a, b = _haar(v, '#8a5a2e', '#b07a44')
+    return kopf(h, hs, '',
+        f'<path d="M30 40 C28 22 44 18 54 20 C66 22 74 30 70 42 C66 34 56 30 44 32 C38 34 32 38 30 40 Z" fill="{a}"/><path d="M34 30 C40 24 50 22 58 24 C50 25 42 28 36 33 Z" fill="{b}" opacity=".55"/>'
+        + (f'<path d="M36 60 C40 68 60 68 64 60 C64 64 60 70 50 70 C40 70 36 64 36 60 Z" fill="{a}"/>' if bart else ''),
+        '#3b8fd6','#2a62b0','<path d="M44 74 L50 82 L56 74" stroke="#fffaf2" stroke-width="3" fill="none"/>')
+def oma(v):
+    h, hs = HAUT[v]
+    return kopf(h, hs, '<circle cx="50" cy="20" r="10" fill="#d8dce6"/>',
+        '<path d="M30 44 C28 26 40 22 50 22 C62 22 72 28 70 44 C64 34 54 30 30 44 Z" fill="#e8ecf2"/>',
+        '#8462e0','#6a48c8','<g fill="none" stroke="#5a5a6a" stroke-width="2"><circle cx="42" cy="48" r="6"/><circle cx="58" cy="48" r="6"/><path d="M48 48 h4"/></g><path d="M40 72 C44 78 56 78 60 72" stroke="#fffaf2" stroke-width="3" fill="none"/>')
+def opa(v):
+    h, hs = HAUT[v]
+    return kopf(h, hs, '<path d="M28 50 C26 40 30 34 34 32 L34 52 Z M72 50 C74 40 70 34 66 32 L66 52 Z" fill="#e8ecf2"/>',
+        '<path d="M40 58 C44 54 56 54 60 58 C56 60 44 60 40 58 Z" fill="#e8ecf2"/><path d="M36 38 q6 -4 10 0 M54 38 q6 -4 10 0" stroke="#e8ecf2" stroke-width="3" fill="none"/>',
+        '#5ea844','#4a8a30',f'<g fill="none" stroke="#5a5a6a" stroke-width="2"><rect x="35" y="43" width="12" height="9" rx="3"/><rect x="53" y="43" width="12" height="9" rx="3"/><path d="M47 47 h6"/></g><path d="M40 26 C44 24 56 24 60 26" stroke="{hs}" stroke-width="2" fill="none"/>')
+def baby(v):
+    h, hs = HAUT[v]; a, _ = _haar(v, '#c88a52', '')
+    return kopf(h, hs, '', f'<path d="M48 26 C44 18 54 14 56 22 C52 20 50 22 52 26" stroke="{a}" stroke-width="2.4" fill="none" stroke-linecap="round"/>',
+        '#ffd23a','#e0a820','<circle cx="50" cy="60" r="6" fill="#ff8fb1"/><circle cx="50" cy="60" r="3" fill="#fff4f8"/><rect x="47" y="54" width="6" height="4" rx="1.6" fill="#7fc8ff"/>', augen='zu')
+def bruder(v):
+    h, hs = HAUT[v]; a, _ = _haar(v, '#a8642a', '')
+    return kopf(h, hs, '', f'<path d="M30 42 C28 24 42 20 52 22 C62 20 74 28 70 42 C64 30 54 34 46 30 C40 34 34 36 30 42 Z" fill="{a}"/>',
+        '#f08a24','#c8661a','<rect x="36" y="80" width="28" height="6" rx="3" fill="#fffaf2" opacity=".6"/>')
+def schwester(v):
+    h, hs = HAUT[v]; a, b = _haar(v, '#e0a83c', '#f2c25a')
+    return kopf(h, hs, f'<path d="M22 50 C16 58 18 70 24 74 C28 66 28 56 26 48 Z M78 50 C84 58 82 70 76 74 C72 66 72 56 74 48 Z" fill="{a}"/>',
+        f'<path d="M30 44 C28 26 40 22 50 22 C62 22 72 28 70 44 C66 34 58 30 48 32 C40 34 34 38 30 44 Z" fill="{b}"/><circle cx="24" cy="46" r="4" fill="#ff5d8f"/><circle cx="76" cy="46" r="4" fill="#ff5d8f"/>',
+        '#ff8fb1','#e86a94','')
+def freunde(v1, v2):
+    h1, hs1 = HAUT[v1]; h2, hs2 = HAUT[v2]
+    a1, _ = _haar(v1, '#6a3a1e', ''); a2, _ = _haar(v2, '#c8561a', '')
+    return ('<g transform="translate(-16 6) scale(.8)">'+kopf(h1,hs1,f'<path d="M24 44 C20 26 34 18 50 18 C66 18 80 26 76 44 C76 56 70 62 66 62 L34 62 C30 62 24 56 24 44 Z" fill="{a1}"/>','','#7fd88a','#5cbf6a','')
+        +'</g><g transform="translate(36 6) scale(.8)">'+kopf(h2,hs2,'',f'<path d="M30 42 C28 24 42 20 52 22 C62 20 74 28 70 42 C64 32 52 28 30 42 Z" fill="{a2}"/>','#3b8fd6','#2a62b0','')
+        +f'</g><path d="M42 82 C48 76 52 76 58 82" stroke="{h2}" stroke-width="6" fill="none" stroke-linecap="round"/>')
+def erzieherin(v):
+    h, hs = HAUT[v]; a, b = _haar(v, '#7a4a24', '#8a5a2e')
+    return kopf(h, hs, f'<path d="M24 46 C22 26 36 18 50 18 C64 18 78 26 76 46 C76 56 72 60 68 60 L32 60 C28 60 24 56 24 46 Z" fill="{a}"/>',
+        f'<path d="M30 40 C32 26 44 22 52 22 C62 22 70 30 70 40 C60 34 44 32 30 40 Z" fill="{b}"/>',
+        '#7fd3ff','#4fb4e6','<rect x="38" y="78" width="24" height="16" rx="3" fill="#fffaf2"/><circle cx="46" cy="86" r="3" fill="#ffd23a"/><circle cx="54" cy="86" r="3" fill="#e8452b"/>')
+def aerztin(v):
+    h, hs = HAUT[v]; a, b = _haar(v, '#c8561a', '#e0702a')
+    return kopf(h, hs, f'<path d="M24 46 C22 28 34 20 50 20 C66 20 78 28 76 46 L76 62 L24 62 Z" fill="{a}"/>',
+        f'<path d="M30 42 C30 26 42 22 52 22 C64 22 72 30 70 42 C62 34 48 32 30 42 Z" fill="{b}"/>',
+        '#fffaf2','#e2dccf','<path d="M38 74 C34 84 40 90 46 88 M62 74 C66 84 60 90 54 88" stroke="#5a6478" stroke-width="2.4" fill="none"/><circle cx="50" cy="88" r="4" fill="#9aa2ae"/><path d="M66 80 h8 M70 76 v8" stroke="#e8452b" stroke-width="3"/>')
+# (Kennung, Name, Zeichnung, Variante der bisherigen Kennung)
+PERSONEN = [('mama','Mama',mama,'w'),('papa','Papa',papa,'w'),('oma','Oma',oma,'w'),('opa','Opa',opa,'l'),
+    ('baby','Baby',baby,'w'),('bruder','Bruder',bruder,'s'),('schwester','Schwester',schwester,'w'),
+    ('erzieherin','Erzieherin',erzieherin,'l'),('aerztin','Kinderärztin',aerztin,'w')]
+for k, name, f, alt in PERSONEN:
+    for v in 'wls':
+        kennung = f'g-{k}' if v == alt else f'g-{k}-{v}'
+        inhalt = papa(v, bart=True) if (k == 'papa' and v == 'l') else f(v)
+        B.append((kennung, name, 'Leute', 'wackeln', inhalt))
+B.append(('g-freunde','Freunde treffen','Leute','wackeln', freunde('s','w')))
+B.append(('g-freunde-l','Freunde treffen','Leute','wackeln', freunde('w','l')))
+B.append(('g-freunde-s','Freunde treffen','Leute','wackeln', freunde('l','s')))

@@ -2,7 +2,7 @@
   // Datenschutz-Kurzfassung und Lizenzen der verwendeten Bausteine (in der App, auch ohne Internet lesbar)
   import { t } from '../lib/i18n.svelte'
   import fluent from '../assets/icons/LICENSE-fluentui-emoji.txt?raw'
-  import andika from '../assets/fonts/LICENSE-Andika-OFL.txt?raw'
+  import lexend from '../assets/fonts/LICENSE-Lexend-OFL.txt?raw'
   import fredoka from '../assets/fonts/LICENSE-Fredoka-OFL.txt?raw'
   import svelteLizenz from '../../node_modules/svelte/LICENSE.md?raw'
   import capacitor from '../../node_modules/@capacitor/core/LICENSE?raw'
@@ -12,7 +12,7 @@
   const LIZENZEN = [
     { name: 'Bilder (Symbole): Microsoft Fluent Emoji', text: fluent },
     { name: 'Schrift Fredoka', text: fredoka },
-    { name: 'Schrift Andika', text: andika },
+    { name: 'Schrift Lexend', text: lexend },
     { name: 'Svelte', text: svelteLizenz },
     { name: 'Capacitor', text: capacitor },
     { name: 'Capacitor Keep Awake', text: keepAwake },
@@ -38,7 +38,7 @@
 <details>
   <summary>{t('Bilder und Lizenzen')}</summary>
   <div class="text">
-    <p>{t('Die großen Szenenbilder auf den Karten sind KI-generiert (Google Gemini). Die kleinen Symbole stammen von Microsoft Fluent Emoji (MIT-Lizenz). Schriften: Fredoka und Andika (SIL Open Font License 1.1).')}</p>
+    <p>{t('Die großen Szenenbilder auf den Karten sind KI-generiert (Google Gemini). Figuren, Szenen und viele Bilder sind selbst gezeichnet; die übrigen kleinen Symbole stammen von Microsoft Fluent Emoji (MIT-Lizenz). Schriften: Fredoka und Lexend (SIL Open Font License 1.1).')}</p>
     {#each LIZENZEN as l (l.name)}
       <details class="innen">
         <summary>{t(l.name)}</summary>

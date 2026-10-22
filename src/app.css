@@ -1,26 +1,19 @@
 /* Wochenplan – Gestaltung
    Idee: Der Tag als Himmel. Jeder Tagesabschnitt hat seine Himmelsfarbe (Morgenrot → Abendblau),
    Aufgaben sind „Magnete“ auf einer Tafel, eine Sonne wandert über den Tag.
-   Schrift: Fredoka (rund, freundlich) für Überschriften, Andika (für Leseanfänger) für Beschriftungen. */
+   Schrift: Fredoka (rund, freundlich) für Überschriften, Lexend (gut lesbar, auch für Leseanfänger) für Beschriftungen. */
 
+@font-face {
+  font-family: 'Lexend';
+  src: url('./assets/fonts/lexend-latin-wght-normal.woff2') format('woff2-variations');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
 @font-face {
   font-family: 'Fredoka';
   src: url('./assets/fonts/fredoka-latin-wght-normal.woff2') format('woff2-variations');
   font-weight: 300 700;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Andika';
-  src: url('./assets/fonts/andika-latin-400-normal.woff2') format('woff2');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Andika';
-  src: url('./assets/fonts/andika-latin-700-normal.woff2') format('woff2');
-  font-weight: 700;
   font-style: normal;
   font-display: swap;
 }
@@ -74,8 +67,8 @@
   /* Schrift auf den hellen Abschnittsfarben – in beiden Themen gleich */
   --tinte-auf-farbe: #1d2b4f;
 
-  --schrift-titel: 'Fredoka', 'Andika', 'Trebuchet MS', system-ui, sans-serif;
-  --schrift-text: 'Andika', 'Fredoka', 'Trebuchet MS', system-ui, sans-serif;
+  --schrift-titel: 'Fredoka', 'Lexend', 'Trebuchet MS', system-ui, sans-serif;
+  --schrift-text: 'Lexend', 'Fredoka', 'Trebuchet MS', system-ui, sans-serif;
 
   --t-klein: clamp(13px, 1.35vw, 18px);
   --t-text: clamp(15px, 1.7vw, 22px);
