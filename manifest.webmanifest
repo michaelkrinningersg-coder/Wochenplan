@@ -1,0 +1,16 @@
+{
+  "name": "Tagolino",
+  "short_name": "Tagolino",
+  "description": "Was ist heute dran? Tagesplan mit Bildern, Timer und Ampel.",
+  "lang": "de",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "any",
+  "background_color": "#e3edf6",
+  "theme_color": "#e3edf6",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
